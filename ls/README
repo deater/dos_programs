@@ -1,0 +1,9 @@
+This is an implementation of the UNIX (well, IRIX in this case)
+"ls" command written in Pascal for DOS.
+
+I made this because after a summer of using an IRIX machine I kept typing
+ls on my family's DOS machine.
+
+This was probably the first code I ever uploaded to the internet, I think
+I uploaded it to SIMTEL or maybe SUNSITE in the 1995 timeframe.
+
