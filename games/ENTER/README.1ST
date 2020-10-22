@@ -1,0 +1,20 @@
+Ok...here is a USS enterprise Shape rotation made by me....Vince weaver
+                                      Deater#23 Utopia BBS 410-557-0868
+
+I made this using the Book HIGH PREFORMANCE INTERACTIVE GRAPHICS
+                           by Lee Adams (tab Books)
+It told how to make a 3D cube in basic...
+I added....
+     The shape of the enterprise
+     Rotation Commands
+     it's in Pascal
+     Page flipping.
+I might be persuaded to release the source code.
+Directions: Q quits
+   1,2 :Get closer, farther away respectively
+   3,4 :Move Left, right respectively
+   5,6 :Move it Up, and down respectively
+   7,8 :Make it biggrt, smaller respectively
+   9,0 :rotate  \
+   O,P :rotate  |- One of these is roll, pitch, yaw..not sure 
+   L,; :rotate  /         which is which

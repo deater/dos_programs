@@ -1,0 +1,203 @@
+
+     SPACEWAR III                                     (C) Vince Weaver
+      SPACEWAR III                                              1994
+       SPACEWAR III                              
+        SPACEWAR III                                  Version 1.35
+
+     A nifty space shoot-em-up.
+    
+  1.  General Info
+  ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+     I. HOW TO BEGIN
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     If you are so happy you have bought/downloaded/been forced to play the 
+     author/ this game you wish to start right up all you have to do is
+     type:
+
+                sw3        
+     
+     The help menu might be helpfull, and there is a hidden message in the
+     acknowledgements.
+
+     II. EXTRA INFORMATION
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+    
+     1.          There is none yet...but watch for newer versions!!!
+
+
+     III.  ABOUT SPACEWAR III
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     Spacewar III is a direct copy off of the original graphics computer
+     game spacewars, developed at MIT in the '60s.  This version is based 
+     on a CGA version by Bill Seiler.  
+     
+     It is written in Turbo Pascal v5.0 and has taken about 6 months
+     of off and on working to produce.  All graphics made in PaintPro.
+
+
+
+     2. COMMANDS/KEYS TO PRESS/STORY/ETC...
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  Player 1 Controls:                           Player 2 Controls:
+  ÉÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍ»              ÉÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍ»
+  º    Q    º    W    º    E    º   Remember   º    7    º    8    º    9    º
+  º         º         º         º  Always Use  º         º         º         º
+  º  Laser  º  Cloak  º Missile º "F5" to Quit º  Laser  º  Cloak  º Missile º
+  ÌÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍ¹              ÌÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍ¹
+  º    A    º    S    º    D    º              º    4    º    5    º    6    º
+  º      <Ä¿º         ºÚÄ>      º              º      <Ä¿º         ºÚÄ>      º
+  º RotateÄÙº Forward ºÀÄRotate º              º RotateÄÙº Forward ºÀÄRotate º
+  ÌÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍ¹              ÌÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍ¹
+  º    Z    º    X    º    C    º              º    1    º    2    º    3    º
+  º         º         º         º              º         º         º         º
+  º Energy  º  Warp   º Shields º              º Energy  º  Warp   º Shields º
+  ÈÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍ¼              ÈÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍ¼
+
+  Your Mission:
+       Use Your Lasers and Missiles to Destroy Your Opponent.
+       Use Your Manuevering and Warp Capabilities to Dodge Attack.
+       And Most Of All, Transfer Your Energy To Shields and Back wisely.
+  
+  Energy Considerations:
+       Missiles:    Consume 1 Unit Of Energy, But Cause 4 Units of Damage
+       Lasers:      Consume 1 Unit Of Energy, But Cause 2 Units of Damage
+       Engines:     Consume 1 Unit Of Energy every Rocket Burn
+       Cloak:       Consume 1 Unit Of Energy Per Second While Engaged
+       Warp:        Consume 8 Units Of Energy To Randomly Relocate Yourself
+  
+
+     3. FREEWARE      <Courtesy of Mark Cox>
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     This software is Freeware - that means that there is no registration fee,
+     you can copy this software, give it to anyone, and use it for anything 
+     (subject to the license at the end of this document).  If you like this
+     program, and wish to support the author-  a gift would be treasured and
+     appreciated, send any spare money, games you made (no viruses please.)
+     ;-)
+
+        
+
+
+     4. LICENSE/WARRANTY
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     The game SPACWAR III and all relating files (SW3.EXE,*.sw3) 
+     have been time-consumingly written by the author. 
+     I will allow you to to:  use the software, make as many copies 
+     of the program and documentation as you wish,  give such copies 
+     to anyone, and distribute the software and documentation via 
+     electronic means.  This means that as a company you could put 
+     SPACEWAR III on any of your Networks freely.
+    
+     This software may be distributed in Shareware/Public Domain libraries
+     that charge for copying and distributing disks.
+    
+     * No Copy Of The Software May Be Distributed Or Given Away Without   *
+     * This Document; And Neither The Program Or Document May Be Altered  *
+     * In Any Way, Or Reverse-Engineered By Disassembly Or Other Method.  *
+    
+     There is no warranty of any kind, and the author is not liable
+     for damages of any kind.  Any viruses, hard disk errors, minor
+     explosions or anything of the sort I did not cause, so it's not 
+     my fauly.  If you useg this software, you agree to all the
+     above terms.
+    
+     
+
+     5. SOME BASIC INFORMATION ON VMW SOFTWARE
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     1.  No, the aforementioned "VMW SOFTWARE" technically does not
+         exist, is not incorporated, and has no tax liscence or any
+         formal papers.  That is why I cannot charge money for anything.
+
+     2.  Yes, the author of this is 16 years old...so any gifts would
+         be helping put him through college or upgrading his computer
+         equipment, or both.  <I have a 1200 baud modem right now>.
+
+     3.  If for some strange reason you would like to write programs
+         under this name, feel free to send me samples, but please 
+         no viruses.  I am not stupid or naive.  I do check all 
+         incoming stuff.  And if you wrote the virus yourself and
+         it is new, please don't ruin my computer.  Please.
+
+     4.  Anyone who wants to steal the name of my company/pipe dream
+         and trademark it so I can't use it, I have one question...
+         why would you want a company with my initials?
+
+     5.  Watch out for other versions and new games.  Thanx.
+
+
+
+
+
+     6.  Other VMW SOFTWARE PRODUCTIONS
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+         A. PAINTPRO:
+               All of my games use this for graphics.  A paint program
+               written by me.  It saves graphics in a text file format
+               that can be loaded easily into any programming language.
+               C, Pascal, and Basic samples included.  Also, screen-
+               capture utility.  Whole program not totaly done, but works
+               just the same.
+
+         B. ADVENTURES IN TIME AND SPACE:
+               OK, so this game is just barely started, but it shows
+               promise.  I am working on it and it has an awesome plot
+               line.  Don't know when it will be done.
+
+         C. Im Weiner Cafe:
+               A game in GERMAN!  Learn German as you play a fun and
+               interesting game based on the DEUTSCH AKTUEL series of
+               books.  Will be done by Sept '94.
+
+         D. BASIC/PASCAL sample programs!!!
+               Over 300 basic/pascal programs doing anything from making
+               fractals to rotating 3-D images of the enterprose, from
+               playing "Little Bird House in Your Soul" to synthesizing
+               space ship engines.
+
+
+         To Get ANy Of These Cool Things, either send me a blank disk
+         In A Self adressed stamped envelope, or somehow get me to 
+         upload it at a board you call.   :->
+
+     
+
+
+     7.  HOW TO REACH ME 
+     ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     I can be reached at many places:
+
+        Vincent Weaver
+        326 Foster Knoll Dr.
+        Joppa, MD 21085-4706
+        USA  Earth, Solar System, Milky Way, etc...
+
+     UTOPIA BBS ---HOME BBS OF VMW SOFTWARE
+
+        410-557-0868-----14.4K baud
+        <My number..and all others may be prone to change because
+         this board always seems to be losing its user list>
+        I am usually #23 Deater  (--Yep a cosysop).
+        23@13034       (RenegadeNet)
+        23@4108        (PlaNet)
+        23@2           (LiveNet)
+
+     INTERNET ----supposedly Utopia somehow gets Internet E-Mail somehow.
+
+        I am (supposedly) 23-4108%oznet@tweekco.ness.com 
+
+     For fastest reply please include Self Adressed Stamped Envelope.
+     For Newest version include blank disk.
+
+     Thanx....Vince Weaver  AKA Deater..........
+
+
+     23-Jun 1994.......11:52:15 EDT.
+
