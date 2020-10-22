@@ -1,0 +1,55 @@
+*********************************************************************
+*                        ls version 1.5                             *
+*********************************************************************
+
+ls.... another exciting VMW software production.
+
+This program (ls.exe) and the included source (ls.pas) emulate the
+Unix command of the same name.  It ignores all the formatting
+switches however; it emulates an "ls -la" command.  The "lls.bat" file
+included just pipes the output to the more command to make it more
+readable.
+
+When compiled, this program can be copied to a directory in the path
+(i.e c:\dos) and then it can be run from anywhere.
+
+Instead of making a clunky batchfile called ls, use this and feel 
+sort of at home on a PC.
+
+I wrote this program in Turbo Pascal 6.0, but I am sure it would
+run on 5.x.  It should compile easily, once loaded into the editor.
+
+Most dos wildcards work similar to the equivelant dir command.
+
+For example:   ls *.exe   is equivelant to   dir *.exe
+               ls c:*.bat is equivelant to   dir c:*.exe
+               ls h.??u   is equivelant to   dir h.??u
+
+The way it works:
+  Using pascal all of the attribute bits are detected through dos.
+  If a file is read only, then it is displayed as such.  Same thing
+  with the system attrubute.  Hidden files are shown with a period
+  in front of them.  Any files ending in the extension bat, com,
+  or exe are marked as executable.  Directories are marked as
+  directories and executable.  The time and date format is exactly
+  the same as an "ls -la" command on an SGI running Irix 5.3.  The
+  main atttributes are replicated three times because of the lack
+  of privledges.  The owner of file is always shown as "root" because
+  on a PC everyone has root privledges.  The source code lacks 
+  comments, but it should not be too difficult to follow.
+
+This program is a freeware VMW software production.
+
+Other VMW software productions, including Tom Bombem (a cool game)
+      can be found at 
+      http:\\www.wam.umd.edu\~vmweaver\tb1
+
+by:
+
+Vince Weaver
+Joppa, Maryland, USA
+
+Contact:
+   vmweaver@wam.umd.edu
+
+   
