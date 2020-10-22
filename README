@@ -3,3 +3,16 @@ roughly 1990 to 1996.
 
 Not to be confused with my "dos33fsprogs" repository which is where
 I store all of my Apple II (Apple DOS33) related work.
+
+
+ll:		linux_logo in assembly
+ls:		DOS version of the UNIX ls utility
+gwbasic:	various BASICA, GWBASIC programs
+paintpro.*	A paint program for DOS I wrote (its full name
+		was PAINTPROGRAM but DOS 8.3 filenames truncated it)
+pascal		various Turbo Pascal programs
+games:		various games I wrote
+gwbasic_bot:	demos that run on the gwbasic bot
+qbasic:		various QBASIC programs
+tb1:		game I wrote
+xmas:		Christmas demos I wrote
