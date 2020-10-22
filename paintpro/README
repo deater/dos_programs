@@ -1,0 +1,6 @@
+Code for a paint program I wrote for my own use.
+
+This was back in the days before I had an internet connection so I wrote
+the paint program from scratch, made my own file format, and even
+independently invented RLE compression.
+
