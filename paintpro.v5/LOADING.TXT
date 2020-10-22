@@ -1,0 +1,8 @@
+To load Paintpro Files in Basic use the file LOADPIC.BAS
+It has remarks that are self-explanitory
+
+To load Paintpro Files In Pascal use the File PASLOAD.PAS
+Make sure that PASLOAD.PAS, EGAVGA.BGI, PICLOAD.TPU, and SAMPLES.PPO 
+     are all in the Pascal directory.   
+
+Thanks--- Vincent Weaver

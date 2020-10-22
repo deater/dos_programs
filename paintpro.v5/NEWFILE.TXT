@@ -1,0 +1,24 @@
+To all people with versions od paintpro less then 3.15
+
+There is a new file format for paintpro.  Run the program called
+PPUPGRADE by typing.  "PPUPGRA filename" where filename is your older file.  
+For those of you who would like to know the new file format, here it is.
+
+  Format                        Example
+
+ Mode                       egavga, cga, or partial (If you don't use the whole screen)
+ Colors                        4, 16, 256 (depending on which driver you use)
+
+ Xsize                         The x size of the drawing
+
+ Ysize                         The y size of the drawing
+
+ ---------------------------------------------------------------
+The rest is the standard format- Color*1000 + Nmber of pixels across
+--------------------------------------------------------------------
+
+Also included is the new basic and pascalc(ANd hopefull soon C) drivers to load the image.
+
+                      Vince Weaver 8-18-93
+             Utopia BBS 557-0868 #3 Deater
+

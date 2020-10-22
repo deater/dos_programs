@@ -1,0 +1,31 @@
+PAINTPRO v3.18
+  A Paint Program written in Pascal specifically in mind for programmers.  Sa
+  in a file format ideal for loading into C, PAscal, or Basic programs.
+
+  by: Vincent Weaver
+      326 Foster Knoll Dr.
+      Joppa, MD 21085-4706
+
+  This is currently Freeware...feel free to distribute if all the
+  following are present....
+   
+       PPRO40.EXE ---The most important file
+       PPRO256.EXE ---The almost as good 256 color version
+       EGAVGA.BGI, VGA256.BGI---BGI files...I will link them in soon
+       LITT.CHR ----See Above
+       README.BAT, PAINTPRO.DOC, LOADING.DOC, HELP.DOC, NEWFILE.DOC --docs
+       LOADPIC.BAS --load paintpro files in basic with this
+       SAMPLE.PPO -- a sample picture
+       PPROVIEW.EXE --a dos program to view PPO files...
+       PPUPGRAD.EXE --upgrade to new file format--not neccessary
+                      unless you had a version older then 3.0
+       PICLOAD.TPU, PASLOAD.PAS --enable you to load paintpro pictures
+                                  with Turbo Pascal
+       PICLOAD.H, PICLOAD.C --enable to load them into Turbo C
+       PPRO.HLP --Help File Used by Program
+       PPROTSR.EXE, PPROWRIT.EXE, PIC2PPO---Screen Capture Utility..
+                  run PPROTSR.EXE first, self explanitory...
+       FILE_ID.DIZ -- you must have it--You are reading it!
+
+Thank you..and be sure to call UTOPIA BBS 410-557-0868 14.4KBps--#23 Deater
+
