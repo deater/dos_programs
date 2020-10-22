@@ -1,0 +1,168 @@
+Paintpro version 6.0 Specification
+
+by Vincent Weaver  (vmweaver@wam.umd.edu)
+                   http://www.wam.umd.edu
+
+Background:
+
+When I was younger my goal was always to make computer games.
+Whether on an Apple IIe, or when in 7th grade we got a 386 DX
+33Mhz, I would always work on games.  One problem I had was
+creating graphics.  Making a picture pixel by pixel and line
+by line with graph paper took forever.  But I was using
+GW-BASIC and knew no better way.
+
+So in 1992 (when I was in 9th grade) I had a revelation.  I would
+write my own paint program, that could create pictures and then
+load them into BASIC.  I did just that.  In Turbo Pascal 5.0
+(which I had just learned) I created a paint program.  Not
+knowing what to call it, I saved it as PAINTPROGRAM.PAS
+Thanks to Bill Gates and the 8 letter dos file limit, this was
+truncated to PAINTPRO.PAS and hence the paintpro format was born.
+
+The original paintpro was an extremely crude program, using 
+the borland BGI and allowing 16 color editing in VGA and EGA
+modes.  Some clever design work on my part eventually got
+a pretty good interface going (no mouse, and cryptic commands)
+with lines, circles, magnification and my own fill routines.
+The PAINTPRO format from versions 1.0-4.0 was a text file.
+(A very large text file usually).  
+
+I used RLE encoding ( I didn't realize I used RLE encoding until
+1996.  I always thought it was a nifty algorythm I invented). 
+Basically you start in the upper left corner of the picture,
+get the color, and count how many pixels across the color stays
+the same.  When the color changes, you save to disk the color
+and the number across.  Do this for the whole picture and
+you have it saved.  As I was saying, versions 1.0-4.0 of
+paintpro saved it as a text file of integers, with each
+integer being  color*1000+numacross.
+
+This was extremely bulky and slow, but easy to import into C, pascal,
+and most of all basic.  By this time I stopped using Basic, leaning
+more to Turbo Pascal.  But my friend, Jeff, was an amazing artist
+and he used the program to create graphics for Basic programs.  My
+friend John used paintpro to make C programs.
+
+About this time I finished version 4.0 of paintpro.  This version used
+Borland's VGA256.BGI to implement a 256 colot 320x200 mode.  The only
+problem was with 256 colors the integer size would be overflown with
+color*1000.  I was stumbling; further devolpment was halted.
+
+My friend Jeff created his own program, using the Paintpro format,
+in visual basic and continued using it.
+
+Then I discoveres TSR's and I developed a screen-capture utility.
+Goodbye Paintpro, hello Deluxe-Paint and screen capture.  This
+lasted me through two games I never finished, AITAS and SPACEWAR III.
+
+Finally in 1994 I went to Germany as an exchange student.  There I got
+the PCGPE (PC Game Programmers Encyclopedia).  In it I learned all 
+about assembly and MCGA mode 13h (320x200x256) and from then on
+I was programming in this mode.  But I needed a new format.
+
+Paintpro version 4.1 was invented.  It was a crude attempt to create
+binary files.  It packed the files smaller, but it wasted a lot of
+space.  Using this and a 256 color screen capture I developed I 
+started work on Tom Bombem, my best game ever.
+
+About a year later I revised the paintpro format, version 5.0.  This
+version was much improved, didn't waste space, and incuded pallete
+information.  Development continued.
+
+Finally in the Summer of 1996, after working on loading paintpro images
+on Unix machines (sgi's and others) I refined the format one more time.
+Since I haven't talked to Jeff in a year and John uses paintpro 
+sporadically, I never felt the need to be backwards compatible.
+I also now have a pcx to paintpro converter, because after years
+of ignorance I finally got a book and realized that the paintpro
+format is amazingly similar to the PCX format.  Oh well.  I like it.
+
+SPECIFICATION:
+
+The Paintpro format (.ppp) was developed by me, Vince Weaver.
+Over time is has developed from text into packed hex.
+Although platform independant, all of my current utilities
+         are for the IBM PC in mode 13h (320x200 256 colors)
+
+Paramaters:  A graphics file, semi-compressed.
+             Maximum Dimensions : 4096x4096
+             Maximum Colors:      2048
+             24 bit color
+
+Encoding:  Integer to 3 bytes
+         
+           Many of the paramaters are stored this way to save room.
+           Basically an integer is 2 bytes long (16 bits).
+           so the integer 266 is $010A hex or 0000 0001 0000 1010 binary.
+
+           What integer to 3 bytes does is strip the top 4 bits off
+           of two integers (limiting the size of each to 4096, hence 
+           the maximum values of the file) and runs them together
+           two 12 bit intgers together is 24 bits, or 3 bytes.
+
+           So these two stripped integers are saved as 3 bytes.
+
+           e.g  say the integers 320 and 200 are to be stored this way.
+
+                      320 = $0140 hex           200 = $00C8 
+                             |                       |
+                    0000|0001 0010 0000     0000|0000 1100 1000
+                             !                       !
+First 4 bits stripped  0001 0010|0000         0000|1100 1000
+                         !             !            !
+                     0001 0010     0000 0000    1100 1000
+
+                         $14          $00         $C8  
+                         
+
+                so the leading 0 is stripped off of each, and
+                the three bytes $14 $00 $c8
+
+      This is a little confusing, but this is the method I chose
+      and it works pretty well.
+
+
+The Format:
+
+Header:
+  PAINTPRO     8 bytes,file type
+  V6.0         4 bytes,version
+  xsize,ysize  3 bytes (2 integers two 3 bytes.  see above)
+                       (max value 4095 for each)
+  numcolors,0  3 bytes (2 integers two 3 bytes)
+                       (max value 2047 for colors.  0 is space holder)
+
+  palette
+     [0..(numcolors-1)] of 3 byte (r,g,b) 
+                       (24 bit color)
+
+The actual file:
+    color,numacross  3bytes (2 integers two 3 bytes)
+
+    repeated until screen is full.
+
+Optimizations:
+    here are some optimizations you have to watch for the decreased
+    file size over v5.0 by at least 10%
+
+   wrapping:  If a numacross goes past the right edge of the screen,
+              wrap it to the next line.
+
+           e.g if the first one is decoded (5,540) then the color
+               5 is drawn until the end (at 320) and 320 is 
+               subtracted and then the remaining 220 goes on the
+               next line).
+
+   single pixel:  If a value is over 2048, then it is a single pixel
+                  of the value-2048.
+
+            e.g if color or numacross is 2148, then put one pixel of 100.
+                (these only occur in pairs of 2 to make the 
+                 file saving faster)
+
+This is the basic format.  It is used extensively in Tom Bombem.
+It is a standard application of RLE (run-length encoding) and
+co-incidently similar to a PCX file.
+
+Feel free to use the format for any application.

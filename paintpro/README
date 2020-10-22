@@ -4,3 +4,21 @@ This was back in the days before I had an internet connection so I wrote
 the paint program from scratch, made my own file format, and even
 independently invented RLE compression.
 
+-------------------
+
+Contents of old README.1ST
+
+These are utilities for using the PAINTPRO image format.
+They are written in turbo pascal (source included)
+     and are primarily for an IBM PC compatible in 
+     320x200 256 color mode (mode 13h).
+
+The included files:
+    pppview.exe    view a 320x200 file
+    ppp5to6.exe    converts version 5 images to version 6
+    ppptsr.exe   \ Screen capture for 320x200 ppp
+    pppwrite.exe /
+    pcx2ppp.exe    converts a 320x200 pcx file to ppp
+
+The pascal files are the source.
+See PAINTPRO.TXT for background/format.

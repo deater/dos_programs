@@ -1,0 +1,13 @@
+This is only to be used in mode 13h (320x200 in 256 color) mode.
+It is extremely inefficient and you should try to use the
+pcx2ppp converter if at all possible.
+
+It creates a 72k array in memory that does not go away until
+rebooting, which can be annotin.
+
+Baciscally, run PPPTSR.
+
+Then  get your image on the screen.  Press "Shift-Printscreen."
+Return to dos and then run the "PPPWRITE" utility.
+
+Repeat the "shift-prtsct" "pppwrite" as often as necessary.
