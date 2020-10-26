@@ -39,6 +39,10 @@
 # 120 bytes (two thick lines)
 # 117 bytes (direction in %cx)
 # 127 bytes (red and green bars)
+# 126 bytes (use loop instruction)
+# 133 bytes (red and green moving independently)
+# 132 bytes (can make assumption %cx is 0)
+# 128 bytes (remove unnecessary ands)
 
 .text
 
@@ -70,7 +74,10 @@ line_loop:
 	dec	%bx			# increment color
 	jne	line_loop		# if not, loop
 
-	mov	$0x101,%cx		# direction
+
+	# CX is zero at this point
+
+	mov	$0x101,%bx		# direction
 
 big_big_loop:
 	# wait for vertical refresh
@@ -86,9 +93,24 @@ l2:
 	jz	l2
 
 	#=============================================
+	#=============================================
 	# raster line
-	mov	$16,%bx
+	#=============================================
+	#=============================================
+
+	mov	$16,%cl
 	mov	$line1,%si
+
+raster_loop:
+
+	# 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
+	#swap
+	test	$7,%cl		# (16 and 8 it equals 0)
+	jne	no_swap
+
+do_swap:
+	xchg	%bh,%bl
+
 
 	# check to see if switch direction
 
@@ -96,22 +118,27 @@ l2:
 
 	cmp	$0,%al
 	je	flip_dir		# if 0, switch to down
-	cmp	$190,%al		# if 190, switch to up
+	cmp	$192,%al		# if 190, switch to up
 	jne	was_fine		# otherwise we were good
 
 flip_dir:
-	neg	%cl			# flip direction
+	neg	%bl			# flip direction
 
 was_fine:
 	dec	%si
 
-raster_loop:
+
+
+no_swap:
+
+
+
 
 	lodsb				# load Y into al
 
 	# raster move
 
-	add	%cl,%al			# add direction into Y
+	add	%bl,%al			# add direction into Y
 	mov	%al,-1(%si)		# store out
 
 set_pal:
@@ -121,15 +148,15 @@ set_pal:
 
 	lodsb
 	push	%ax
-	and	$0x0f,%al
-	sal	%al
-	sal	%al
+#	and	$0x0f,%al
+	shl	%al
+	shl	%al
 	out	%al,%dx		# r
 
 	pop	%ax
-	and	$0xf0,%al
-	sar	%al
-	sar	%al
+#	and	$0xf0,%al
+	shr	%al
+	shr	%al
 	out	%al,%dx		# g
 
 	xor	%al,%al
@@ -137,8 +164,7 @@ set_pal:
 
 	# do loop
 
-	dec	%bx
-	jns	raster_loop
+	loop	raster_loop
 
 	jmp	big_big_loop
 
@@ -155,21 +181,20 @@ exit:
 .data
 
 line1:
-.byte	51,	0x00	# 7		r=(color&0xf)<<2
-.byte	52,	0x03	# 6
-.byte	53,	0x08	# 5
-.byte	54,	0x0b	# 4
-.byte	55,	0x0f	# 3
-.byte	56,	0x0b	# 2
-.byte	57,	0x08	# 1
-.byte	58,	0x00	# 0
+.byte	51,	0x00	# 16		r=(color&0xf)<<2
+.byte	52,	0x03	# 15
+.byte	53,	0x08	# 14
+.byte	54,	0x0b	# 13
+.byte	55,	0x0f	# 12
+.byte	56,	0x0b	# 11
+.byte	57,	0x08	# 10
+.byte	58,	0x00	# 9
 
-.byte	151,	0x00	# 7
-.byte	152,	0x30	# 6
-.byte	153,	0x80	# 5
-.byte	154,	0xb0	# 4
-.byte	155,	0xf0	# 3
-.byte	156,	0xb0	# 2
-.byte	157,	0x80	# 1
-.byte	158,	0x00	# 0
-
+.byte	151,	0x00	# 8		g=(color&0xf0)>>2
+.byte	152,	0x30	# 7
+.byte	153,	0x80	# 6
+.byte	154,	0xb0	# 5
+.byte	155,	0xf0	# 4
+.byte	156,	0xb0	# 3
+.byte	157,	0x80	# 2
+.byte	158,	0x00	# 1
