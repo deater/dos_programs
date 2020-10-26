@@ -32,6 +32,7 @@
 # 133 bytes (save y position)
 # 127 bytes (use neg on memory)
 # 125 bytes (loop backward)
+# 128 bytes (two rasterbars)
 
 .text
 
@@ -49,14 +50,12 @@ start:
 	mov	$0x13,%ax
 	int	$0x10
 
-#	push	%es
 	mov	$0xa000,%bx		# point es:di to $a000:0000
 	mov	%bx,%es
 	xor	%di,%di
 
 	# draw colored lines
 
-#	xor	%dx,%dx			# clear Y
 	mov	$200,%bx
 line_loop:
 	mov	$320,%cx		# X
@@ -80,27 +79,14 @@ l2:
 	and	$8,%al
 	jz	l2
 
-	# set all colors to zero
-#	xor	%ax,%ax
-#	xor	%cx,%cx
-#clear_pal_loop:
-#	mov	%cl,%al
-#	call	set_pal
-
-#	inc	%cl
-#	cmp	$255,%cl
-#	jne	clear_pal_loop
-
-
+	#=============================================
 	# raster line
-#	xor	%bx,%bx			# is this set from before?
 	mov	$33,%bx
 raster_loop:
 
 	mov	line1+0(%bx,1),%al	# load Y into al
 	push	%ax			# save for later
 	mov	line1+2(%bx,1),%ah	# load color into ah
-#	call	set_pal			# set color
 
 set_pal:
 	mov	$0x3c8,%dx
@@ -136,14 +122,11 @@ was_fine:
 
 	# do loop
 
-#	add	$3,%bx
 	sub	$3,%bx
-#	cmp	$36,%bx
 	jns	raster_loop
 
 	jmp	big_big_loop
 
-#	pop	%es
 
 	#================================
 	# Exit
@@ -153,24 +136,6 @@ exit:
 #	mov	$0x4c,%ah		# exit
 #	int     $0x21             	# and exit
 
-
-	# set palette
-	# color in %al
-	# r in %ah, g in %bh b in %bl
-
-
-
-	#===================================
-	# assumes you want to clear a000:000
-#cls:
-#	push	%es
-#	mov	$0xa000,%cx
-#	mov	%cx,%es
-#	mov	$32000,%cx
-#	xor	%di,%di
-#	rep	stosw
-#	pop	%es
-#	ret
 
 .data
 
