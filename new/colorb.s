@@ -33,6 +33,8 @@
 # 131 bytes (std/cld abuse)
 # 125 bytes (let's hope VGA truncates bits written to pal register)
 # 131 bytes (four raster bars???)
+# 129 bytes (let colors be a bit off)
+# 127 bytes (unneeded temp var)
 
 .text
 
@@ -93,9 +95,6 @@ middle_loop:
 
 	mov	$7,%cl			# points to loop
 
-
-
-
 	# check to see if switch direction
 
 	lodsb				# load current Y into al
@@ -109,8 +108,8 @@ flip_dir:
 was_fine:
 	mov	%al,%bl			# put Y into bl
 	lodsb				# load direction into %al
-	add	%bl,%al
-	mov	%al,-2(%si)		# store out updated Y
+#	add	%bl,%al
+	add	%al,-2(%si)		# store out updated Y
 
 
 raster_loop:
@@ -138,7 +137,7 @@ set_pal:
 	out	%al,%dx		# g
 
 	shr	%cl,%ax
-	and	$0x30,%al
+#	and	$0x30,%al
 	out	%al,%dx		# b
 
 	# do loop
@@ -150,12 +149,12 @@ blah:
 	pop	%cx
 	loop	raster_loop
 
-	cld
+	cld				# get strings going forward again
 
-	sub	$6,%bp
+	sub	$6,%bp			# middle loop (next color bar)
 	jns	middle_loop
 
-	jmp	big_big_loop
+	jmp	big_big_loop		# run forever
 
 
 	#================================
