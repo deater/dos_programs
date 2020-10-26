@@ -33,6 +33,7 @@
 # 127 bytes (use neg on memory)
 # 125 bytes (loop backward)
 # 128 bytes (two rasterbars)
+# 119 bytes (use si for indexing)
 
 .text
 
@@ -62,7 +63,6 @@ line_loop:
 	mov	%bl,%al			# set color
 	rep	stosb			# slower but fewer bytes
 	dec	%bx			# increment color
-#	cmp	$200,%bx		# see if at end
 	jne	line_loop		# if not, loop
 
 
@@ -82,17 +82,18 @@ l2:
 	#=============================================
 	# raster line
 	mov	$33,%bx
+	mov	$line1,%si
 raster_loop:
 
-	mov	line1+0(%bx,1),%al	# load Y into al
+	lodsb				# load Y into al
 	push	%ax			# save for later
-	mov	line1+2(%bx,1),%ah	# load color into ah
 
 set_pal:
 	mov	$0x3c8,%dx
 	out	%al,%dx
 	inc	%dx
-	mov	%ah,%al		# r
+	lodsb
+#	mov	%ah,%al		# r
 	out	%al,%dx
 	xor	%al,%al		# g
 	out	%al,%dx
@@ -103,10 +104,7 @@ set_pal:
 
 	# raster move
 
-
-
-	pop	%ax
-#	mov	line1(%bx,1),%al	# load current Y
+	pop	%ax			# load current Y
 	cmp	$0,%al
 	je	flip_dir		# if 0, switch to down
 	cmp	$200,%al		# if 200, switch to up
@@ -114,14 +112,15 @@ set_pal:
 	jmp	was_fine		# otherwise we were good
 
 flip_dir:
-	negb	line1+1(%bx,1)		# flip direction
+	negb	(%si)			# flip direction
 
 was_fine:
-	add	line1+1(%bx,1),%al	# add direction into Y
-	mov	%al,line1+0(%bx,1)	# store out
+	add	(%si),%al		# add direction into Y
+	mov	%al,-2(%si)		# store out
 
 	# do loop
 
+	inc	%si
 	sub	$3,%bx
 	jns	raster_loop
 
@@ -140,17 +139,17 @@ exit:
 .data
 
 line1:
-.byte	51,1,0		# 0
-.byte	52,1,13		# 1
-.byte	53,1,43		# 2
-.byte	54,1,63		# 3
-.byte	55,1,43		# 4
-.byte	56,1,13		# 5
-#.byte	57,1,0		# 6
-.byte	151,1,0		# 7
-.byte	152,1,13	# 8
-.byte	153,1,43	# 9
-.byte	154,1,63	# 10
-.byte	155,1,43	# 11
-.byte	156,1,13	# 12
-#.byte	157,1,0		# 13
+.byte	51,	0,	1	# 0
+.byte	52,	13,	1	# 1
+.byte	53,	43,	1	# 2
+.byte	54,	63,	1	# 3
+.byte	55,	43,	1	# 4
+.byte	56,	13,	1	# 5
+#.byte	57,	0,	1	# 6
+.byte	151,	0,	1	# 7
+.byte	152,	13,	1	# 8
+.byte	153,	43,	1	# 9
+.byte	154,	63,	1	# 10
+.byte	155,	43,	1	# 11
+.byte	156,	13,	1	# 12
+#.byte	157,	0,	1	# 13
