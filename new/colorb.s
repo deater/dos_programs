@@ -31,6 +31,8 @@
 # 134 bytes (use bl for color instead of bh)
 # 133 bytes (set dl instead of dx)
 # 131 bytes (std/cld abuse)
+# 125 bytes (let's hope VGA truncates bits written to pal register)
+# 131 bytes (four raster bars???)
 
 .text
 
@@ -84,10 +86,10 @@ l2:
 	#=============================================
 	#=============================================
 
-
-	mov	$line1,%si		# point to data
-	mov	$3,%bp			# lines to draw
+	mov	$(4*6),%bp		# lines to draw
 middle_loop:
+
+	lea	line1(%bp), %si
 
 	mov	$7,%cl			# points to loop
 
@@ -126,21 +128,16 @@ set_pal:
 	inc	%dx
 
 	lodsb
-	push	%ax
-	and	$0x03,%al
 	mov	$4,%cl
-	shl	%cl,%al
+	shl	%cl,%ax
 	out	%al,%dx		# r
 
-	pop	%ax
-	push	%ax
 	dec	%cx
 	dec	%cx
-	shl	%cl,%al
-	and	$0x30,%al
+	shr	%cl,%ax
 	out	%al,%dx		# g
 
-	pop	%ax
+	shr	%cl,%ax
 	and	$0x30,%al
 	out	%al,%dx		# b
 
@@ -154,10 +151,9 @@ blah:
 	loop	raster_loop
 
 	cld
-	add	$5,%si
 
-	dec	%bp
-	jne	middle_loop
+	sub	$6,%bp
+	jns	middle_loop
 
 	jmp	big_big_loop
 
@@ -180,4 +176,6 @@ line1:
 .byte	0x00,0x04,0x08,0x0c
 .byte	111,	1				# blue
 .byte	0x00,0x10,0x20,0x30
+.byte	161,	1				# yellow
+.byte	0x00,0x05,0x0a,0x0f
 
