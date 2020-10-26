@@ -26,6 +26,7 @@
 
 # 128 bytes (fork from raster.s)
 # 145 bytes (re-write to support three colors)
+# 138 bytes (optimize boundary code a bit)
 
 .text
 
@@ -82,30 +83,26 @@ l2:
 	# %cx==0 here
 
 
-	mov	$line1,%si
-
-	mov	$3,%bp
+	mov	$line1,%si		# point to data
+	mov	$3,%bp			# lines to draw
 middle_loop:
 	mov	$8,%cl
 
 	# check to see if switch direction
 
-	lodsb				# load direction into al
-	mov	%al,%bl			# move current direction into bl
 	lodsb				# load current Y into al
-	mov	%al,%bh			# move Y into bh
-
-	cmp	$0,%bh
+	cmp	$0,%al
 	je	flip_dir		# if 8, switch to down
-	cmp	$192,%bh		# if 190, switch to up
+	cmp	$192,%al		# if 190, switch to up
 	jne	was_fine		# otherwise we were good
 
 flip_dir:
-	neg	%bl			# flip direction
-	mov	%bl,-2(%si)
+	negb	(%si)			# flip direction
 was_fine:
-	add	%bl,%al
-	mov	%al,-1(%si)		# store out updated Y
+	mov	%al,%bh			# put Y into bh
+	lodsb				# load direction into %al
+	add	%bh,%al
+	mov	%al,-2(%si)		# store out updated Y
 
 raster_loop:
 
@@ -160,12 +157,10 @@ exit:
 .data
 
 line1:
-.byte	1,	11				# red
+.byte	11,	1				# red
 .byte	0x00,0x01,0x02,0x03,0x03,0x02,0x02,0x00
-.byte	1,	61				# green
+.byte	61,	1				# green
 .byte	0x00,0x04,0x08,0x0c,0x0c,0x08,0x04,0x00
-.byte	1,	111				# green
+.byte	111,	1				# green
 .byte	0x00,0x10,0x20,0x30,0x30,0x20,0x10,0x00
-
-
 
