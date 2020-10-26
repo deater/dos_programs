@@ -25,7 +25,7 @@
 
 
 # 128 bytes (fork from raster.s)
-# 129 bytes (re-write to support three colors)
+# 145 bytes (re-write to support three colors)
 
 .text
 
@@ -81,8 +81,12 @@ l2:
 
 	# %cx==0 here
 
-	mov	$8,%cl
+
 	mov	$line1,%si
+
+	mov	$3,%bp
+middle_loop:
+	mov	$8,%cl
 
 	# check to see if switch direction
 
@@ -124,11 +128,11 @@ set_pal:
 	push	%ax
 	shl	%al
 	shl	%al
-	and	$0xc0,%al
+	and	$0x30,%al
 	out	%al,%dx		# g
 
 	pop	%ax
-	and	$0xc0,%al
+	and	$0x30,%al
 	out	%al,%dx		# b
 
 	# do loop
@@ -136,8 +140,10 @@ set_pal:
 
 	add	$1,%bh			# point to next Y
 
-
 	loop	raster_loop
+
+	dec	%bp
+	jne	middle_loop
 
 	jmp	big_big_loop
 
@@ -154,10 +160,12 @@ exit:
 .data
 
 line1:
-.byte	1,	51				# red
+.byte	1,	11				# red
 .byte	0x00,0x01,0x02,0x03,0x03,0x02,0x02,0x00
-.byte	1,	151				# green
+.byte	1,	61				# green
 .byte	0x00,0x04,0x08,0x0c,0x0c,0x08,0x04,0x00
+.byte	1,	111				# green
+.byte	0x00,0x10,0x20,0x30,0x30,0x20,0x10,0x00
 
 
 
