@@ -27,6 +27,10 @@
 # 128 bytes (fork from raster.s)
 # 145 bytes (re-write to support three colors)
 # 138 bytes (optimize boundary code a bit)
+# 136 bytes (use cl form of shift)
+# 134 bytes (use bl for color instead of bh)
+# 133 bytes (set dl instead of dx)
+# 131 bytes (std/cld abuse)
 
 .text
 
@@ -80,13 +84,15 @@ l2:
 	#=============================================
 	#=============================================
 
-	# %cx==0 here
-
 
 	mov	$line1,%si		# point to data
 	mov	$3,%bp			# lines to draw
 middle_loop:
-	mov	$8,%cl
+
+	mov	$7,%cl			# points to loop
+
+
+
 
 	# check to see if switch direction
 
@@ -99,32 +105,38 @@ middle_loop:
 flip_dir:
 	negb	(%si)			# flip direction
 was_fine:
-	mov	%al,%bh			# put Y into bh
+	mov	%al,%bl			# put Y into bl
 	lodsb				# load direction into %al
-	add	%bh,%al
+	add	%bl,%al
 	mov	%al,-2(%si)		# store out updated Y
 
+
 raster_loop:
+	push	%cx
+	cmp	$5,%cl
+	jge	no_std
+	std				# if cl <5 clear direction
+no_std:
+
 
 set_pal:
-	mov	$0x3c8,%dx
-	mov	%bh,%al
+	mov	$0xc8,%dl		# set to port 0x3c8 (dh already 3)
+	mov	%bl,%al
 	out	%al,%dx
 	inc	%dx
 
 	lodsb
 	push	%ax
 	and	$0x03,%al
-	shl	%al
-	shl	%al
-	shl	%al
-	shl	%al
+	mov	$4,%cl
+	shl	%cl,%al
 	out	%al,%dx		# r
 
 	pop	%ax
 	push	%ax
-	shl	%al
-	shl	%al
+	dec	%cx
+	dec	%cx
+	shl	%cl,%al
 	and	$0x30,%al
 	out	%al,%dx		# g
 
@@ -134,10 +146,15 @@ set_pal:
 
 	# do loop
 
+blah:
 
-	add	$1,%bh			# point to next Y
+	inc	%bx			# point to next Y
 
+	pop	%cx
 	loop	raster_loop
+
+	cld
+	add	$5,%si
 
 	dec	%bp
 	jne	middle_loop
@@ -158,9 +175,9 @@ exit:
 
 line1:
 .byte	11,	1				# red
-.byte	0x00,0x01,0x02,0x03,0x03,0x02,0x02,0x00
+.byte	0x00,0x01,0x02,0x03
 .byte	61,	1				# green
-.byte	0x00,0x04,0x08,0x0c,0x0c,0x08,0x04,0x00
-.byte	111,	1				# green
-.byte	0x00,0x10,0x20,0x30,0x30,0x20,0x10,0x00
+.byte	0x00,0x04,0x08,0x0c
+.byte	111,	1				# blue
+.byte	0x00,0x10,0x20,0x30
 
