@@ -23,6 +23,16 @@
 
 #  dump with  "objdump -bbinary --disassemble-all -mi8086 ./raster.com"
 
+
+# 142 bytes
+# 140 bytes (optimize draw lines loop)
+# 137 bytes (count down loop)
+# 139 bytes (fix bug where we were drawing white rather than red)
+# 135 bytes (inline raster)
+# 133 bytes (save y position)
+# 127 bytes (use neg on memory)
+# 125 bytes (loop backward)
+
 .text
 
 # generate only 8086 code
@@ -40,21 +50,21 @@ start:
 	int	$0x10
 
 #	push	%es
-	mov	$0xa000,%cx
-	mov	%cx,%es
+	mov	$0xa000,%bx		# point es:di to $a000:0000
+	mov	%bx,%es
+	xor	%di,%di
 
 	# draw colored lines
 
-	xor	%dx,%dx
-	xor	%di,%di
+#	xor	%dx,%dx			# clear Y
+	mov	$200,%bx
 line_loop:
-	mov	$160,%cx
-	mov	%dl,%al
-	mov	%al,%ah
-	rep	stosw
-	inc	%dx
-	cmp	$200,%dx
-	jne	line_loop
+	mov	$320,%cx		# X
+	mov	%bl,%al			# set color
+	rep	stosb			# slower but fewer bytes
+	dec	%bx			# increment color
+#	cmp	$200,%bx		# see if at end
+	jne	line_loop		# if not, loop
 
 
 big_big_loop:
@@ -73,7 +83,7 @@ l2:
 	# set all colors to zero
 #	xor	%ax,%ax
 #	xor	%cx,%cx
-clear_pal_loop:
+#clear_pal_loop:
 #	mov	%cl,%al
 #	call	set_pal
 
@@ -83,32 +93,42 @@ clear_pal_loop:
 
 
 	# raster line
-	xor	%bx,%bx
+#	xor	%bx,%bx			# is this set from before?
+	mov	$33,%bx
 raster_loop:
 
-	mov	line1(%bx,1),%al
-	mov	line1+2(%bx,1),%ah
-	call	set_pal
+	mov	line1+0(%bx,1),%al	# load Y into al
+	push	%ax			# save for later
+	mov	line1+2(%bx,1),%ah	# load color into ah
+#	call	set_pal			# set color
+
+set_pal:
+	mov	$0x3c8,%dx
+	out	%al,%dx
+	inc	%dx
+	mov	%ah,%al		# r
+	out	%al,%dx
+	xor	%al,%al		# g
+	out	%al,%dx
+#	xor	%al,%al		# b
+	out	%al,%dx
+#	ret
+
 
 	# raster move
 
 
-	mov	line1(%bx,1),%al	# load current Y
+
+	pop	%ax
+#	mov	line1(%bx,1),%al	# load current Y
 	cmp	$0,%al
-	je	make_positive		# if 0, switch to down
+	je	flip_dir		# if 0, switch to down
 	cmp	$200,%al		# if 200, switch to up
-	je	make_negative
+	je	flip_dir
 	jmp	was_fine		# otherwise we were good
 
-make_positive:
-	mov	$0x1,%ah		# make add 1
-	jmp	done_make
-
-make_negative:
-	mov	$0xff,%ah		# make add -1
-
-done_make:
-	mov	%ah,line1+1(%bx,1)	# move to add location
+flip_dir:
+	negb	line1+1(%bx,1)		# flip direction
 
 was_fine:
 	add	line1+1(%bx,1),%al	# add direction into Y
@@ -116,9 +136,10 @@ was_fine:
 
 	# do loop
 
-	add	$3,%bx
-	cmp	$36,%bx
-	jne	raster_loop
+#	add	$3,%bx
+	sub	$3,%bx
+#	cmp	$36,%bx
+	jns	raster_loop
 
 	jmp	big_big_loop
 
@@ -137,17 +158,6 @@ exit:
 	# color in %al
 	# r in %ah, g in %bh b in %bl
 
-set_pal:
-	mov	$0x3c8,%dx
-	out	%al,%dx
-	inc	%dx
-	mov	%ah,%al		# r
-	out	%al,%dx
-#	xor	%al,%al		# g
-	out	%al,%dx
-#	xor	%al,%al		# b
-	out	%al,%dx
-	ret
 
 
 	#===================================
@@ -165,16 +175,17 @@ set_pal:
 .data
 
 line1:
-.byte	1,1,0
-.byte	2,1,13
-.byte	3,1,23
-.byte	4,1,43
-.byte	5,1,53
-.byte	6,1,63
-.byte	7,1,53
-.byte	8,1,43
-.byte	9,1,23
-.byte	10,1,13
-.byte	11,1,0
-
-
+.byte	51,1,0		# 0
+.byte	52,1,13		# 1
+.byte	53,1,43		# 2
+.byte	54,1,63		# 3
+.byte	55,1,43		# 4
+.byte	56,1,13		# 5
+#.byte	57,1,0		# 6
+.byte	151,1,0		# 7
+.byte	152,1,13	# 8
+.byte	153,1,43	# 9
+.byte	154,1,63	# 10
+.byte	155,1,43	# 11
+.byte	156,1,13	# 12
+#.byte	157,1,0		# 13
