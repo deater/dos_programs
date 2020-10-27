@@ -42,8 +42,8 @@
 	.globl start
 start:
 
-	# point data segment to $4000
-	mov	$0x4000,%bx
+	# point data segment to 100
+	mov	$100,%bx
 	mov	%bx,%ds
 
 	# set 320x200x256 mode
