@@ -43,8 +43,11 @@
 start:
 
 	# point data segment to 100
-	mov	$100,%bx
-	mov	%bx,%ds
+#	mov	$100,%bx
+#	mov	%bx,%ds
+
+	push	%cs
+	pop	%ds
 
 	# set 320x200x256 mode
 
