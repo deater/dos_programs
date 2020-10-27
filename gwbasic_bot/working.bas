@@ -6,6 +6,11 @@
 5 D(I)=(4^((I-1) MOD 3))
 6 B%(I)=B%(I)+(INT(Q(I)/D(I)) AND 3)
 7 NEXT
+10 FOR I=1 TO 132:PRINT B%(I);" ";:IF (I MOD 16=0) THEN PRINT
+11 NEXT:PRINT
+32 ?
 35 DEF SEG=&h4000
 40 for i=0 to 132:poke i+256,B%(i+1):next
-70 V=256:CALL V
+50 REM for i=0 to 132:?peek(256+i);" ";:next
+60 REM V=7319 = 1c97:  try 4000:0000
+70 REM v=256:call v
