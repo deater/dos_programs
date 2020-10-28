@@ -30,4 +30,4 @@ install:	raster.com colorb.com
 	cp raster.com colorb.com /home/vince/dos/dos/
 
 clean:	
-	rm -f *.o raster colorb
+	rm -f *~ *.o raster colorb
