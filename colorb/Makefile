@@ -29,5 +29,8 @@ colorb.o:	      colorb.s
 install:	raster.com colorb.com
 	cp raster.com colorb.com /home/vince/dos/dos/
 
+zip:	colorb.com
+	zip
+
 clean:	
 	rm -f *~ *.o raster colorb
