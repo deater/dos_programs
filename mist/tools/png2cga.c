@@ -9,29 +9,70 @@
 
 #include "loadpng.h"
 
-/* Converts a PNG to a GR file you can BLOAD to 0x400		*/
-/* HOWEVER you *never* want to do this in real life		*/
-/* as it will clobber important values in the memory holes	*/
+/* Converts an Apple II Lores PNG to a CGA file */
+/* this creates two files, one that is attributes and one that is data */
+/* for our purposes the entire data is going to be char 220 */
+
+static int color_map[16]={
+		/* apple 2		CGA */
+	0,	/* 0 BLACK	->	0 Black */
+	4,	/* 1 RED	->	4 Red */
+	1,	/* 2 D BLUE	->	1 D Blue */
+	5,	/* 3 PURPLE	->	5 Purple */
+	2,	/* 4 D GREEN	->	2 D Green */
+	8,	/* 5 GREY1	->	8 D Grey */
+	3,	/* 6 M Blue	->	3 Cyan */
+	7,	/* 7 L Blue	->	7 Grey */
+	6,	/* 8 Brown	->	6 Brown */
+	12,	/* 9 Orange	->	12 L Red */
+	0,	/* 10 Grey2 (transparent)	*/
+	13,	/* 11 Pink	->	13 Pink */
+	10,	/* 12 L. Green	->	10 L Green */
+	14,	/* 13 Yellow	-> 	14 Yellow */
+	11,	/* 14 Aqua	->	11 L Cyan */
+	15,	/* 15 White	->	15 White */
+};
 
 int main(int argc, char **argv) {
 
 	int row=0;
 	int col=0;
-	int x;
-	unsigned char out_buffer[1024];
+	int x,i;
+	unsigned char out_buffer[80*25];
+	int top_color,bottom_color,color;
 
 	unsigned char *image;
 	int xsize,ysize;
-	FILE *outfile;
+	FILE *outattr,*outdata;
+
+	char attr_filename[256];
+	char data_filename[256];
 
 	if (argc<3) {
-		fprintf(stderr,"Usage:\t%s INFILE OUTFILE\n\n",argv[0]);
+		fprintf(stderr,"Usage:\t%s INFILE OUTBASE\n\n",argv[0]);
 		exit(-1);
 	}
 
-	outfile=fopen(argv[2],"w");
-	if (outfile==NULL) {
-		fprintf(stderr,"Error!  Could not open %s\n",argv[2]);
+	sprintf(attr_filename,"%s.attr",argv[2]);
+	sprintf(data_filename,"%s.data",argv[2]);
+
+	outdata=fopen(data_filename,"w");
+	if (outdata==NULL) {
+		fprintf(stderr,"Error!  Could not open %s\n",data_filename);
+		exit(-1);
+	}
+
+	/* all 220 */
+	for(i=0;i<80*25;i++) {
+		fputc(220,outdata);
+	}
+
+	fclose(outdata);
+
+
+	outattr=fopen(attr_filename,"w");
+	if (outattr==NULL) {
+		fprintf(stderr,"Error!  Could not open %s\n",attr_filename);
 		exit(-1);
 	}
 
@@ -42,22 +83,21 @@ int main(int argc, char **argv) {
 
 	fprintf(stderr,"Loaded image %d by %d\n",xsize,ysize);
 
-	short gr_offsets[]={
-		0x400,0x480,0x500,0x580,0x600,0x680,0x700,0x780,
-		0x428,0x4a8,0x528,0x5a8,0x628,0x6a8,0x728,0x7a8,
-		0x450,0x4d0,0x550,0x5d0,0x650,0x6d0,0x750,0x7d0,
-	};
+	memset(out_buffer,0,80*25);
 
-	memset(out_buffer,0,1024);
 	for(row=0;row<24;row++) {
 		for(col=0;col<40;col++) {
-			out_buffer[(gr_offsets[row]-0x400)+col]=image[row*xsize+col];
+			top_color=color_map[(image[row*xsize+col])&0xf];
+			bottom_color=color_map[(image[row*xsize+col])>>4];
+			color=(top_color<<4)|bottom_color;
+			out_buffer[(row*80)+(col*2)]=color;
+			out_buffer[(row*80)+(col*2)+1]=color;
 		}
 	}
 
-	for(x=0;x<1024;x++) fputc( out_buffer[x],outfile);
+	for(x=0;x<80*25;x++) fputc( out_buffer[x],outattr);
 
-	fclose(outfile);
+	fclose(outattr);
 
 	return 0;
 }
