@@ -90,6 +90,8 @@ int main(int argc, char **argv) {
 			top_color=color_map[(image[row*xsize+col])&0xf];
 			bottom_color=color_map[(image[row*xsize+col])>>4];
 			color=(top_color<<4)|bottom_color;
+
+			/* 40 -> 80, two consecutive */
 			out_buffer[(row*80)+(col*2)]=color;
 			out_buffer[(row*80)+(col*2)+1]=color;
 		}

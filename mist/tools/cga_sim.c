@@ -8,7 +8,7 @@
 
 #include <SDL.h>
 
-//#include "gr_sim.h"
+#include "cga_sim.h"
 
 #include "vga_font.h"
 
@@ -25,7 +25,7 @@ static int ysize=TEXT_YSIZE*TEXT_Y_SCALE;
 
 static SDL_Surface *sdl_screen=NULL;
 
-static unsigned char ram[80*25*2];
+unsigned char ram[80*25*2];
 
 int grsim_input(void) {
 
@@ -96,7 +96,7 @@ static unsigned int color[16]={
 };
 
 
-void draw_text(unsigned int *out_pointer,int text_start, int text_end) {
+static void draw_text(unsigned int *out_pointer,int text_start, int text_end) {
 
 	int bit_set,ch,fg_color,bg_color;
 	int xx,yy,i,j;
@@ -108,9 +108,9 @@ void draw_text(unsigned int *out_pointer,int text_start, int text_end) {
 		for(j=0;j<TEXT_Y_SCALE;j++) {
 			for(xx=0;xx<TEXT_XSIZE;xx++) {
 
-				ch=ram[yy*80+xx*2];
-				fg_color=(ram[yy*80+xx*2+1])*0xf;
-				bg_color=(ram[yy*80+xx*2+1])>>4;
+				ch=ram[yy*160+xx*2];
+				fg_color=(ram[yy*160+xx*2+1])&0xf;
+				bg_color=(ram[yy*160+xx*2+1])>>4;
 				//if (ch!=0) printf("Printing: %c at %d %d\n",ch,
 				//	xx,yy);
 
@@ -173,6 +173,7 @@ int grsim_init(void) {
 
 	/* assume 32-bit color */
 	sdl_screen = SDL_SetVideoMode(xsize, ysize, 32, mode);
+	printf("Setting up %d x %d 32-bit screen\n",xsize,ysize);
 
 	if ( sdl_screen == NULL ) {
 		fprintf(stderr, "ERROR!  Couldn't set %dx%d video mode: %s\n",
@@ -188,26 +189,3 @@ int grsim_init(void) {
 	return 0;
 }
 
-
-int main(int argc, char **argv) {
-
-	int result,ch,i;
-
-	result=grsim_init();
-	if (result<0) return -1;
-
-	for(i=0;i<26;i++) {
-		ram[i]='A'+i;
-	}
-
-
-	while(1) {
-		grsim_update();
-		usleep(10000);
-		ch=grsim_input();
-		if (ch==27) break;
-	}
-
-	return 0;
-
-}
