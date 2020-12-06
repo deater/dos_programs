@@ -6,7 +6,7 @@ CFLAGS = -g -Wall -O2
 SDL_LIBS= `sdl-config --libs`
 SDL_INCLUDE= `sdl-config --cflags`
 
-all:	png2cga mist_poc
+all:	png2cga mist_poc cgasplit
 
 
 ###
@@ -26,6 +26,15 @@ png2cga.o:		png2cga.c loadpng.h
 
 ###
 
+cgasplit:		cgasplit.o
+	$(CC) $(LFLAGS) -o cgasplit cgasplit.o
+
+cgasplit.o:		cgasplit.c
+	$(CC) $(CFLAGS) -c cgasplit.c
+
+
+###
+
 cga_sim.o:		cga_sim.c
 	$(CC) $(CFLAGS) $(SDL_INCLUDE) -c cga_sim.c
 
@@ -42,4 +51,4 @@ mist_poc.o:		mist_poc.c
 #		cp png2gr png2gr_text png2rle png2lz4 png_to_40x48d png_to_40x96 png2sixbitmap png2sixrle png2sixrle2 png2fourrle png2six80 $(INSTALL_LOC)
 
 clean:		
-		rm -f *~ *.o png2cga cga_sim mist_poc
+		rm -f *~ *.o png2cga cga_sim mist_poc cgasplit
