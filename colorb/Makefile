@@ -2,7 +2,7 @@ CC = gcc
 STRIP = strip
 CFLAGS = -O2 -Wall
 
-all:	raster.com colorb.com
+all:	raster.com colorb.com colorb2.com
 
 raster.com:	      raster.o.o
 		      dd if=raster.o.o of=raster.com bs=256 skip=1
@@ -26,11 +26,24 @@ colorb.o:	      colorb.s
 
 ###
 
-install:	raster.com colorb.com
-	cp raster.com colorb.com /home/vince/dos/dos/
+colorb2.com:	      colorb2.o.o
+		      dd if=colorb2.o.o of=colorb2.com bs=256 skip=1
+
+colorb2.o.o:	      colorb2.o
+		      objcopy -O binary colorb2.o colorb2.o.o
+
+colorb2.o:	      colorb2.s
+		      as --32 -R -o colorb2.o colorb2.s
+
+
+
+###
+
+install:	raster.com colorb.com colorb2.com
+	cp raster.com colorb.com colorb2.com /home/vince/dos/dos/
 
 zip:	colorb.com
 	zip
 
 clean:	
-	rm -f *~ *.o raster colorb
+	rm -f *~ *.o raster colorb colorb2
