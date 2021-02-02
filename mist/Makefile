@@ -3,6 +3,21 @@ CFLAGS = -Wall -O2 -g
 
 all:	mist
 
+###
+
+mist:	mist.o \
+	level_mist.o
+	$(CC) -o mist mist.o level_mist.o $(LFLAGS)
+
+###
+
+mist.o:	mist.c zp.h
+	$(CC) $(CFLAGS) -c mist.c
+
+###
+
+level_mist.o:	level_mist.c zp.h
+	$(CC) $(CFLAGS) -c level_mist.c
 
 ####
 
