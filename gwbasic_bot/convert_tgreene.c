@@ -98,49 +98,19 @@ int main(int argc, char **argv) {
 	enc2[enc_ptr]=0;
 
 // from Tom Greene @txgx42
-// $850 = 2128
-// with call
-#if 0
-	printf("1FORI=0TO%d:POKE768+I,4*PEEK(%d+I)-"
-		"192+(PEEK(%d+I/3)-%d)/4^(I-INT(I/3)*3):NEXT\n",
-		filesize-1,2128,2128+filesize,OFFSET2);
-	printf("2CALL768\"%s%s\n",enc2,enc);
-#endif
 
-#if 1
-// if using & to the end then jumping back
-	printf("1FORI=0TO%d:POKE%d+I,4*PEEK(%d+I)-"
-		"192+(PEEK(%d+I/3)-%d)/4^(I-INT(I/3)*3):NEXT\n",
-		filesize-1,
-		0x3f5-filesize+3,
-		2125,2125+filesize,OFFSET2);
-	printf("2&\"%s%s\n",enc2,enc);
-#endif
+//	printf("1FORI=0TO%d:POKE768+I,4*PEEK(%d+I)-"
+//		"192+(PEEK(%d+I/3)-%d)/4^(I-INT(I/3)*3):NEXT\n",
+//		filesize-1,2128,2128+filesize,OFFSET2);
+//	printf("2CALL768\"%s%s\n",enc2,enc);
 
-#if 0
-// if using & to jump to beginning (over-writing text page)
-	printf("1FORI=0TO%d:POKE%d+I,4*PEEK(%d+I)-"
-		"192+(PEEK(%d+I/3)-%d)/4^(I-INT(I/3)*3):NEXT\n",
-		filesize-1,
-		0x3f5,
-		2126,2126+filesize,OFFSET2);
-	printf("2&\"%s%s\n",enc2,enc);
-#endif
-
-//	printf("%s\n",enc);
-//	printf("2FORI=0TO%d:POKE768+I,4*PEEK(2054+I)-"
-//		"192+(PEEK(%d+I/3)-32)/4^(I-INT(I/3)*3):NEXT:CALL768\n",
-//		filesize,2054+filesize);
-
-
-
-//	printf("2FORI=0TO%d:C=(PEEK(%d+I/3)-32)/4^(I-INT(I/3)*3):POKE768+I,C+4*(PEEK(2054+I)-32-INT(C/4)):NEXT:CALL768\n",
-//		filesize,2054+filesize);
-
-// note, peek/poke truncate?
-//2FORI=1013TO1141:C=(PEEK(1843+I/3)-32)/4^(I-INT(I/3)*3):POKEI,C+4*(PEEK(1041+I)-32-INT(C/4)):NEXT:&
-
-
+	printf("A$=\"%s%s\"\n",enc2,enc);
+	printf("V=SADD(A$)\n");
+	printf("FOR I=0 TO %d\n",filesize-1);
+	printf("POKE I,4*PEEK(V+I)-204+(PEEK(V+%d+I\\3)-35)\\4^(I MOD 3)\n",
+		filesize);
+	printf("NEXT\n");
+	printf("CALL ABSOLUTE(Q)\n");
 
 	return 0;
 }
