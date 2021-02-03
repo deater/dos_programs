@@ -43,6 +43,7 @@ int grsim_input(void) {
 
 			case SDLK_ESCAPE:
 				return 27;
+			case ' ':
 			case 'a'...'z':
 			case 'A'...'Z':
 				return keypressed;

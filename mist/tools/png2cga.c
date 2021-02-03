@@ -25,7 +25,7 @@ static int color_map[16]={
 	7,	/* 7 L Blue	->	7 Grey */
 	6,	/* 8 Brown	->	6 Brown */
 	12,	/* 9 Orange	->	12 L Red */
-	0,	/* 10 Grey2 (transparent)	*/
+	8,	/* 10 Grey2 (transparent)	*/
 	13,	/* 11 Pink	->	13 Pink */
 	10,	/* 12 L. Green	->	10 L Green */
 	14,	/* 13 Yellow	-> 	14 Yellow */

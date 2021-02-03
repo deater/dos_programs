@@ -220,3 +220,5 @@ struct game_state {
 //CURRENT_DISPLAY	=	$E4	; selena
 //LAST_PLAYED	=	$E4	; selena
 
+/* levels */
+int level_mist(void);

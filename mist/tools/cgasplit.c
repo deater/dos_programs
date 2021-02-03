@@ -12,13 +12,11 @@ int main(int argc, char **argv) {
 
 	int row=0;
 	int col=0;
-	int x,i;
+	int ch;
 	unsigned char out_buffer[80*25];
 	unsigned char in_buffer[80*25*2];
-	int top_color,bottom_color,color;
+	int color;
 
-	unsigned char *image;
-	int xsize,ysize;
 	FILE *outattr,*outdata,*infile;
 
 	char attr_filename[256];
@@ -55,19 +53,15 @@ int main(int argc, char **argv) {
 
 	memset(out_buffer,0,80*25);
 
-	for(row=0;row<24;row++) {
-		for(col=0;col<40;col++) {
-			top_color=color_map[(image[row*xsize+col])&0xf];
-			bottom_color=color_map[(image[row*xsize+col])>>4];
-			color=(top_color<<4)|bottom_color;
+	for(row=0;row<25;row++) {
+		for(col=0;col<80;col++) {
+			color=in_buffer[(row*160)+col*2+1];
+			ch=in_buffer[(row*160)+col*2];
+			fputc(color,outattr);
+			fputc(ch,outdata);
 
-			/* 40 -> 80, two consecutive */
-			out_buffer[(row*80)+(col*2)]=color;
-			out_buffer[(row*80)+(col*2)+1]=color;
 		}
 	}
-
-	for(x=0;x<80*25;x++) fputc( out_buffer[x],outattr);
 
 	fclose(outdata);
 	fclose(outattr);

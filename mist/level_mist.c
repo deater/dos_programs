@@ -1,17 +1,15 @@
-; Mist
+/* Mist Island */
+/* (yes there's a subtle German joke here) */
 
-; a version of Myst?
-; (yes there's a subtle German joke here)
+/* by deater (Vince Weaver) <vince@deater.net> */
 
-; by deater (Vince Weaver) <vince@deater.net>
+#include <stdio.h>
 
-; Zero Page
-	.include "zp.inc"
-	.include "hardware.inc"
-	.include "common_defines.inc"
-	.include "common_routines.inc"
+#include "zp.h"
 
-mist_start:
+int level_mist(void) {
+#if 0
+
 	;===================
 	; init screen
 	;===================
@@ -359,7 +357,11 @@ grab_it:
 flip_dock_switch:
 	lda	#MARKER_DOCK
 	jmp	click_marker_switch
+#endif
 
+	return 0;
+}
+#if 0
 
 	;==========================
 	; includes
@@ -379,3 +381,4 @@ flip_dock_switch:
 
 	; level data
 	.include	"leveldata_mist.inc"
+#endif

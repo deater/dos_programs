@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 		switch(zp.which_level) {
 
 			case LEVEL_MIST:
+				level_mist();
 				break;
 
 			default:
