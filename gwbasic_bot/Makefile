@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -O2 -Wall
 
-all:	convert_qkumba convert_tgreene LOADER.BAS LOADER2.BAS LOADER3.BAS QBASIC.BAS QBASIC2.BAS
+all:	convert_qkumba convert_tgreene LOADER.BAS LOADER2.BAS LOADER3.BAS QBASIC.BAS QBASIC2.BAS QBASIC3.BAS RR.BAS
 
 convert_qkumba:	convert_qkumba.o
 	$(CC) $(LFLAGS) -o convert_qkumba convert_qkumba.o
@@ -34,6 +34,12 @@ QBASIC.BAS:	qbasic.bas
 
 QBASIC2.BAS:	qbasic2.bas
 	todos < qbasic2.bas > QBASIC2.BAS
+
+QBASIC3.BAS:	qbasic3.bas
+	todos < qbasic3.bas > QBASIC3.BAS
+
+RR.BAS:	rr.bas
+	todos < rr.bas > RR.BAS
 
 clean:
 	rm -f *~ *.o convert_qkumba convert_tgreene

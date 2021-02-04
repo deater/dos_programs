@@ -1,0 +1,18 @@
+80	0	63	0	63	; background  x1 x2 y1 y2
+23	26	38	26	63	; grey lower
+19	11	25	26	40	; left dgrey
+19	35	26	41	46	; right dgrey
+18	10	22	32	40	; l green
+18	15	38	47	63	; l green bottom
+18	35	39	35	46	; l green
+17	7	25	41	50	; black arm
+17	39	48	47	54	; r arm
+64	26	32	40	46	; l hand
+64	48	56	49	53	; r hand
+64	25	30	17	25	; neck
+87	28	34	10	22	; face
+6	26	35	6	9	; hair
+6	22	27	8	18	; hair
+24	33	34	31	63	; mic
+24	31	35	23	30	; mic
+87	34	35	16	18	; nose
