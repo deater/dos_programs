@@ -1,0 +1,6 @@
+run dosbox-debug
+
+alt-pause to enter debugger (alt-fn-w on elitebook)
+bp 192:100 to set breakpoint
+F5 in debugger to restart
+F10 to single step
