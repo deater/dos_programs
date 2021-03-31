@@ -1,0 +1,22 @@
+80	0	94	0	94	; 0 background  x1 x2 y1 y2
+23	39	57	39	94	; 1 grey lower
+19	17	38	39	60	; 2 left dgrey
+19	53	62	39	69	; 3 right dgrey
+18	15	34	48	60	; 4 l green
+18	23	58	70	94	; 5 l green bottom
+18	53	59	53	69	; 6 l green
+64	38	45	26	38	; 7 neck
+87	42	51	15	33	; 8 face
+6	39	53	9	14	; 9 hair
+6	33	41	12	27	; 10 hair
+24	50	52	47	94	; 11 mic
+24	47	53	35	45	; 12 mic
+87	51	53	24	27	; 13 nose
+17	11	38	61	75	; 14 l arm
+64	39	48	60	69	; 15 l hand
+80	63	74	60	80	; 16 erase r arm up
+17	59	73	70	81	; 17 r arm
+64	73	84	73	80	; 18 r hand
+80	62	87	70	84	; 19 erase r arm down
+17	62	71	70	81	; 20 r arm up
+64	63	70	60	69	; 21 r hand up
