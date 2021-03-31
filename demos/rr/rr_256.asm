@@ -29,14 +29,11 @@ org 100h
 	; draw rick
 
 ;	xor	di,di
-	mov	si,boxes_data
+	mov	si,boxes_data	; point to the data
 	call	draw_box
 
-;	mov	al,3Fh
-;	mov	dx,0331h
-;	out	dx,al
-;	dec	dx
-	mov	dx,0x330
+
+
 
 	;==========================
 	; play music
@@ -44,14 +41,22 @@ org 100h
 	; it's accepted to assume UART mode
 	; has to be set in the dosbox config
 
+;	mov	al,3Fh
+;	mov	dx,0331h
+;	out	dx,al
+;	dec	dx
+	mov	dx,0x330
+
 	mov	si,music_sequence
 music_loop:
-	mov	al,90h
+	mov	al,90h		; MIDI start note
 	out	dx,al
+
 	mov	cl,08h
 	lodsb
-	or	al,al
-	jz	exit
+	or	al,al		; lodsb doesn't set flags
+	jz	exit		; if zero, done
+
 	js	ong
 	sar	cx,01h
 ong:
@@ -62,26 +67,27 @@ ong:
 	jle	blah
 	sub	bp,byte 10h
 blah:
-;	push	si
-;	push	dx
-	pusha
-;	mov	si,arm_down
-;	add	si,bp
-	lea	si,[bp+arm_down]
+
+	pusha				; save registers (si and dx most impt)
+
+	lea	si,[bp+arm_down]	; point to arm up/arm down
 
 	call	draw_box
-;	pop	dx
-;	pop	si
-	popa
+
+	popa				; restore registers
+
 	jmp	short music_loop
 nohands:
-	and	al,7Fh
+	and	al,7Fh			; strip off length
+	out	dx,al			; output note
+
+	mov	al,67h			; output velocity
 	out	dx,al
-	mov	al,67h
-	out	dx,al
-;	mov	ah,86h
+
+;	mov	ah,86h			; pause
 ;	int	15h
 ;	mov cl,6
+
 waiter:
 	hlt
 	loop	waiter
