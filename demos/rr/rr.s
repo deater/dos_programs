@@ -15,7 +15,7 @@
 #  dump with  "objdump -bbinary --disassemble-all -mi8086 ./rr.com"
 
 
-# ??? bytes
+# 258 bytes -- sorta working code with music
 
 .text
 
@@ -35,7 +35,7 @@ start:
 	mov	%bx,%es
 	xor	%di,%di
 
-	mov	$boxes,%si
+	mov	$boxes,%si	# point to our boxes data
 
 	# input in si
 	# y is in di.   yend in dx
@@ -47,7 +47,7 @@ draw_box:
 	lodsb			# get y1 into al
 
 	cmp	$128,%al	# note lodsb does not set flags
-	je	exit
+	je	done_boxes
 
 	add	$52,%al		# center vertically
 
@@ -56,31 +56,86 @@ draw_box:
 	mov	%ax,%di		# y1*320 into di
 
 	lodsb			# get y2 into al
-	mov	%al,%dl
+	mov	%al,%dl		# store in %dx
 
 	xor	%ax,%ax
-	lodsb			# get x1 into al
+	lodsb			# get x1 into ax
+
 	add	%ax,%di		# di=(320*y1)+x1
 	add	$112,%di	# center horizontally
 
 	lodsb			# get length
 	mov	%ax,%bp		# store for later
 
-	mov	$320,%bx
+	mov	$320,%bx	# offset to increment to get next line
 	sub	%bp,%bx
 
 	lodsb			# color
 
 box_loop:
-	mov	%bp,%cx
-	rep	stosb
+	mov	%bp,%cx		# put line length into %cx
+	rep	stosb		# store out a line
 
-	add	%bx,%di
+	add	%bx,%di		# add offset to next line
 
-	dec	%dl
-	jnz	box_loop
+	dec	%dl		# decrement row count
+	jnz	box_loop	# repeat until box done
 
-	jmp	draw_box
+	jmp	draw_box	# draw next box
+
+done_boxes:
+
+music:
+	mov	$0x3F,%al		# set UART mode - command
+	mov 	$0x331,%dx		# MIDI Control Port
+	out 	%al,%dx			# send !
+	dec 	%dx			# MIDI Data Port ( = 330h )
+
+
+	mov	$music_sequence,%si	# point to music sequence
+music_loop:
+
+	mov 	$0x90,%al		# send note on channel ZERO - command
+	out 	%al,%dx			# send
+
+	mov	$8,%cx			# set default note length
+
+	lodsb				# get note (doesn't set flags)
+	or	%al,%al			# if 0, then end
+	jz	exit
+
+	js	long			# if high bit set, leave it long
+
+short:
+	sar	%cx			# play note shorter
+long:
+
+handle_note:
+
+	and	$0x7f,%al		# data byte 1: note in %al
+	push	%ax			# save so we can stop
+	out 	%al,%dx			# send !
+	mov 	$0x67,%al		# data byte 2 : VOLUME = 67h
+	out 	%al,%dx			# send !
+
+pause:
+
+	# cx:dx = wait in microseconds
+	# cx=1 = 65536us = 64ms
+	# so 20 should be about a second?
+	# dx preserved?
+
+	mov	$0x86,%ah		# WAIT.
+	int	$0x15
+
+	mov 	$0x80,%al		# send note on channel ZERO - command
+	out 	%al,%dx			# send !
+	pop	%ax
+	out 	%al,%dx			# send !
+	mov 	$0x67,%al		# data byte 2 : VOLUME = 67h
+	out 	%al,%dx			# send !
+
+	jmp	music_loop
 
 	#================================
 	# Exit
@@ -110,10 +165,39 @@ boxes:
 .byte	24,	4,	51,	3,	87	# 13 nose
 .byte	61,	15,	11,	28,	17	# 14 l arm
 .byte	60,	10,	39,	10,	64	# 15 l hand
+arm_up:
 .byte	60,	21,	63,	12,	80	# 16 erase r arm up
 .byte	70,	12,	59,	15,	17	# 17 r arm
 .byte	73,	8,	73,	12,	64	# 18 r hand
+.byte	128
+arm_down:
 .byte	70,	15,	62,	26,	80	# 19 erase r arm down
 .byte	70,	12,	62,	10,	17	# 20 r arm up
 .byte	60,	10,	63,	8,	64	# 21 r hand up
 .byte	128
+
+PAUSE		= 1
+SHORT		= 0
+LONG		= 128
+END		= 0
+
+NOTE_A3		= 57
+NOTE_B3		= 59
+NOTE_CSHARP4	= 61
+NOTE_D4		= 62
+NOTE_E4		= 64
+NOTE_FSHARP4	= 66
+
+music_sequence:
+first:
+	.byte   SHORT|NOTE_A3, SHORT|NOTE_B3, SHORT|NOTE_D4, SHORT|NOTE_B3
+	.byte   LONG|NOTE_FSHARP4, LONG|NOTE_FSHARP4, LONG|NOTE_E4,  PAUSE
+second:
+	.byte   SHORT|NOTE_A3, SHORT|NOTE_B3, SHORT|NOTE_D4, SHORT|NOTE_B3
+	.byte   LONG|NOTE_E4, LONG|NOTE_E4, SHORT|NOTE_D4, SHORT|NOTE_CSHARP4
+	.byte   LONG|NOTE_B3,   PAUSE
+third:
+	.byte   SHORT|NOTE_A3, SHORT|NOTE_B3, SHORT|NOTE_D4, SHORT|NOTE_B3
+	.byte   LONG|NOTE_D4, SHORT|NOTE_E4, LONG|NOTE_CSHARP4, SHORT|NOTE_A3
+	.byte   SHORT|NOTE_A3, LONG|NOTE_E4, LONG|NOTE_D4, PAUSE, END
+
