@@ -16,6 +16,9 @@
 
 
 # 258 bytes -- sorta working code with music
+# 249 bytes -- disable turning off notes
+# 253 bytes -- draw box as separate routine
+# 281 bytes -- hand waving works
 
 .text
 
@@ -28,6 +31,9 @@
 	.globl start
 start:
 
+	#==========================
+	# setup graphics
+
 	mov	$0x13,%ax	# set 320x200x256 mode
 	int	$0x10
 
@@ -35,13 +41,113 @@ start:
 	mov	%bx,%es
 	xor	%di,%di
 
+	#==========================
+	# draw rick
+
 	mov	$boxes,%si	# point to our boxes data
 
-	# input in si
-	# y is in di.   yend in dx
-	# color in AX
-	# saved width in bp->cx
-	# bx = add to next line
+	call	draw_box	# draw initial with hands down
+
+	#==========================
+	# play music
+
+music:
+	mov	$0x3F,%al		# set UART mode - command
+	mov 	$0x331,%dx		# MIDI Control Port
+	out 	%al,%dx			# send !
+	dec 	%dx			# MIDI Data Port ( = 330h )
+
+
+	mov	$music_sequence,%si	# point to music sequence
+music_loop:
+
+	mov 	$0x90,%al		# send note on channel ZERO - command
+	out 	%al,%dx			# send
+
+	mov	$8,%cx			# set default note length
+
+	lodsb				# get note (doesn't set flags)
+	or	%al,%al			# if 0, then end
+	jz	exit
+
+	js	long			# if high bit set, leave it long
+
+short:
+	sar	%cx			# play note shorter
+long:
+
+	cmp	$1,%al			# see if pause/move hand
+	jne	no_hands
+
+	#======================
+	# wave hands at pause
+do_hands:
+	xor	%bp,%bp
+	cmp	$second,%si
+	jle	blah
+	sub	$16,%bp
+blah:
+
+	push	%si
+	push	%dx			# need to save port number
+
+	mov	$arm_down,%si
+	add	%bp,%si
+
+	call	draw_box
+
+	pop	%dx
+	pop	%si
+	jmp	music_loop
+
+
+no_hands:
+	and	$0x7f,%al		# data byte 1: note in %al
+#	push	%ax			# save note to turn off later
+
+handle_note1:
+
+
+	out 	%al,%dx			# send !
+	mov 	$0x67,%al		# data byte 2 : VOLUME = 67h
+	out 	%al,%dx			# send !
+
+
+
+pause:
+
+	# cx:dx = wait in microseconds
+	# cx=1 = 65536us = 64ms
+	# so 20 should be about a second?
+	# dx preserved?
+
+	mov	$0x86,%ah		# WAIT
+	int	$0x15
+
+	# Turn off note
+
+#	mov 	$0x80,%al		# send note on channel ZERO - command
+#	out 	%al,%dx			# send !
+
+#	pop	%ax
+#
+#handle_note2:
+#	out 	%al,%dx			# send !
+#	mov 	$0x67,%al		# data byte 2 : VOLUME = 67h
+#	out 	%al,%dx			# send !
+
+	jmp	music_loop
+
+
+#================================
+# Draw Box
+#================================
+# input in si
+# y is in di.   yend in dx
+# color in AX
+# saved width in bp->cx
+# bx = add to next line
+
 draw_box:
 	xor	%ax,%ax
 	lodsb			# get y1 into al
@@ -84,58 +190,7 @@ box_loop:
 	jmp	draw_box	# draw next box
 
 done_boxes:
-
-music:
-	mov	$0x3F,%al		# set UART mode - command
-	mov 	$0x331,%dx		# MIDI Control Port
-	out 	%al,%dx			# send !
-	dec 	%dx			# MIDI Data Port ( = 330h )
-
-
-	mov	$music_sequence,%si	# point to music sequence
-music_loop:
-
-	mov 	$0x90,%al		# send note on channel ZERO - command
-	out 	%al,%dx			# send
-
-	mov	$8,%cx			# set default note length
-
-	lodsb				# get note (doesn't set flags)
-	or	%al,%al			# if 0, then end
-	jz	exit
-
-	js	long			# if high bit set, leave it long
-
-short:
-	sar	%cx			# play note shorter
-long:
-
-handle_note:
-
-	and	$0x7f,%al		# data byte 1: note in %al
-	push	%ax			# save so we can stop
-	out 	%al,%dx			# send !
-	mov 	$0x67,%al		# data byte 2 : VOLUME = 67h
-	out 	%al,%dx			# send !
-
-pause:
-
-	# cx:dx = wait in microseconds
-	# cx=1 = 65536us = 64ms
-	# so 20 should be about a second?
-	# dx preserved?
-
-	mov	$0x86,%ah		# WAIT.
-	int	$0x15
-
-	mov 	$0x80,%al		# send note on channel ZERO - command
-	out 	%al,%dx			# send !
-	pop	%ax
-	out 	%al,%dx			# send !
-	mov 	$0x67,%al		# data byte 2 : VOLUME = 67h
-	out 	%al,%dx			# send !
-
-	jmp	music_loop
+	ret
 
 	#================================
 	# Exit
@@ -144,6 +199,8 @@ exit:
 	xor     %al,%al			# return 0
 	mov	$0x4c,%ah		# exit
 	int     $0x21             	# and exit
+
+
 
 
 .data
@@ -189,15 +246,15 @@ NOTE_E4		= 64
 NOTE_FSHARP4	= 66
 
 music_sequence:
-first:
+first: # si=7
 	.byte   SHORT|NOTE_A3, SHORT|NOTE_B3, SHORT|NOTE_D4, SHORT|NOTE_B3
 	.byte   LONG|NOTE_FSHARP4, LONG|NOTE_FSHARP4, LONG|NOTE_E4,  PAUSE
-second:
+second: #si=17
 	.byte   SHORT|NOTE_A3, SHORT|NOTE_B3, SHORT|NOTE_D4, SHORT|NOTE_B3
 	.byte   LONG|NOTE_E4, LONG|NOTE_E4, SHORT|NOTE_D4, SHORT|NOTE_CSHARP4
 	.byte   LONG|NOTE_B3,   PAUSE
-third:
+third: #si=29
 	.byte   SHORT|NOTE_A3, SHORT|NOTE_B3, SHORT|NOTE_D4, SHORT|NOTE_B3
 	.byte   LONG|NOTE_D4, SHORT|NOTE_E4, LONG|NOTE_CSHARP4, SHORT|NOTE_A3
-	.byte   SHORT|NOTE_A3, LONG|NOTE_E4, LONG|NOTE_D4, PAUSE, END
+	.byte   SHORT|NOTE_A3, LONG|NOTE_E4, LONG|NOTE_D4, END
 

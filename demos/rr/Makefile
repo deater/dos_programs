@@ -2,7 +2,13 @@ CC = gcc
 STRIP = strip
 CFLAGS = -O2 -Wall
 
-all:	rr.com
+all:	rr.com	rr_256.com
+
+
+###
+
+rr_256.com:	rr_256.asm
+	nasm rr_256.asm -fbin -o rr_256.com
 
 ###
 
