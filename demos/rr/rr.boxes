@@ -1,7 +1,6 @@
 80	0	94	0	94	; 0 background  x1 x2 y1 y2
 23	39	57	39	94	; 1 grey lower
-19	17	38	39	60	; 2 left dgrey
-19	53	62	39	69	; 3 right dgrey
+19	17	62	39	70	; 2 left dgrey
 18	15	34	48	60	; 4 l green
 18	23	58	70	94	; 5 l green bottom
 18	53	59	53	69	; 6 l green
