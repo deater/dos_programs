@@ -1,9 +1,10 @@
-; rr
+; Wait for it...
+;	256 byte DOS demo shown at Revision 2021
 
 ; roughly based on a PCbot twitter Qbasic program
 
 ; by Vince `deater` Weaver <vince@deater.net>
-;	size optimization by Hellmood
+;	with Dragon Fractal and Extreme Size Optimization by Hellmood
 
 ;	--== Desire ==--
 
