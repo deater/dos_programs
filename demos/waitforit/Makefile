@@ -38,10 +38,9 @@ rr.o:		rr.s
 
 ###
 
-install:	rr.com rr_small.com rr_tiny.com
-	cp rr.com /home/vince/dos/dos/
-	cp rr_small.com /home/vince/dos/dos/
-	cp rr_tiny.com /home/vince/dos/dos/
+install:	waitfor.com rr.com rr_small.com rr_tiny.com
+	cp waitfor.com /home/vince/dos/dos/
+
 
 zip:	rr.com
 	zip
