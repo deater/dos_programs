@@ -63,7 +63,7 @@ void drawdots(void) {
 	ax=cs;				// mov	ax,cs
 	ds=ax;				// mov	ds,ax
 
-					// mov	fs,cs:_bgpic[2]
+	fs=bgpic[2];			// mov	fs,cs:_bgpic[2]
 	cx=dotnum;			// mov	cx,cs:_dotnum
 	si=0;				// mov	si,OFFSET dot
 
@@ -71,7 +71,7 @@ label1:
 	push(cx);			//push	cx
 	ax=dot[si].x;			// mov	ax,ds:[si+0] ;X
 	imul_16(rotsin);		// imul	ds:_rotsin
-	ax=ax;				//	mov	ax,ax
+	ax=ax;				// mov	ax,ax
 	cx=dx;				// mov	cx,dx
 	ax=dot[si].z;			// mov	ax,ds:[si+4] ;Z
 	imul_16(rotcos);		// imul	ds:_rotcos
@@ -86,14 +86,20 @@ label1:
 	cx=dx;				// mov	cx,dx
 	ax=dot[si].z;			// mov	ax,ds:[si+4] ;Z
 	imul_16(rotsin);		// imul	ds:_rotsin
-	ax=ax+bx;			// add	ax,bx
+
+	temp32=ax+bx;			// add	ax,bx
+	ax=ax+bx;			//
 	dx=dx+cx;			// adc	dx,cx
+	if (temp32&(1<<16)) dx=dx+1;
+
+
 	ax=(ax>>8)|(dx<<8);		// shrd	ax,dx,8
-	dx=dx>>8;			// sar	dx,8
+	dx=(dx>>8)&0xff;		// sar	dx,8
 
 	bx=ax;				// mov	bx,ax
 	cx=dx;				// mov	cx,dx
-	ax=(ax>>3)|(dx<<5);		// shrd	ax,dx,3
+	ax=(ax>>3)|(dx<<13);		// shrd	ax,dx,3
+
 	dx=dx>>3;			// sar	dx,3
 	temp32=ax+bx;			// add	ax,bx
 	ax=ax+bx;
@@ -115,14 +121,14 @@ label1:
 	if (ax>199) goto label2;	// cmp	ax,199
 					// ja	@@2
 	bx=ax;				// mov	bx,ax
-	bx=bx>>1;			// shl	bx,1
+	bx=bx<<1;			// shl	bx,1
 	bx=rows[bx];			// mov	bx,ds:_rows[bx]
 	ax=pop();			// pop	ax
 	bx=bx+ax;			// add	bx,ax
 	push(ax);			// push	ax
 
+	/* erase old */
 	di=dot[si].old1;		// mov	di,ds:[si+6]
-
 	ax=bgpic[di];			// mov	ax,fs:[di]
 	framebuffer[di]=ax;		// mov	es:[di],ax
 	ax=87+87*256;			// mov	ax,87+87*256
@@ -299,6 +305,8 @@ label3:
 }
 
 void setpalette(char *pal) {
+
+	printf("TODO: implement setpalette\n");
 #if 0
 	push	bp
 	mov	bp,sp
@@ -326,13 +334,41 @@ short _face[]={
 	30000,30000,30000
 };
 
-/* wait for VGA retrace */
+/* wait for VGA border start */
 int dis_waitb(void) {
+
+// descr: Waits for border start
+// waitb_1 PROC NEAR
+//        call    checkkeys
+
+//        IFDEF INDEMO
+//        sti
+//        mov     ax,cs:copperframecount
+//@@v:    cmp     cs:copperframecount,ax
+//        je      @@v
+//@@q:    mov     ax,cs:copperframecount
+//       mov     cs:copperframecount,0
+//        ELSE
+
+//        mov     dx,3dah
+//@@1:    in      al,dx
+//        test    al,8
+//        jnz     @@1
+//@@2:    in      al,dx
+//        test    al,8
+ //       jz      @@2
+
+  //      mov     ax,1 ;number of frames taken            ;TEMP!
+
+//        ENDIF
+//        ret
+//waitb_1 ENDP
+
 
 	/* approximate by 70Hz sleep */
 	usleep(14286);
 
-	return 0;
+	return 1;
 }
 
 int dis_exit(void) {
@@ -407,11 +443,12 @@ int main(int argc,char **argv) {
 	int rota=-1*64;
 //	int fb=0;
 	int rot=0,rots=0;
-	int a,b,c,d,i,j,mode;
+	int a,b,c,d,i,j=0,mode;
 	int grav,gravd;
 	int f=0;
 
 	//dis_partstart();
+
 	dotnum=512;
 	for(a=0;a<dotnum;a++) {
 		dottaul[a]=a;
@@ -447,6 +484,7 @@ int main(int argc,char **argv) {
 		d=dot[b].z; dot[b].z=dot[c].z; dot[c].z=d;
 	}
 
+	/* setup rows lookup table */
 	for(a=0;a<200;a++) {
 		rows[a]=a*320;
 	}
@@ -547,45 +585,49 @@ int main(int argc,char **argv) {
 
 	while(!dis_exit() && frame<2450) {
 
+		/* code sets border color */
+		/* then waits for it to end, as a timing thing? */
 		setborder(0);
+
+		/* when not in demo this defaults to 1? */
 		repeat=dis_waitb();
+
 		if(frame>2300) setpalette(pal2);
+
 		setborder(1);
+
 		if(dis_indemo()) {
 			/* ?? music synchronization? */
 //			a=dis_musplus();
 //			if(a>-4 && a<0) break;
 		}
-		while(repeat--)
-		{
-			frame++;
-			if(frame==500) f=0;
-			i=dottaul[j];
-			j++; j%=dotnum;
-			if(frame<500)
-			{
-				dot[i].x=isin(f*11)*40;
-				dot[i].y=icos(f*13)*10-dropper;
-				dot[i].z=isin(f*17)*40;
-				dot[i].yadd=0;
-			}
-			else if(frame<900)
-			{
-				dot[i].x=icos(f*15)*55;
-				dot[i].y=dropper;
-				dot[i].z=isin(f*15)*55;
-				dot[i].yadd=-260;
-			}
-			else if(frame<1700)
-			{	
-				a=sin1024[frame&1023]/8;
-				dot[i].x=icos(f*66)*a;
-				dot[i].y=8000;
-				dot[i].z=isin(f*66)*a;
-				dot[i].yadd=-300;
-			}
-			else if(frame<2360)
-			{
+
+		while(repeat--) {
+
+		frame++;
+		if(frame==500) f=0;
+		i=dottaul[j];
+		j++; j%=dotnum;
+		if(frame<500) {
+			dot[i].x=isin(f*11)*40;
+			dot[i].y=icos(f*13)*10-dropper;
+			dot[i].z=isin(f*17)*40;
+			dot[i].yadd=0;
+		}
+		else if(frame<900) {
+			dot[i].x=icos(f*15)*55;
+			dot[i].y=dropper;
+			dot[i].z=isin(f*15)*55;
+			dot[i].yadd=-260;
+		}
+		else if(frame<1700) {
+			a=sin1024[frame&1023]/8;
+			dot[i].x=icos(f*66)*a;
+			dot[i].y=8000;
+			dot[i].z=isin(f*66)*a;
+			dot[i].yadd=-300;
+		}
+		else if(frame<2360) {
 				/*
 				a=rand()/128+32;
 				dot[i].y=8000-a*80;
@@ -596,53 +638,52 @@ int main(int argc,char **argv) {
 				dot[i].yadd=300;
 				if(frame>1640 && !(frame&31) && grav>-2) grav--;
 				*/
-				dot[i].x=rand()-16384;
-				dot[i].y=8000-rand()/2;
-				dot[i].z=rand()-16384;
-				dot[i].yadd=0;
-				if(frame>1900 && !(frame&31) && grav>0) grav--;
-			}
-			else if(frame<2400)
-			{
-				a=frame-2360;
-				for(b=0;b<768;b+=3)
-				{
-					c=pal[b+0]+a*3;
-					if(c>63) c=63;
-					pal2[b+0]=c;
-					c=pal[b+1]+a*3;
-					if(c>63) c=63;
-					pal2[b+1]=c;
-					c=pal[b+2]+a*4;
-					if(c>63) c=63;
-					pal2[b+2]=c;
-				}
-			}
-			else if(frame<2440)
-			{
-				a=frame-2400;
-				for(b=0;b<768;b+=3)
-				{
-					c=63-a*2;
-					if(c<0) c=0;
-					pal2[b+0]=c;
-					pal2[b+1]=c;
-					pal2[b+2]=c;
-				}
-			}
-			if(dropper>4000) dropper-=100;
-			rotcos=icos(rot)*64; rotsin=isin(rot)*64;
-			rots+=2;
-			if(frame>1900) 
-			{
-				rot+=rota/64;
-				rota--;
-			}
-			else rot=isin(rots);
-			f++;
-			gravity=grav;
-			gravityd=gravd;
+			dot[i].x=rand()-16384;
+			dot[i].y=8000-rand()/2;
+			dot[i].z=rand()-16384;
+			dot[i].yadd=0;
+			if(frame>1900 && !(frame&31) && grav>0) grav--;
 		}
+		else if(frame<2400) {
+			a=frame-2360;
+			for(b=0;b<768;b+=3) {
+				c=pal[b+0]+a*3;
+				if(c>63) c=63;
+				pal2[b+0]=c;
+				c=pal[b+1]+a*3;
+				if(c>63) c=63;
+				pal2[b+1]=c;
+				c=pal[b+2]+a*4;
+				if(c>63) c=63;
+				pal2[b+2]=c;
+			}
+		}
+		else if(frame<2440) {
+			a=frame-2400;
+			for(b=0;b<768;b+=3) {
+				c=63-a*2;
+				if(c<0) c=0;
+				pal2[b+0]=c;
+				pal2[b+1]=c;
+				pal2[b+2]=c;
+			}
+		}
+		if(dropper>4000) dropper-=100;
+
+		rotcos=icos(rot)*64; rotsin=isin(rot)*64;
+		rots+=2;
+
+		if(frame>1900) {
+			rot+=rota/64;
+			rota--;
+		}
+		else rot=isin(rots);
+		f++;
+		gravity=grav;
+		gravityd=gravd;
+		}
+
+
 		drawdots();
 
 		mode13h_graphics_update();
