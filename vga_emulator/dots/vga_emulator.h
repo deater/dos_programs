@@ -11,3 +11,6 @@ int mode13h_graphics_update(void);
 void set_default_pal(void);
 int graphics_input(void);
 void write_framebuffer(int address, int value);
+
+void outp(short address, int value);
+int inp(short addr);

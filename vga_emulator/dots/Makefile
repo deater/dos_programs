@@ -8,8 +8,8 @@ all:	dots hellmood_memories
 
 ###
 
-dots:	dots.o vga_emulator.o
-	$(CC) -o dots dots.o vga_emulator.o $(LFLAGS) $(SDL_LIBS)
+dots:	dots.o vga_emulator.o 8086_emulator.o
+	$(CC) -o dots dots.o vga_emulator.o 8086_emulator.o $(LFLAGS) $(SDL_LIBS)
 
 dots.o:	dots.c vga_emulator.h
 	$(CC) $(CFLAGS) $(SDL_INCLUDE) -c dots.c

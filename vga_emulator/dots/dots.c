@@ -1,30 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <malloc.h>
 #include <math.h>
 
+#include "8086_emulator.h"
 #include "vga_emulator.h"
 #include "sin1024.h"
-
-#if 0
-//extern int face[];
-
-//extern int bpmin,bpmax;
-
-//extern char *bgpic;
-//extern int rotsin,rotcos;
-//extern int rows[];
-//extern long depthtable1[];
-//extern long depthtable2[];
-//extern long depthtable3[];
-//extern long depthtable4[];
-
-//extern int dotnum;
-
-//extern void drawdots(void);
-#endif
-
 
 #define	MAXDOTS	1024
 
@@ -45,14 +28,14 @@ short rows[200]; // all zero
 //short dot[MAXDOTS][8];	// x,y,z,oldposshadow,oldpos,-,-,-
 
 struct {
-	short	x;
-	short	y;
-	short	z;
-	short	old1;
-	short	old2;
-	short	old3;
-	short	old4;
-	short	yadd;
+	short	x;	// 0
+	short	y;	// 2
+	short	z;	// 4
+	short	old1;	// 6
+	short	old2;	// 8
+	short	old3;	// 10
+	short	old4;	// 12
+	short	yadd;	// 14
 } dot[MAXDOTS];
 
 
@@ -72,176 +55,250 @@ int depthtable3[128];
 int depthtable4[128];
 
 void drawdots(void) {
+	int temp32,eax;
 
-#if 0
-	CBEG
-	mov	ax,0a000h
-	mov	es,ax
-	mov	ax,cs
-	mov	ds,ax
-	mov	fs,cs:_bgpic[2]
-	mov	cx,cs:_dotnum
-	mov	si,OFFSET dot
-@@1:	push	cx
+				//	CBEG
+	ax=0xa000;			// mov	ax,0a000h
+	es=ax;				// mov	es,ax
+	ax=cs;				// mov	ax,cs
+	ds=ax;				// mov	ds,ax
 
-	mov	ax,ds:[si+0] ;X
-	imul	ds:_rotsin
-	mov	ax,ax
-	mov	cx,dx
-	mov	ax,ds:[si+4] ;Z
-	imul	ds:_rotcos
-	sub	ax,bx
-	sub	dx,cx
-	mov	bp,dx
-	add	bp,9000
-	
-	mov	ax,ds:[si+0] ;X
-	imul	ds:_rotcos
-	mov	bx,ax
-	mov	cx,dx
-	mov	ax,ds:[si+4] ;Z
-	imul	ds:_rotsin
-	add	ax,bx
-	adc	dx,cx
-	shrd	ax,dx,8
-	sar	dx,8
-	
-	mov	bx,ax
-	mov	cx,dx
-	shrd	ax,dx,3
-	sar	dx,3
-	add	ax,bx
-	adc	dx,cx
-	
-	idiv	bp
-	add	ax,160
-	push	ax
-	cmp	ax,319
-	ja	@@2
-	
-	;shadow
+					// mov	fs,cs:_bgpic[2]
+	cx=dotnum;			// mov	cx,cs:_dotnum
+	si=0;				// mov	si,OFFSET dot
 
-	xor	ax,ax
-	mov	dx,8
-	idiv	bp
-	add	ax,100
-	cmp	ax,199
-	ja	@@2
-	mov	bx,ax
-	shl	bx,1
-	mov	bx,ds:_rows[bx]
-	pop	ax
-	add	bx,ax
-	push	ax
-	
-	mov	di,ds:[si+6]
-	mov	ax,fs:[di]
-	mov	es:[di],ax
-	mov	ax,87+87*256
-	mov	word ptr es:[bx],ax
-	mov	ds:[si+6],bx
-	
-	;ball
-	
-	mov	ax,ds:_gravity
-	add	ds:[si+14],ax
-	mov	ax,ds:[si+2] ;Y
-	add	ax,ds:[si+14]
-	cmp	ax,ds:_gravitybottom
-	jl	@@4
-	push	ax
-	mov	ax,ds:[si+14]
-	neg	ax
-	imul	cs:_gravityd
-	sar	ax,4
-	mov	ds:[si+14],ax
-	pop	ax
-	add	ax,ds:[si+14]
-@@4:	mov	ds:[si+2],ax
-	cwd
-	shld	dx,ax,6
-	shl	ax,6
-	idiv	bp
-	add	ax,100
-	cmp	ax,199
-	ja	@@3
-	mov	bx,ax
-	shl	bx,1
-	mov	bx,ds:_rows[bx]
-	pop	ax
-	add	bx,ax
+label1:
+	push(cx);			//push	cx
+	ax=dot[si].x;			// mov	ax,ds:[si+0] ;X
+	imul_16(rotsin);		// imul	ds:_rotsin
+	ax=ax;				//	mov	ax,ax
+	cx=dx;				// mov	cx,dx
+	ax=dot[si].z;			// mov	ax,ds:[si+4] ;Z
+	imul_16(rotcos);		// imul	ds:_rotcos
+	ax=ax-bx;			// sub	ax,bx
+	dx=dx-cx;			// sub	dx,cx
+	bp=dx;				// mov	bp,dx
+	bp=bp+9000;			// add	bp,9000
 
-	mov	di,ds:[si+8]
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	add	di,320
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	add	di,320
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-;	add	di,320
-;	mov	eax,fs:[di]
-;	mov	es:[di],eax
-	shr	bp,6
-	and	bp,not 3
-	
-	cmp	bp,cs:_bpmin
-	jge	@@t1
-	mov	cs:_bpmin,bp
-@@t1:	cmp	bp,cs:_bpmax
-	jle	@@t2
-	mov	cs:_bpmax,bp
-@@t2:
-	mov	ax,word ptr ds:_depthtable1[bp]
-	mov	word ptr es:[bx+1],ax
-	mov	eax,ds:_depthtable2[bp]
-	mov	dword ptr es:[bx+320],eax
-	mov	ax,word ptr ds:_depthtable3[bp]
-	mov	word ptr es:[bx+641],ax
-	mov	ds:[si+8],bx
+	ax=dot[si].x;			// mov	ax,ds:[si+0] ;X
+	imul_16(rotcos);		// imul	ds:_rotcos
+	bx=ax;				// mov	bx,ax
+	cx=dx;				// mov	cx,dx
+	ax=dot[si].z;			// mov	ax,ds:[si+4] ;Z
+	imul_16(rotsin);		// imul	ds:_rotsin
+	ax=ax+bx;			// add	ax,bx
+	dx=dx+cx;			// adc	dx,cx
+	ax=(ax>>8)|(dx<<8);		// shrd	ax,dx,8
+	dx=dx>>8;			// sar	dx,8
 
-@@z:	pop	cx
-	add	si,16
-	loop	@@1
-@@0:	CEND
+	bx=ax;				// mov	bx,ax
+	cx=dx;				// mov	cx,dx
+	ax=(ax>>3)|(dx<<5);		// shrd	ax,dx,3
+	dx=dx>>3;			// sar	dx,3
+	temp32=ax+bx;			// add	ax,bx
+	ax=ax+bx;
+	dx=dx+cx;			// adc	dx,cx
+	if (temp32&(1<<16)) dx=dx+1;
 
-@@2:	mov	di,ds:[si+8]
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	add	di,320
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	add	di,320
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	mov	di,ds:[si+6]
-	mov	ds:[si+6],ax
-	mov	ax,fs:[di]
-	mov	es:[di],ax
-	pop	bx
-	pop	cx
-	add	si,16
-	loop	@@1
-	jmp	@@0
-@@3:	mov	di,ds:[si+8]
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	add	di,320
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	add	di,320
-	mov	eax,fs:[di]
-	mov	es:[di],eax
-	pop	bx
-	pop	cx
-	add	si,16
-	loop	@@1
-	jmp	@@0
-#endif
+	idiv_16(bp);			// idiv bp
+	ax=ax+160;			// add	ax,160
+	push(ax);			// push	ax
+	if (ax>319) goto label2;	// cmp	ax,319
+					// ja	@@2
+
+	/* shadow */
+
+	ax=0;				// xor	ax,ax
+	dx=8;				// mov	dx,8
+	idiv_16(bp);			// idiv	bp
+	ax=ax+100;			// add	ax,100
+	if (ax>199) goto label2;	// cmp	ax,199
+					// ja	@@2
+	bx=ax;				// mov	bx,ax
+	bx=bx>>1;			// shl	bx,1
+	bx=rows[bx];			// mov	bx,ds:_rows[bx]
+	ax=pop();			// pop	ax
+	bx=bx+ax;			// add	bx,ax
+	push(ax);			// push	ax
+
+	di=dot[si].old1;		// mov	di,ds:[si+6]
+
+	ax=bgpic[di];			// mov	ax,fs:[di]
+	framebuffer[di]=ax;		// mov	es:[di],ax
+	ax=87+87*256;			// mov	ax,87+87*256
+	framebuffer[bx]=ax;		// mov	word ptr es:[bx],ax
+	dot[si].old1=bx;		// mov	ds:[si+6],bx
+
+	/* ball */
+
+	ax=gravity;			// mov	ax,ds:_gravity
+	dot[si].yadd+=ax;		// add	ds:[si+14],ax
+	ax=dot[si].y;			// mov	ax,ds:[si+2] ;Y
+	ax+=dot[si].yadd;		// add	ax,ds:[si+14]
+	if (ax<gravitybottom) goto label4; //cmp	ax,ds:_gravitybottom
+					// jl	@@4
+
+	push(ax);			// push	ax
+
+	ax=dot[si].yadd;		// mov	ax,ds:[si+14]
+	ax=-ax;				// neg	ax
+	imul_16(gravityd);		// imul	cs:_gravityd
+	ax=ax>>4;			// sar	ax,4
+	dot[si].yadd=ax;		// mov	ds:[si+14],ax
+	ax=pop();			// pop	ax
+	ax+=dot[si].yadd;		// add	ax,ds:[si+14]
+
+label4:
+	dot[si].y=ax;			// mov	ds:[si+2],ax
+	if (ax&0x8000) {		// cwd
+		dx=0xffff;
+	}
+	else {
+		dx=0;
+	}
+
+	dx=(dx<<6)|(ax>>10);		// shld	dx,ax,6
+	ax=ax<<6;			// shl	ax,6
+
+	idiv_16(bp);			// idiv	bp
+	ax=ax+100;			// add	ax,100
+	if (ax>199) goto label3;	// cmp	ax,199
+					// ja	@@3
+	bx=ax;				// mov	bx,ax
+	bx=bx<<1;			// shl	bx,1
+	bx=rows[bx];			// mov	bx,ds:_rows[bx]
+
+	ax=pop();			// pop	ax
+	bx=bx+ax;			// add	bx,ax
+
+	di=dot[si].old2;		// mov	di,ds:[si+8]
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=di+320;			// add	di,320
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=di+320;			// add	di,320
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+				//;;	add	di,320
+				//;;	mov	eax,fs:[di]
+				//;;	mov	es:[di],eax
+
+	bp=bp>>6;		// shr	bp,6
+	bp=bp&(~3);		// and	bp,not 3
+
+	if (bp>=bpmin) goto label_t1;	// cmp	bp,cs:_bpmin
+					// jge	@@t1
+	bpmin=bp;			// mov	cs:_bpmin,bp
+label_t1:
+	if (bp<=bpmax) goto label_t2;	// cmp	bp,cs:_bpmax
+					// jle	@@t2
+	bpmax=bp;			// mov	cs:_bpmax,bp
+label_t2:
+	eax=depthtable1[bp];		// mov	ax,word ptr ds:_depthtable1[bp]
+					// mov	word ptr es:[bx+1],ax
+	framebuffer[bx+1]=(eax>>0)&0xff;
+	framebuffer[bx+2]=(eax>>8)&0xff;
+
+	eax=depthtable2[bp];		// mov	eax,ds:_depthtable2[bp]
+					// mov	dword ptr es:[bx+320],eax
+	framebuffer[bx+320]=(eax>>0)&0xff;
+	framebuffer[bx+321]=(eax>>8)&0xff;
+	framebuffer[bx+322]=(eax>>16)&0xff;
+	framebuffer[bx+323]=(eax>>24)&0xff;
+
+	eax=depthtable3[bp];	// mov	ax,word ptr ds:_depthtable3[bp]
+				// mov	word ptr es:[bx+641],ax
+	framebuffer[bx+641]=(eax>>0)&0xff;
+	framebuffer[bx+642]=(eax>>8)&0xff;
+	dot[si].old2=bx;	// mov	ds:[si+8],bx
+
+
+//labelz:
+	cx=pop();		// pop	cx
+	si=si+1;		// add	si,16	point to next dot
+	cx=cx-1;
+	if (cx!=0) goto label1;	// loop	@@1
+label0:
+	return;
+				// @@0:	CEND
+
+label2:
+	di=dot[si].old2;		// mov	di,ds:[si+8]
+
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=di+320;			// add	di,320
+
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=di+320;
+
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=dot[si].old1;		// mov	di,ds:[si+6]
+	dot[si].old1=ax;		// mov	ds:[si+6],ax
+
+	framebuffer[di]=bgpic[di];	// mov	ax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],ax
+
+	bx=pop();			// pop	bx
+	cx=pop();			// pop	cx
+	si=si+1;			// add	si,16
+	cx=cx-1;			// loop	@@1
+	if (cx!=0) goto label1;
+	goto label0;			// jmp	@@0
+
+label3:
+	di=dot[si].old2;		// mov	di,ds:[si+8]
+
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=di+320;			// add	di,320
+
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	di=di+320;			// add	di,320
+
+	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+	framebuffer[di+2]=bgpic[di+2];
+	framebuffer[di+3]=bgpic[di+3];
+
+	bx=pop();			// pop	bx
+	cx=pop();			// pop	cx
+	si=si+1;			// add	si,16
+	cx=cx-1;			// loop	@@1
+	if (cx!=0) goto label1;
+	goto label0;			// jmp	@@0
+
 }
 
-void _setpalette(void) {
+void setpalette(char *pal) {
 #if 0
 	push	bp
 	mov	bp,sp
@@ -269,15 +326,12 @@ short _face[]={
 	30000,30000,30000
 };
 
-void outp(int x, int y) {
-
-}
-
-int inp(int addr) {
-	return 0;
-}
-
+/* wait for VGA retrace */
 int dis_waitb(void) {
+
+	/* approximate by 70Hz sleep */
+	usleep(14286);
+
 	return 0;
 }
 
@@ -317,7 +371,7 @@ int	icos(int deg)
 
 void setborder(int color) {
 
-	printf("Setting border to %d\n",color);
+	//printf("Setting border to %d\n",color);
 
 	// to write attribute register:
 	//	read/write address to $3c0
@@ -347,11 +401,11 @@ int dottaul[1024];
 
 int main(int argc,char **argv) {
 
-	int timer=30000;
+//	int timer=30000;
 	int dropper,repeat;
 	int frame=0;
 	int rota=-1*64;
-	int fb=0;
+//	int fb=0;
 	int rot=0,rots=0;
 	int a,b,c,d,i,j,mode;
 	int grav,gravd;
@@ -405,37 +459,56 @@ int main(int argc,char **argv) {
 //	_asm mov ax,13h
 //	_asm int 10h
 
+	/* set palette address to 0 */
 	outp(0x3c8,0);
-	for(a=0;a<16;a++) for(b=0;b<4;b++)
-	{
-		c=100+a*9;
-		outp(0x3c9,cols[b*3+0]);
-		outp(0x3c9,cols[b*3+1]*c/256);
-		outp(0x3c9,cols[b*3+2]*c/256);
+
+	/* set up colors for first 64 colors */
+	for(a=0;a<16;a++) {
+		for(b=0;b<4;b++) {
+			c=100+a*9;
+			outp(0x3c9,cols[b*3+0]);
+			outp(0x3c9,cols[b*3+1]*c/256);
+			outp(0x3c9,cols[b*3+2]*c/256);
+		}
 	}
+
+	/* set palette for color 255 */
 	outp(0x3c8,255);
+
+	/* some sort of purplish color? */
 	outp(0x3c9,31);
 	outp(0x3c9,0);
 	outp(0x3c9,15);
+
+
+	/* set colors starting from 64 ... 164 */
+	/* looks like a grey gradient of some sort */
 	outp(0x3c8,64);
-	for(a=0;a<100;a++)
-	{
+
+	for(a=0;a<100;a++) {
 		c=64-256/(a+4);
 		c=c*c/64;
 		outp(0x3c9,c/4);
 		outp(0x3c9,c/4);
 		outp(0x3c9,c/4);
 	}
+
+	/* read out the VGA card's idea of palette (?) */
 	outp(0x3c7,0);
 	for(a=0;a<768;a++) pal[a]=inp(0x3c9);
+
+	/* clear palette to all 0 */
+	/* this lets up setup background while not visible */
 	outp(0x3c8,0);
 	for(a=0;a<768;a++) outp(0x3c9,0);
-	for(a=0;a<100;a++)
-	{
+
+	/* put grey gradient on bottom half of screen? */
+	for(a=0;a<100;a++) {
 		memset(vram+(100+a)*320,a+64,320);
 	}
-	for(a=0;a<128;a++)
-	{
+
+	/* set up depth table? */
+	for(a=0;a<128;a++) {
 		c=a-(43+20)/2;
 		c=c*3/4;
 		c+=8;
@@ -446,32 +519,40 @@ int main(int argc,char **argv) {
 		depthtable3[a]=0x202+0x04040404*c;
 		//depthtable4[a]=0x02020302+0x04040404*c;
 	}
+
+	/* allocate space for background */
 	//bgpic=halloc(64000L,1L);
 	bgpic=calloc(64000L,1L);
+
+	/* backup background */
 	memcpy(bgpic,vram,64000);
+
+	mode13h_graphics_update();
+
+	/* Fade back in from palette */
 	a=0;
-	for(b=64;b>=0;b--)
-	{	
-		for(c=0;c<768;c++)
-		{
+	for(b=64;b>=0;b--) {
+		for(c=0;c<768;c++) {
 			a=pal[c]-b;
 			if(a<0) a=0;
 			pal2[c]=a;
 		}
+		/* wait for retrace (delay) */
 		dis_waitb();
 		dis_waitb();
 		outp(0x3c8,0);
 		for(c=0;c<768;c++) outp(0x3c9,pal2[c]);
+		mode13h_graphics_update();
 	}
 
-	while(!dis_exit() && frame<2450)
-	{
-		//setborder(0);
+	while(!dis_exit() && frame<2450) {
+
+		setborder(0);
 		repeat=dis_waitb();
-//		if(frame>2300) setpalette(pal2);
-		//setborder(1);
-		if(dis_indemo())
-		{
+		if(frame>2300) setpalette(pal2);
+		setborder(1);
+		if(dis_indemo()) {
+			/* ?? music synchronization? */
 //			a=dis_musplus();
 //			if(a>-4 && a<0) break;
 		}

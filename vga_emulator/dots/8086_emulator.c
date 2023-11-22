@@ -4,7 +4,7 @@
 #include "8086_emulator.h"
 
 unsigned short stack[4096];
-unsigned short ax,bx,cx,dx,di,bp,es;
+unsigned short ax,bx,cx,dx,si,di,bp,cs,ds,es,fs;
 int cf=0,of=0,zf=0,sf=0;
 int sp=0;
 
@@ -179,6 +179,36 @@ void div_8(unsigned char value) {
 	ax=(r<<8)|(q&0xff);
 
 }
+
+
+/* signed divide */
+/* DX:AX / word.  AX=quotient, DX=remainder */
+void idiv_16(short value) {
+
+	short r,q;
+	int temp32,result,remainder;
+
+	temp32=(dx<<16)|ax;
+
+//	printf("Dividing %d (%x) by %d (%x): ",ax,ax,value,value);
+
+	if (value==0) {
+		printf("Divide by zero!\n");
+		return;
+	}
+
+	result=temp32/value;
+	remainder=temp32%value;
+
+	q=result;
+	r=remainder;
+
+//	printf("Result: q=%d r=%d\n",q,r);
+
+	ax=q;
+	dx=r;
+}
+
 
 
 

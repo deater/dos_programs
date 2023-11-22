@@ -11,6 +11,8 @@ static SDL_Surface *sdl_screen=NULL;
 
 static struct palette pal;
 
+int debug=0;
+
 int mode13h_graphics_init(char *name) {
 
 	int mode;
@@ -186,3 +188,96 @@ void write_framebuffer(int address, int value) {
 
 }
 
+static int dac_write_address=0,dac_write_which=0;
+static int dac_read_address=0,dac_read_which=0;
+
+void outp(short address, int value) {
+
+	switch(address) {
+
+	/* DAC read address */
+	case 0x3c7:
+		if (debug) fprintf(stderr,"Setting read address to %d\n",value);
+		dac_read_address=value;
+		dac_read_which=0;
+		break;
+
+	/* DAC write address */
+	case 0x3c8:
+		if (debug) fprintf(stderr,"Setting write address to %d\n",value);
+		dac_write_address=value;
+		dac_write_which=0;
+		break;
+
+	/* PEL/DAC data */
+	/* Note colors are 0..63 */
+	case 0x3c9:
+		if (dac_write_which==0) {
+			pal.red[dac_write_address]=value*4;
+			if (debug) fprintf(stderr,"Color %d R=0x%x ",
+				dac_write_address,value);
+		}
+		if (dac_write_which==1) {
+			pal.green[dac_write_address]=value*4;
+			if (debug) fprintf(stderr,"G=0x%x ",value);
+		}
+		if (dac_write_which==2) {
+			pal.blue[dac_write_address]=value*4;
+			if (debug) fprintf(stderr,"B=0x%x\n",value);
+		}
+		dac_write_which++;
+		if (dac_write_which==3) {
+			dac_write_address++;
+			dac_write_which=0;
+			if (dac_write_address>255) {
+				if (debug) fprintf(stderr,"Palette overflow!\n");
+				dac_write_address=0;	/* FIXME: is this right? */
+			}
+		}
+		break;
+
+
+	default:
+		printf("outp to unknown port 0x%x\n",address);
+	}
+}
+
+int inp(short address) {
+
+	int retval=0;
+
+	switch(address) {
+
+	/* DAC read address */
+	case 0x3c9:
+		if (dac_read_which==0) {
+			retval=pal.red[dac_read_address]/4;
+			if (debug) fprintf(stderr,"Color %d R=0x%x ",
+				dac_read_address,retval);
+		}
+		if (dac_read_which==1) {
+			retval=pal.green[dac_read_address]/4;
+			if (debug) fprintf(stderr,"G=0x%x ",retval);
+		}
+		if (dac_read_which==2) {
+			retval=pal.blue[dac_read_address]/4;
+			if (debug) fprintf(stderr,"B=0x%x\n",retval);
+		}
+		dac_read_which++;
+		if (dac_read_which==3) {
+			dac_read_address++;
+			dac_read_which=0;
+			if (dac_read_address>255) {
+				if (debug) fprintf(stderr,"Palette overflow!\n");
+				dac_read_address=0;	/* FIXME: is this right? */
+			}
+		}
+		break;
+
+
+		default:
+			printf("inp from unknown port 0x%x\n",address);
+	}
+
+        return retval;
+}
