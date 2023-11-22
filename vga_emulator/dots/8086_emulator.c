@@ -76,6 +76,7 @@ void imul_8(char value) {
 }
 
 /* signed multiply */
+/* DX:AX = AX * value */
 void imul_16(short value) {
 
 	int result;

@@ -67,8 +67,10 @@ void drawdots(void) {
 	cx=dotnum;			// mov	cx,cs:_dotnum
 	si=0;				// mov	si,OFFSET dot
 
+//	printf("Drawing dot %d\n",cx);
+
 label1:
-	push(cx);			//push	cx
+	push(cx);			// push	cx
 	ax=dot[si].x;			// mov	ax,ds:[si+0] ;X
 	imul_16(rotsin);		// imul	ds:_rotsin
 	ax=ax;				// mov	ax,ax
@@ -110,9 +112,11 @@ label1:
 	ax=ax+160;			// add	ax,160
 	push(ax);			// push	ax
 	if (ax>319) goto label2;	// cmp	ax,319
-					// ja	@@2
 
+					// ja	@@2
+	/**********/
 	/* shadow */
+	/**********/
 
 	ax=0;				// xor	ax,ax
 	dx=8;				// mov	dx,8
@@ -121,18 +125,38 @@ label1:
 	if (ax>199) goto label2;	// cmp	ax,199
 					// ja	@@2
 	bx=ax;				// mov	bx,ax
-	bx=bx<<1;			// shl	bx,1
+
+	// not needed, it's a C array
+	//bx=bx<<1;			// shl	bx,1
 	bx=rows[bx];			// mov	bx,ds:_rows[bx]
 	ax=pop();			// pop	ax
 	bx=bx+ax;			// add	bx,ax
 	push(ax);			// push	ax
 
-	/* erase old */
+//	printf("Drawing shadow at %d,%d\n",bx%320,bx/320);
+
+	/* erase old shadow (?)*/
 	di=dot[si].old1;		// mov	di,ds:[si+6]
-	ax=bgpic[di];			// mov	ax,fs:[di]
-	framebuffer[di]=ax;		// mov	es:[di],ax
-	ax=87+87*256;			// mov	ax,87+87*256
-	framebuffer[bx]=ax;		// mov	word ptr es:[bx],ax
+	//ax=bgpic[di];			// mov	ax,fs:[di]
+	//framebuffer[di]=ax;		// mov	es:[di],ax
+
+//	framebuffer[di]=bgpic[di];
+//	framebuffer[di+1]=bgpic[di+1];
+	framebuffer_write(di,bgpic[di]);
+	framebuffer_write(di+1,bgpic[di]);
+
+
+
+	/* draw new shadow (?) */
+//	ax=87+87*256;			// mov	ax,87+87*256
+//	framebuffer[bx]=ax;		// mov	word ptr es:[bx],ax
+
+//	framebuffer[bx]=87;
+//	framebuffer[bx+1]=87;
+	framebuffer_write(bx,87);
+	framebuffer_write(bx+1,87);
+
+	/* save this to erase next time */
 	dot[si].old1=bx;		// mov	ds:[si+6],bx
 
 	/* ball */
@@ -171,36 +195,57 @@ label4:
 	if (ax>199) goto label3;	// cmp	ax,199
 					// ja	@@3
 	bx=ax;				// mov	bx,ax
-	bx=bx<<1;			// shl	bx,1
+
+	// not needed, C array
+	//bx=bx<<1;			// shl	bx,1
 	bx=rows[bx];			// mov	bx,ds:_rows[bx]
 
 	ax=pop();			// pop	ax
 	bx=bx+ax;			// add	bx,ax
 
 	di=dot[si].old2;		// mov	di,ds:[si+8]
-	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
-	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
-	framebuffer[di+2]=bgpic[di+2];
-	framebuffer[di+3]=bgpic[di+3];
+//	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+//	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+//	framebuffer[di+2]=bgpic[di+2];
+//	framebuffer[di+3]=bgpic[di+3];
+
+	framebuffer_write(di,bgpic[di]);
+	framebuffer_write(di+1,bgpic[di+1]);
+	framebuffer_write(di+2,bgpic[di+2]);
+	framebuffer_write(di+3,bgpic[di+3]);
+
+
+
 
 	di=di+320;			// add	di,320
-	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
-	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
-	framebuffer[di+2]=bgpic[di+2];
-	framebuffer[di+3]=bgpic[di+3];
+//	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+//	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+//	framebuffer[di+2]=bgpic[di+2];
+//	framebuffer[di+3]=bgpic[di+3];
+
+	framebuffer_write(di,bgpic[di]);
+	framebuffer_write(di+1,bgpic[di+1]);
+	framebuffer_write(di+2,bgpic[di+2]);
+	framebuffer_write(di+3,bgpic[di+3]);
+
 
 	di=di+320;			// add	di,320
-	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
-	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
-	framebuffer[di+2]=bgpic[di+2];
-	framebuffer[di+3]=bgpic[di+3];
+//	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
+//	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
+//	framebuffer[di+2]=bgpic[di+2];
+//	framebuffer[di+3]=bgpic[di+3];
+
+	framebuffer_write(di,bgpic[di]);
+	framebuffer_write(di+1,bgpic[di+1]);
+	framebuffer_write(di+2,bgpic[di+2]);
+	framebuffer_write(di+3,bgpic[di+3]);
 
 				//;;	add	di,320
 				//;;	mov	eax,fs:[di]
 				//;;	mov	es:[di],eax
 
 	bp=bp>>6;		// shr	bp,6
-	bp=bp&(~3);		// and	bp,not 3
+	bp=bp&(~3L);		// and	bp,not 3
 
 	if (bp>=bpmin) goto label_t1;	// cmp	bp,cs:_bpmin
 					// jge	@@t1
@@ -239,6 +284,7 @@ label0:
 				// @@0:	CEND
 
 label2:
+	/* erase old dot */
 	di=dot[si].old2;		// mov	di,ds:[si+8]
 
 	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
@@ -253,12 +299,16 @@ label2:
 	framebuffer[di+2]=bgpic[di+2];
 	framebuffer[di+3]=bgpic[di+3];
 
-	di=di+320;
+	di=di+320;			// add  di,320
 
 	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
 	framebuffer[di+1]=bgpic[di+1];	// mov	es:[di],eax
 	framebuffer[di+2]=bgpic[di+2];
 	framebuffer[di+3]=bgpic[di+3];
+
+	ax=(framebuffer[di]|(framebuffer[di+1]<<8));
+
+	/* doing something to shadow here? */
 
 	di=dot[si].old1;		// mov	di,ds:[si+6]
 	dot[si].old1=ax;		// mov	ds:[si+6],ax
@@ -274,6 +324,7 @@ label2:
 	goto label0;			// jmp	@@0
 
 label3:
+	/* erase old dot */
 	di=dot[si].old2;		// mov	di,ds:[si+8]
 
 	framebuffer[di]=bgpic[di];	// mov	eax,fs:[di]
@@ -306,30 +357,33 @@ label3:
 
 void setpalette(char *pal) {
 
-	printf("TODO: implement setpalette\n");
-#if 0
-	push	bp
-	mov	bp,sp
-	push	si
-	push	di
-	push	ds
-	mov	si,[bp+6]
-	mov	ds,[bp+8]
-	mov	dx,3c8h
-	mov	al,0
-	out	dx,al
-	inc	dx
-	mov	cx,768
-	rep	outsb
-	pop	ds
-	pop	di
-	pop	si
-	pop	bp
-	ret
-#endif
+	int c;
+
+	// push	bp
+	// mov	bp,sp
+	// push	si
+	// push	di
+	// push	ds
+	// mov	si,[bp+6]
+	// mov	ds,[bp+8]
+					// mov	dx,3c8h
+					// mov	al,0
+	outp(0x3c8,0);			//out	dx,al
+
+	for(c=0;c<768;c++) outp(0x3c9,pal[c]);
+	mode13h_graphics_update();
+					// inc	dx
+					//mov	cx,768
+					//rep	outsb
+					//	pop	ds
+					//	pop	di
+					//	pop	si
+					//	pop	bp
+					//	ret
+
 }
 
-short _face[]={
+short face[]={
 	2248,-2306,0,		// from face.inc
 	30000,30000,30000
 };
@@ -443,7 +497,7 @@ int main(int argc,char **argv) {
 	int rota=-1*64;
 //	int fb=0;
 	int rot=0,rots=0;
-	int a,b,c,d,i,j=0,mode;
+	int a,b,c,d,i,j=0;//,mode;
 	int grav,gravd;
 	int f=0;
 
@@ -470,7 +524,7 @@ int main(int argc,char **argv) {
 		dot[a].z=0;
 		dot[a].yadd=0;
 	}
-	mode=7;
+	//mode=7;
 	grav=3;
 	gravd=13;
 	gravitybottom=8105;

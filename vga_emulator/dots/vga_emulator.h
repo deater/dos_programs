@@ -1,4 +1,4 @@
-extern unsigned char framebuffer[320*200];
+extern unsigned char framebuffer[65536];
 
 struct palette {
         unsigned char red[256];
@@ -10,7 +10,9 @@ int mode13h_graphics_init(char *name);
 int mode13h_graphics_update(void);
 void set_default_pal(void);
 int graphics_input(void);
-void write_framebuffer(int address, int value);
+
+void framebuffer_write_20bit(int address, int value);
+void framebuffer_write(int address, int value);
 
 void outp(short address, int value);
 int inp(short addr);

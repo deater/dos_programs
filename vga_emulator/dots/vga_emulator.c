@@ -5,7 +5,9 @@
 
 #include "vga_emulator.h"
 
-unsigned char framebuffer[320*200];
+/* technically bigger than 320x200 but some code writes off edge... */
+/* in theory 16-bit pointer can't write beyond this */
+unsigned char framebuffer[65536];
 
 static SDL_Surface *sdl_screen=NULL;
 
@@ -177,8 +179,7 @@ int graphics_input(void) {
 
 }
 
-
-void write_framebuffer(int address, int value) {
+void framebuffer_write_20bit(int address, int value) {
 	int real_addr;
 
 	real_addr=address-0xa0000;
@@ -187,6 +188,25 @@ void write_framebuffer(int address, int value) {
 	framebuffer[real_addr]=value;
 
 }
+
+void framebuffer_write(int address, int value) {
+
+	if (debug) {
+	if ((address<0) || (address>320*200)) {
+		fprintf(stderr,
+			"Error!  Framebuffer write of 0x%x (%d,%d) "
+			"out of bounds\n",
+			address,address%320,address/320);
+		return;
+	}
+	}
+
+	framebuffer[address]=value;
+
+}
+
+
+
 
 static int dac_write_address=0,dac_write_which=0;
 static int dac_read_address=0,dac_read_which=0;

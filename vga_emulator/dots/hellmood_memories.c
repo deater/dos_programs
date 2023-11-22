@@ -361,7 +361,7 @@ top:
 		default: printf("Trying effect %d\n",bx&0xff);
 	}
 				// stosb
-	write_framebuffer((es<<4)+di, ax&0xff);
+	framebuffer_write_20bit((es<<4)+di, ax&0xff);
 	di++;
 
 //	printf("Writing %d to %x (%x:%x)\n",ax&0xff,(es<<4)+di,es,di);
