@@ -13,11 +13,17 @@ static SDL_Surface *sdl_screen=NULL;
 
 static struct palette pal;
 
-int debug=0;
+static int debug=0;
 
-int mode13h_graphics_init(char *name) {
+static int xsize=320,ysize=200,scale=1;
+
+int mode13h_graphics_init(char *name, int new_scale) {
 
 	int mode;
+
+	scale=new_scale;
+	xsize=320*scale;
+	ysize=200*scale;
 
 	mode=SDL_SWSURFACE|SDL_HWPALETTE|SDL_HWSURFACE;
 
@@ -31,11 +37,11 @@ int mode13h_graphics_init(char *name) {
 	atexit(SDL_Quit);
 
 	/* assume 32-bit color */
-	sdl_screen = SDL_SetVideoMode(320, 200, 32, mode);
+	sdl_screen = SDL_SetVideoMode(xsize, ysize, 32, mode);
 
 	if ( sdl_screen == NULL ) {
-		fprintf(stderr, "ERROR!  Couldn't set 320x200 video mode: %s\n",
-			SDL_GetError());
+		fprintf(stderr, "ERROR!  Couldn't set %dx%d video mode: %s\n",
+			xsize,ysize,SDL_GetError());
 		return -1;
 	}
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -54,21 +60,28 @@ int mode13h_graphics_update(void) {
 
         unsigned int *t_pointer;
 
-        int x,temp;
+        int x,y,temp,in_ptr,out_ptr,i,j;
 
         /* point to SDL output pixels */
         t_pointer=((Uint32 *)sdl_screen->pixels);
 
-        for(x=0;x<320*200;x++) {
-
-                temp=(pal.red[framebuffer[x]]<<16)|
-                        (pal.green[framebuffer[x]]<<8)|
-                        (pal.blue[framebuffer[x]]<<0)|0;
-
-                t_pointer[x]=temp;
+	out_ptr=0;
+	for(y=0;y<200;y++) {
+		for(j=0;j<scale;j++) {
+	        for(x=0;x<320;x++) {
+			in_ptr=(y*320)+x;
+	                temp=(pal.red[framebuffer[in_ptr]]<<16)|
+        	                (pal.green[framebuffer[in_ptr]]<<8)|
+                	        (pal.blue[framebuffer[in_ptr]]<<0)|0;
+			for(i=0;i<scale;i++) {
+				t_pointer[out_ptr]=temp;
+				out_ptr++;
+			}
+		}
+		}
         }
 
-        SDL_UpdateRect(sdl_screen, 0, 0, 320, 200);
+        SDL_UpdateRect(sdl_screen, 0, 0, xsize, ysize);
 
         return 0;
 }
@@ -171,6 +184,9 @@ int graphics_input(void) {
 
 			case SDLK_ESCAPE:
 				return 27;
+
+			default:
+				return keypressed;
 			}
 			break;
 		}

@@ -184,34 +184,47 @@ void div_8(unsigned char value) {
 
 /* signed divide */
 /* DX:AX / word.  AX=quotient, DX=remainder */
-void idiv_16(short value) {
+void idiv_16(unsigned short value) {
 
-	short r,q;
+	short r,q,divisor;
 	int temp32,result,remainder;
 
-	temp32=(dx<<16)|ax;
+	divisor=value;
 
-//	printf("Dividing %d (%x) by %d (%x): ",ax,ax,value,value);
+	temp32=ax;
+	temp32&=0xffff;
+	temp32|=(dx<<16);
 
-	if (value==0) {
+//	printf("Dividing %d (%x = %04x:%04x) by %d (%x): ",
+//		temp32,temp32,dx,ax,value,value);
+
+	if (divisor==0) {
 		printf("Divide by zero!\n");
 		return;
 	}
 
-	result=temp32/value;
-	remainder=temp32%value;
+	result=temp32/divisor;
+	remainder=temp32%divisor;
 
 	q=result;
 	r=remainder;
 
-//	printf("Result: q=%d r=%d\n",q,r);
+//	printf("q=%d r=%d\n",q,r);
 
 	ax=q;
 	dx=r;
 }
 
+unsigned short sar(unsigned short value,int shift) {
 
+	short temp;
 
+	temp=value;
+	temp>>=shift;
+
+	return temp;
+
+}
 
 void push(int value) {
 	//printf("Pushing %x\n",value);

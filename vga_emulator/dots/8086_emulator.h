@@ -9,7 +9,9 @@ void imul_16(short value);
 void imul_16_bx(short value);
 void imul_16_dx(short value);
 void div_8(unsigned char value);
-void idiv_16(signed short value);
+void idiv_16(unsigned short value);
+
+unsigned short sar(unsigned short value,int shift);
 
 void push(int value);
 short pop(void);

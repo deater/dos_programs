@@ -317,7 +317,7 @@ int main(int argc, char **argv) {
 
 	set_default_pal();
 
-	mode13h_graphics_init("memories");
+	mode13h_graphics_init("memories",2);
 
 	di=0; // ??
 

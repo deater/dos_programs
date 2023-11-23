@@ -13,49 +13,49 @@
 
 #define BOTTOM 8000
 
-short gravitybottom=BOTTOM;
+static short gravitybottom=BOTTOM;
 
-short bpmin=30000;
-short bpmax=-30000;
-short gravity=0;
-short dotnum=0;
-short gravityd=16;
+static short bpmin=30000;
+static short bpmax=-30000;
+static short gravity=0;
+static short dotnum=0;
+static short gravityd=16;
 
 //???,-1280,-960,-640,-320};
 
-short rows[200]; // all zero
+static short rows[200];
 
-//short dot[MAXDOTS][8];	// x,y,z,oldposshadow,oldpos,-,-,-
+//dot dw	MAXDOTS dup(0,0,0,0,0,0,0,0) ;x,y,z,oldposshadow,oldpos,-,-,-
 
-struct {
+static struct {
 	short	x;	// 0
 	short	y;	// 2
 	short	z;	// 4
-	short	old1;	// 6
-	short	old2;	// 8
+	short	old1;	// 6 oldpos shadow
+	short	old2;	// 8 oldpos
 	short	old3;	// 10
 	short	old4;	// 12
 	short	yadd;	// 14
 } dot[MAXDOTS];
 
+static short rotsin=0;
+static short rotcos=0;
 
-//dot dw	MAXDOTS dup(0,0,0,0,0,0,0,0) ;x,y,z,oldposshadow,oldpos,-,-,-
+static char *bgpic;
+
+static int depthtable1[128];
+static int depthtable2[128];
+static int depthtable3[128];
+//static int depthtable4[128];
+
+static unsigned char depthtable1_bytes[512];
+static unsigned char depthtable2_bytes[512];
+static unsigned char depthtable3_bytes[512];
+//static unsigned char depthtable4_bytes[512];
 
 
-short rotsin=0;
-short rotcos=0;
-
-
-char *bgpic;
-
-
-int depthtable1[128];
-int depthtable2[128];
-int depthtable3[128];
-int depthtable4[128];
-
-void drawdots(void) {
-	int temp32,eax;
+static void drawdots(void) {
+	int temp32;
 
 				//	CBEG
 	ax=0xa000;			// mov	ax,0a000h
@@ -63,11 +63,10 @@ void drawdots(void) {
 	ax=cs;				// mov	ax,cs
 	ds=ax;				// mov	ds,ax
 
+	/* why [2]? */
 	fs=bgpic[2];			// mov	fs,cs:_bgpic[2]
 	cx=dotnum;			// mov	cx,cs:_dotnum
 	si=0;				// mov	si,OFFSET dot
-
-//	printf("Drawing dot %d\n",cx);
 
 label1:
 	push(cx);			// push	cx
@@ -95,22 +94,28 @@ label1:
 	if (temp32&(1<<16)) dx=dx+1;
 
 
+//	printf("Before: ax=0x%04X dx=%04X\n",ax,dx);
 	ax=(ax>>8)|(dx<<8);		// shrd	ax,dx,8
-	dx=(dx>>8)&0xff;		// sar	dx,8
+	dx=sar(dx,8);			// sar	dx,8
+//	printf("After: ax=0x%04X dx=%04X\n",ax,dx);
 
 	bx=ax;				// mov	bx,ax
 	cx=dx;				// mov	cx,dx
 	ax=(ax>>3)|(dx<<13);		// shrd	ax,dx,3
 
-	dx=dx>>3;			// sar	dx,3
+	dx=sar(dx,3);			// sar	dx,3
 	temp32=ax+bx;			// add	ax,bx
 	ax=ax+bx;
 	dx=dx+cx;			// adc	dx,cx
 	if (temp32&(1<<16)) dx=dx+1;
 
+	temp32=(dx<<16)|(ax&0xfffff);
 	idiv_16(bp);			// idiv bp
 	ax=ax+160;			// add	ax,160
 	push(ax);			// push	ax
+
+	/* if off end of screen, no need for shadow */
+
 	if (ax>319) goto label2;	// cmp	ax,319
 
 					// ja	@@2
@@ -122,6 +127,8 @@ label1:
 	dx=8;				// mov	dx,8
 	idiv_16(bp);			// idiv	bp
 	ax=ax+100;			// add	ax,100
+
+	/* if shadow off screen, don't draw */
 	if (ax>199) goto label2;	// cmp	ax,199
 					// ja	@@2
 	bx=ax;				// mov	bx,ax
@@ -143,7 +150,7 @@ label1:
 //	framebuffer[di]=bgpic[di];
 //	framebuffer[di+1]=bgpic[di+1];
 	framebuffer_write(di,bgpic[di]);
-	framebuffer_write(di+1,bgpic[di]);
+	framebuffer_write(di+1,bgpic[di+1]);
 
 
 
@@ -165,7 +172,8 @@ label1:
 	dot[si].yadd+=ax;		// add	ds:[si+14],ax
 	ax=dot[si].y;			// mov	ax,ds:[si+2] ;Y
 	ax+=dot[si].yadd;		// add	ax,ds:[si+14]
-	if (ax<gravitybottom) goto label4; //cmp	ax,ds:_gravitybottom
+	temp32=(signed)ax;
+	if (temp32<gravitybottom) goto label4; //cmp	ax,ds:_gravitybottom
 					// jl	@@4
 
 	push(ax);			// push	ax
@@ -173,7 +181,7 @@ label1:
 	ax=dot[si].yadd;		// mov	ax,ds:[si+14]
 	ax=-ax;				// neg	ax
 	imul_16(gravityd);		// imul	cs:_gravityd
-	ax=ax>>4;			// sar	ax,4
+	ax=sar(ax,4);			// sar	ax,4
 	dot[si].yadd=ax;		// mov	ds:[si+14],ax
 	ax=pop();			// pop	ax
 	ax+=dot[si].yadd;		// add	ax,ds:[si+14]
@@ -247,30 +255,32 @@ label4:
 	bp=bp>>6;		// shr	bp,6
 	bp=bp&(~3L);		// and	bp,not 3
 
-	if (bp>=bpmin) goto label_t1;	// cmp	bp,cs:_bpmin
+	temp32=(signed)bp;
+	if (temp32>=bpmin) goto label_t1;	// cmp	bp,cs:_bpmin
 					// jge	@@t1
 	bpmin=bp;			// mov	cs:_bpmin,bp
 label_t1:
-	if (bp<=bpmax) goto label_t2;	// cmp	bp,cs:_bpmax
+	temp32=(signed)bp;
+	if (temp32<=bpmax) goto label_t2;	// cmp	bp,cs:_bpmax
 					// jle	@@t2
 	bpmax=bp;			// mov	cs:_bpmax,bp
 label_t2:
-	eax=depthtable1[bp];		// mov	ax,word ptr ds:_depthtable1[bp]
+//	eax=depthtable1[bp];		// mov	ax,word ptr ds:_depthtable1[bp]
 					// mov	word ptr es:[bx+1],ax
-	framebuffer[bx+1]=(eax>>0)&0xff;
-	framebuffer[bx+2]=(eax>>8)&0xff;
+	framebuffer[bx+1]=depthtable1_bytes[bp];
+	framebuffer[bx+2]=depthtable1_bytes[bp+1];
 
-	eax=depthtable2[bp];		// mov	eax,ds:_depthtable2[bp]
+	//eax=depthtable2[bp];		// mov	eax,ds:_depthtable2[bp]
 					// mov	dword ptr es:[bx+320],eax
-	framebuffer[bx+320]=(eax>>0)&0xff;
-	framebuffer[bx+321]=(eax>>8)&0xff;
-	framebuffer[bx+322]=(eax>>16)&0xff;
-	framebuffer[bx+323]=(eax>>24)&0xff;
+	framebuffer[bx+320]=depthtable2_bytes[bp];
+	framebuffer[bx+321]=depthtable2_bytes[bp+1];
+	framebuffer[bx+322]=depthtable2_bytes[bp+2];
+	framebuffer[bx+323]=depthtable2_bytes[bp+3];
 
-	eax=depthtable3[bp];	// mov	ax,word ptr ds:_depthtable3[bp]
+//	eax=depthtable3[bp];	// mov	ax,word ptr ds:_depthtable3[bp]
 				// mov	word ptr es:[bx+641],ax
-	framebuffer[bx+641]=(eax>>0)&0xff;
-	framebuffer[bx+642]=(eax>>8)&0xff;
+	framebuffer[bx+641]=depthtable3_bytes[bp];
+	framebuffer[bx+642]=depthtable3_bytes[bp+1];
 	dot[si].old2=bx;	// mov	ds:[si+8],bx
 
 
@@ -284,6 +294,9 @@ label0:
 				// @@0:	CEND
 
 label2:
+	/* This is called when we are off the screen */
+	/* erases old but didn't draw new */
+
 	/* erase old dot */
 	di=dot[si].old2;		// mov	di,ds:[si+8]
 
@@ -355,7 +368,7 @@ label3:
 
 }
 
-void setpalette(char *pal) {
+static void setpalette(char *pal) {
 
 	int c;
 
@@ -383,13 +396,13 @@ void setpalette(char *pal) {
 
 }
 
-short face[]={
-	2248,-2306,0,		// from face.inc
-	30000,30000,30000
-};
+//short face[]={
+//	2248,-2306,0,		// from face.inc
+//	30000,30000,30000
+//};
 
 /* wait for VGA border start */
-int dis_waitb(void) {
+static short dis_waitb(void) {
 
 // descr: Waits for border start
 // waitb_1 PROC NEAR
@@ -425,41 +438,29 @@ int dis_waitb(void) {
 	return 1;
 }
 
-int dis_exit(void) {
+static short dis_exit(void) {
 	return 0;
 }
 
-int dis_indemo(void) {
+static short dis_indemo(void) {
 	return 0;
 }
-
-
 
 //char far *vram=(char far *)0xa0000000L;
-unsigned char *vram=framebuffer;
+static unsigned char *vram=framebuffer;
 
-char	pal[768];
-char	pal2[768];
+static char pal[768];
+static char pal2[768];
 
-//extern sin1024[];
-
-int	isin(int deg)
-{
+static short isin(short deg) {
 	return(sin1024[deg&1023]);
 }
 
-int	icos(int deg)
-{
+static short icos(short deg) {
 	return(sin1024[(deg+256)&1023]);
 }
 
-
-
-//extern int gravity;
-//extern int gravitybottom;
-//extern int gravityd;
-
-void setborder(int color) {
+static void setborder(short color) {
 
 	//printf("Setting border to %d\n",color);
 
@@ -481,25 +482,26 @@ void setborder(int color) {
 	//out	dx,al
 }
 
-int	cols[]={
+static short cols[]={
 0,0,0,
 4,25,30,
 8,40,45,
 16,55,60};
 
-int dottaul[1024];
+static short dottaul[1024];
 
 int main(int argc,char **argv) {
 
-//	int timer=30000;
-	int dropper,repeat;
-	int frame=0;
-	int rota=-1*64;
-//	int fb=0;
-	int rot=0,rots=0;
-	int a,b,c,d,i,j=0;//,mode;
-	int grav,gravd;
-	int f=0;
+//	short timer=30000;
+	short dropper,repeat;
+	short frame=0;
+	short rota=-1*64;
+//	short fb=0;
+	short rot=0,rots=0;
+	short a,b,c,d,i,j=0;//,mode;
+	short grav,gravd;
+	short f=0;
+	int ch;
 
 	//dis_partstart();
 
@@ -545,7 +547,7 @@ int main(int argc,char **argv) {
 
 	set_default_pal();
 
-	mode13h_graphics_init("dots");
+	mode13h_graphics_init("dots",2);
 
 //	set mode 13h
 //	_asm mov ax,13h
@@ -600,6 +602,7 @@ int main(int argc,char **argv) {
 	}
 
 	/* set up depth table? */
+	/* this has further away balls a darker color */
 	for(a=0;a<128;a++) {
 		c=a-(43+20)/2;
 		c=c*3/4;
@@ -612,16 +615,40 @@ int main(int argc,char **argv) {
 		//depthtable4[a]=0x02020302+0x04040404*c;
 	}
 
+	/* make a byte-wise copy of this */
+	/* the original code just indexes byte-wise into integer data */
+	/* which is a pain */
+	for(a=0;a<128;a++) {
+		depthtable1_bytes[(a*4)+0]=(depthtable1[a]>>0)&0xff;
+		depthtable1_bytes[(a*4)+1]=(depthtable1[a]>>8)&0xff;
+		depthtable1_bytes[(a*4)+2]=(depthtable1[a]>>16)&0xff;
+		depthtable1_bytes[(a*4)+3]=(depthtable1[a]>>24)&0xff;
+
+		depthtable2_bytes[(a*4)+0]=(depthtable2[a]>>0)&0xff;
+		depthtable2_bytes[(a*4)+1]=(depthtable2[a]>>8)&0xff;
+		depthtable2_bytes[(a*4)+2]=(depthtable2[a]>>16)&0xff;
+		depthtable2_bytes[(a*4)+3]=(depthtable2[a]>>24)&0xff;
+
+		depthtable3_bytes[(a*4)+0]=(depthtable3[a]>>0)&0xff;
+		depthtable3_bytes[(a*4)+1]=(depthtable3[a]>>8)&0xff;
+		depthtable3_bytes[(a*4)+2]=(depthtable3[a]>>16)&0xff;
+		depthtable3_bytes[(a*4)+3]=(depthtable3[a]>>24)&0xff;
+
+
+
+	}
+
+
 	/* allocate space for background */
 	//bgpic=halloc(64000L,1L);
-	bgpic=calloc(64000L,1L);
+	bgpic=calloc(65536L,1L);
 
 	/* backup background */
 	memcpy(bgpic,vram,64000);
 
 	mode13h_graphics_update();
 
-	/* Fade back in from palette */
+	/* Fade back in from black to palette */
 	a=0;
 	for(b=64;b>=0;b--) {
 		for(c=0;c<768;c++) {
@@ -667,6 +694,8 @@ int main(int argc,char **argv) {
 			dot[i].y=icos(f*13)*10-dropper;
 			dot[i].z=isin(f*17)*40;
 			dot[i].yadd=0;
+//			printf("%d: %d,%d,%d,%d\n",i,
+//				dot[i].x,dot[i].y,dot[i].z,dot[i].yadd);
 		}
 		else if(frame<900) {
 			dot[i].x=icos(f*15)*55;
@@ -742,9 +771,19 @@ int main(int argc,char **argv) {
 
 		mode13h_graphics_update();
 
-		if (graphics_input()) {
-	                return 0;
+#if 0
+		for(i=0;i<dotnum;i++) {
+			printf("%d: %d,%d,%d  %d\n",i,
+				dot[i].x,dot[i].y,dot[i].z,dot[i].yadd);
 		}
+#endif
+
+again:
+		ch=graphics_input();
+		if (ch==27) {
+			return 0;
+		}
+//		else if (ch==0) goto again;
 
 	}
 

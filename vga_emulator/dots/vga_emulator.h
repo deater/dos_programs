@@ -6,7 +6,7 @@ struct palette {
         unsigned char blue[256];
 };
 
-int mode13h_graphics_init(char *name);
+int mode13h_graphics_init(char *name, int scale);
 int mode13h_graphics_update(void);
 void set_default_pal(void);
 int graphics_input(void);
