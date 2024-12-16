@@ -169,6 +169,17 @@ void set_default_pal(void) {
 
 }
 
+void set_pal(int which, int r, int g, int b) {
+
+	pal.red[which]=r;
+	pal.green[which]=g;
+	pal.blue[which]=b;
+
+	return;
+
+}
+
+
 int graphics_input(void) {
 
 	SDL_Event event;
