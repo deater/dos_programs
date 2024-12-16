@@ -172,24 +172,24 @@ label1:
 //	ax=gravity;			// mov	ax,ds:_gravity
 //	dot[si].yadd+=ax;		// add	ds:[si+14],ax
 
-	if (si==100) printf("Gravity: %hd (%04x)  Yadd: %hd (%04x)\n",
-			gravity,gravity,dot[si].yadd,dot[si].yadd);
+//	if (si==100) printf("Gravity: %hd (%04x)  Yadd: %hd (%04x)\n",
+//			gravity,gravity,dot[si].yadd,dot[si].yadd);
 
 	dot[si].yadd+=gravity;
 
-	if (si==100) printf("\tyadd after yadd+=gravity: %hd (%04x)\n",
-			dot[si].yadd,dot[si].yadd);
+//	if (si==100) printf("\tyadd after yadd+=gravity: %hd (%04x)\n",
+//			dot[si].yadd,dot[si].yadd);
 
 //	ax=dot[si].y;			// mov	ax,ds:[si+2] ;Y
 //	ax+=dot[si].yadd;		// add	ax,ds:[si+14]
 	ax=dot[si].y+dot[si].yadd;
 
-	if (si==100) printf("\tax=y+yadd: %hu (%04x) = "
-			"%hd (%04x) + %hd (%04x)\n",
-			ax,ax,dot[si].y,dot[si].y,dot[si].yadd,dot[si].yadd);
+//	if (si==100) printf("\tax=y+yadd: %hu (%04x) = "
+//			"%hd (%04x) + %hd (%04x)\n",
+//			ax,ax,dot[si].y,dot[si].y,dot[si].yadd,dot[si].yadd);
 
-	if (si==100) printf("\tcomparing if (ax<gravitybottom): "
-			"%hu < %hd\n",ax,gravitybottom);
+//	if (si==100) printf("\tcomparing if (ax<gravitybottom): "
+//			"%hu < %hd\n",ax,gravitybottom);
 
 
 	temp32=ax;
@@ -197,7 +197,7 @@ label1:
 	if (temp32<gravitybottom) goto label4; //cmp	ax,ds:_gravitybottom
 					// jl	@@4
 
-	if (si==100) printf("\twas greater than (not less)\n");
+//	if (si==100) printf("\twas greater than (not less)\n");
 
 	push(ax);			// push	ax
 
@@ -205,33 +205,33 @@ label1:
 //	ax=-ax;				// neg	ax
 	ax=-dot[si].yadd;
 
-	if (si==100) printf("\tax is -yadd: %hu %x\n",ax,ax);
+//	if (si==100) printf("\tax is -yadd: %hu %x\n",ax,ax);
 
-	if (si==100) printf("\tabout to multiply gravityd*ax: "
-			"%hd (%x) * %hu (%x)\n",gravityd,gravityd,
-			ax,ax);
+//	if (si==100) printf("\tabout to multiply gravityd*ax: "
+//			"%hd (%x) * %hu (%x)\n",gravityd,gravityd,
+//			ax,ax);
 	imul_16(gravityd);		// imul	cs:_gravityd
 
-	if (si==100) printf("\tresult dx:ax is %x:%x (%hu)\n",
-			dx,ax,ax);
+//	if (si==100) printf("\tresult dx:ax is %x:%x (%hu)\n",
+//			dx,ax,ax);
 
 	ax=sar(ax,4);			// sar	ax,4
 
-	if (si==100) printf("\tyadd=(ax>>4 is %x (%hu))\n",
-			ax,ax);
+//	if (si==100) printf("\tyadd=(ax>>4 is %x (%hu))\n",
+//			ax,ax);
 	dot[si].yadd=ax;		// mov	ds:[si+14],ax
 	ax=pop();			// pop	ax
-	if (si==100) printf("\trestoring ax=%x, adding yadd %x\n",
-		ax,dot[si].yadd);
+//	if (si==100) printf("\trestoring ax=%x, adding yadd %x\n",
+//		ax,dot[si].yadd);
 
 	ax+=dot[si].yadd;		// add	ax,ds:[si+14]
 
-	if (si==100) printf("\tax=%x\n",ax);
+//	if (si==100) printf("\tax=%x\n",ax);
 
 label4:
 	dot[si].y=ax;			// mov	ds:[si+2],ax
 
-	if (si==100) printf("\tdot[si].y=%x\n",dot[si].y);
+//	if (si==100) printf("\tdot[si].y=%x\n",dot[si].y);
 
 	if (ax&0x8000) {		// cwd
 		dx=0xffff;
@@ -240,19 +240,19 @@ label4:
 		dx=0;
 	}
 
-	if (si==100) printf("\tdx:ax = %04hx:%04hx\n",dx,ax);
+//	if (si==100) printf("\tdx:ax = %04hx:%04hx\n",dx,ax);
 
 	dx=(dx<<6)|(ax>>10);		// shld	dx,ax,6
 	ax=ax<<6;			// shl	ax,6
 
-	if (si==100) printf("\tdx:ax <<6 = %04hx:%04hx, bp=%04hx\n",dx,ax,bp);
+//	if (si==100) printf("\tdx:ax <<6 = %04hx:%04hx, bp=%04hx\n",dx,ax,bp);
 
 	idiv_16(bp);			// idiv	bp
-	if (si==100) printf("\tY ax=%d\n",ax);
+//	if (si==100) printf("\tY ax=%d\n",ax);
 	ax=ax+100;			// add	ax,100
 	if (ax>199) goto label3;	// cmp	ax,199
 					// ja	@@3
-	if (si==100) printf("\tdraw Y ax=%d\n",ax);
+//	if (si==100) printf("\tdraw Y ax=%d\n",ax);
 	bx=ax;				// mov	bx,ax
 
 	// not needed, C array

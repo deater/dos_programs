@@ -23,386 +23,11 @@
 
 #include <SDL.h>
 
+#include "8086_emulator.h"
+#include "vga_emulator.h"
+
 static int paused=1;
 
-static unsigned short stack[128];
-static unsigned short ax,bx,cx,dx,di,bp,es;
-static int cf=0,of=0,zf=0,sf=0;
-static int sp=0;
-static unsigned char framebuffer[320*200];
-
-static SDL_Surface *sdl_screen=NULL;
-
-struct palette {
-        unsigned char red[256];
-        unsigned char green[256];
-        unsigned char blue[256];
-};
-
-static struct palette pal;
-
-static int mode13h_graphics_init(void) {
-
-	int mode;
-
-	mode=SDL_SWSURFACE|SDL_HWPALETTE|SDL_HWSURFACE;
-
-	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-		fprintf(stderr,
-			"Couldn't initialize SDL: %s\n", SDL_GetError());
-		return -1;
-	}
-
-	/* Clean up on exit */
-	atexit(SDL_Quit);
-
-	/* assume 32-bit color */
-	sdl_screen = SDL_SetVideoMode(320, 200, 32, mode);
-
-	if ( sdl_screen == NULL ) {
-		fprintf(stderr, "ERROR!  Couldn't set 320x200 video mode: %s\n",
-			SDL_GetError());
-		return -1;
-	}
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-
-	SDL_WM_SetCaption("memories -- Linux/C/SDL","memories");
-
-	return 0;
-}
-
-static int mode13h_graphics_update(unsigned char *buffer, struct palette *pal) {
-
-        unsigned int *t_pointer;
-
-        int x,temp;
-
-        /* point to SDL output pixels */
-        t_pointer=((Uint32 *)sdl_screen->pixels);
-
-        for(x=0;x<320*200;x++) {
-
-                temp=(pal->red[buffer[x]]<<16)|
-                        (pal->green[buffer[x]]<<8)|
-                        (pal->blue[buffer[x]]<<0)|0;
-
-                t_pointer[x]=temp;
-        }
-
-        SDL_UpdateRect(sdl_screen, 0, 0, 320, 200);
-
-        return 0;
-}
-
-static void set_vga_pal(void) {
-
-/* output of vgapal https://github.com/canidlogic/vgapal */
-unsigned char raw_pal[3*256]=
-{ 0,   0,   0,    0,   0, 170,    0, 170,   0,    0, 170, 170,
-170,   0,   0,  170,   0, 170,  170,  85,   0,  170, 170, 170,
- 85,  85,  85,   85,  85, 255,   85, 255,  85,   85, 255, 255,
-255,  85,  85,  255,  85, 255,  255, 255,  85,  255, 255, 255,
-  0,   0,   0,   20,  20,  20,   32,  32,  32,   44,  44,  44,
- 56,  56,  56,   69,  69,  69,   81,  81,  81,   97,  97,  97,
-113, 113, 113,  130, 130, 130,  146, 146, 146,  162, 162, 162,
-182, 182, 182,  203, 203, 203,  227, 227, 227,  255, 255, 255,
-  0,   0, 255,   65,   0, 255,  125,   0, 255,  190,   0, 255,
-255,   0, 255,  255,   0, 190,  255,   0, 125,  255,   0,  65,
-255,   0,   0,  255,  65,   0,  255, 125,   0,  255, 190,   0,
-255, 255,   0,  190, 255,   0,  125, 255,   0,   65, 255,   0,
-  0, 255,   0,    0, 255,  65,    0, 255, 125,    0, 255, 190,
-  0, 255, 255,    0, 190, 255,    0, 125, 255,    0,  65, 255,
-125, 125, 255,  158, 125, 255,  190, 125, 255,  223, 125, 255,
-255, 125, 255,  255, 125, 223,  255, 125, 190,  255, 125, 158,
-255, 125, 125,  255, 158, 125,  255, 190, 125,  255, 223, 125,
-255, 255, 125,  223, 255, 125,  190, 255, 125,  158, 255, 125,
-125, 255, 125,  125, 255, 158,  125, 255, 190,  125, 255, 223,
-125, 255, 255,  125, 223, 255,  125, 190, 255,  125, 158, 255,
-182, 182, 255,  199, 182, 255,  219, 182, 255,  235, 182, 255,
-255, 182, 255,  255, 182, 235,  255, 182, 219,  255, 182, 199,
-255, 182, 182,  255, 199, 182,  255, 219, 182,  255, 235, 182,
-255, 255, 182,  235, 255, 182,  219, 255, 182,  199, 255, 182,
-182, 255, 182,  182, 255, 199,  182, 255, 219,  182, 255, 235,
-182, 255, 255,  182, 235, 255,  182, 219, 255,  182, 199, 255,
-  0,   0, 113,   28,   0, 113,   56,   0, 113,   85,   0, 113,
-113,   0, 113,  113,   0,  85,  113,   0,  56,  113,   0,  28,
-113,   0,   0,  113,  28,   0,  113,  56,   0,  113,  85,   0,
-113, 113,   0,   85, 113,   0,   56, 113,   0,   28, 113,   0,
-  0, 113,   0,    0, 113,  28,    0, 113,  56,    0, 113,  85,
-  0, 113, 113,    0,  85, 113,    0,  56, 113,    0,  28, 113,
- 56,  56, 113,   69,  56, 113,   85,  56, 113,   97,  56, 113,
-113,  56, 113,  113,  56,  97,  113,  56,  85,  113,  56,  69,
-113,  56,  56,  113,  69,  56,  113,  85,  56,  113,  97,  56,
-113, 113,  56,   97, 113,  56,   85, 113,  56,   69, 113,  56,
- 56, 113,  56,   56, 113,  69,   56, 113,  85,   56, 113,  97,
- 56, 113, 113,   56,  97, 113,   56,  85, 113,   56,  69, 113,
- 81,  81, 113,   89,  81, 113,   97,  81, 113,  105,  81, 113,
-113,  81, 113,  113,  81, 105,  113,  81,  97,  113,  81,  89,
-113,  81,  81,  113,  89,  81,  113,  97,  81,  113, 105,  81,
-113, 113,  81,  105, 113,  81,   97, 113,  81,   89, 113,  81,
- 81, 113,  81,   81, 113,  89,   81, 113,  97,   81, 113, 105,
- 81, 113, 113,   81, 105, 113,   81,  97, 113,   81,  89, 113,
-  0,   0,  65,   16,   0,  65,   32,   0,  65,   48,   0,  65,
- 65,   0,  65,   65,   0,  48,   65,   0,  32,   65,   0,  16,
- 65,   0,   0,   65,  16,   0,   65,  32,   0,   65,  48,   0,
- 65,  65,   0,   48,  65,   0,   32,  65,   0,   16,  65,   0,
-  0,  65,   0,    0,  65,  16,    0,  65,  32,    0,  65,  48,
-  0,  65,  65,    0,  48,  65,    0,  32,  65,    0,  16,  65,
- 32,  32,  65,   40,  32,  65,   48,  32,  65,   56,  32,  65,
- 65,  32,  65,   65,  32,  56,   65,  32,  48,   65,  32,  40,
- 65,  32,  32,   65,  40,  32,   65,  48,  32,   65,  56,  32,
- 65,  65,  32,   56,  65,  32,   48,  65,  32,   40,  65,  32,
- 32,  65,  32,   32,  65,  40,   32,  65,  48,   32,  65,  56,
- 32,  65,  65,   32,  56,  65,   32,  48,  65,   32,  40,  65,
- 44,  44,  65,   48,  44,  65,   52,  44,  65,   60,  44,  65,
- 65,  44,  65,   65,  44,  60,   65,  44,  52,   65,  44,  48,
- 65,  44,  44,   65,  48,  44,   65,  52,  44,   65,  60,  44,
- 65,  65,  44,   60,  65,  44,   52,  65,  44,   48,  65,  44,
- 44,  65,  44,   44,  65,  48,   44,  65,  52,   44,  65,  60,
- 44,  65,  65,   44,  60,  65,   44,  52,  65,   44,  48,  65,
-  0,   0,   0,    0,   0,   0,    0,   0,   0,    0,   0,   0,
-  0,   0,   0,    0,   0,   0,    0,   0,   0,    0,   0,   0
-};
-
-	int i;
-
-	for(i=0;i<256;i++) {
-		pal.red[i]=raw_pal[i*3];
-		pal.green[i]=raw_pal[(i*3)+1];
-		pal.blue[i]=raw_pal[(i*3)+2];
-
-	}
-	return;
-
-}
-
-static int graphics_input(void) {
-
-	SDL_Event event;
-	int keypressed;
-
-	while ( SDL_PollEvent(&event)) {
-
-		switch(event.type) {
-
-		case SDL_KEYDOWN:
-			keypressed=event.key.keysym.sym;
-			switch (keypressed) {
-
-			case SDLK_ESCAPE:
-				return 27;
-			}
-			break;
-		}
-	}
-	return 0;
-
-}
-
-
-static void write_framebuffer(int address, int value) {
-	int real_addr;
-
-	real_addr=address-0xa0000;
-	if ((real_addr<0) || (real_addr>320*200)) return;
-
-	framebuffer[real_addr]=value;
-
-}
-
-/* unsigned multiply */
-static void mul_16(unsigned short value) {
-	unsigned int result;
-
-	result=ax*value;
-
-//	printf("%x*%x=%x ",value,ax,result);
-
-	ax=result&0xffff;
-	dx=result>>16;
-
-//	printf("%x:%x x=%d y=%d\n",dx,ax,
-//		dx&0xff,(dx>>8)&0xff);
-
-
-
-
-	if (dx==0) {
-		of=0;
-		cf=0;
-	}
-	else {
-		of=1;
-		cf=1;
-	}
-
-}
-
-/* 
-static void imul(short value) {
-	int result;
-
-	result=ax*value;
-
-	ax=result&0xffff;
-	dx=result>>16;
-
-}
-*/
-
-
-
-/* signed multiply */
-static void imul_8(char value) {
-
-	short result;
-	char src;
-
-	src=ax;
-
-	result=src*value;
-
-//	printf("imul: %d*%d=%d ",src,value,result);
-
-	ax=result;
-
-	if (ax==(ax&0xff)) {
-		cf=0;
-		of=0;
-	}
-	else {
-		cf=1;
-		of=1;
-	}
-
-}
-
-/* signed multiply */
-static void imul_16(short value) {
-
-	int result;
-	short src;
-
-	src=ax;
-
-	result=src*value;
-
-//	printf("imul: %d*%d=%d ",src,value,result);
-
-	ax=(result&0xffff);
-	dx=((result>>16)&0xffff);
-
-	if (dx==0) {
-		cf=0;
-		of=0;
-	}
-	else {
-		cf=1;
-		of=1;
-	}
-
-}
-
-/* signed multiply */
-static void imul_16_bx(short value) {
-
-	int result;
-	short src;
-
-	src=bx;
-
-	result=src*value;
-
-//	printf("imul: %d*%d=%d ",src,value,result);
-
-	bx=(result&0xffff);
-
-	if (bx==result) {
-		cf=0;
-		of=0;
-	}
-	else {
-		cf=1;
-		of=1;
-	}
-
-}
-
-/* signed multiply */
-static void imul_16_dx(short value) {
-
-	int result;
-	short src;
-
-	src=dx;
-
-	result=src*value;
-
-//	printf("imul: %d*%d=%d ",src,value,result);
-
-	dx=(result&0xffff);
-
-	if (dx==result) {
-		cf=0;
-		of=0;
-	}
-	else {
-		cf=1;
-		of=1;
-	}
-
-}
-
-
-
-
-
-/* unsigned divide */
-static void div_8(unsigned char value) {
-
-	unsigned char r,q;
-	unsigned int result,remainder;
-
-//	printf("Dividing %d (%x) by %d (%x): ",ax,ax,value,value);
-
-	if (value==0) {
-		printf("Divide by zero!\n");
-		return;
-	}
-
-	result=ax/value;
-	remainder=ax%value;
-
-	q=result;
-	r=remainder;
-
-//	printf("Result: q=%d r=%d\n",q,r);
-
-	ax=(r<<8)|(q&0xff);
-
-}
-
-
-
-static void push(int value) {
-	//printf("Pushing %x\n",value);
-	stack[sp]=value;
-	sp++;
-}
-
-static short pop(void) {
-	if (sp==0) {
-		printf("Stack underflow!\n");
-		return 0;
-	}
-
-	sp--;
-
-	//printf("Popping %x\n",stack[sp]);
-
-	return stack[sp];
-
-}
 	/* tilted plane */
 	/* DH=Y, DL=X */
 static void fx0(void) {
@@ -643,6 +268,8 @@ static void fx6(void) {
 	int edx;
 	char scratch[64];
 
+	memset(scratch,0,64);
+
 	// bx coming in is the address of the effect
 	// this is a guess, too lazy to hexdump
 	bx=0x1d5;
@@ -661,7 +288,7 @@ static void fx6(void) {
 	dx|=dh<<8;
 
 		// mov [bx+si],dx	; move xy to memory location
-		// fild word [bx+si]	; read as integer
+		// fild word [bx+si]	; read as integer put into ST(0)
 		// fidivr dword [bx+si] ; reverse divide by constant
 		// Divide m32int by ST(0) and store result in ST(0)
 		// fstp dword [bx+si-1] ; store result as floating point
@@ -670,7 +297,7 @@ static void fx6(void) {
 	memcpy(&scratch[32],&dx,sizeof(short));
 	f=dx;
 	memcpy(&edx,&scratch[32],sizeof(int));
-	f=f/edx;
+	f=edx/f;
 	memcpy(&scratch[31],&f,sizeof(double));
 	memcpy(&ax,&scratch[32],sizeof(short));
 
@@ -688,9 +315,9 @@ int main(int argc, char **argv) {
 
 	int temp;
 
-	set_vga_pal();
+	set_default_pal();
 
-	mode13h_graphics_init();
+	mode13h_graphics_init("memories",2);
 
 	di=0; // ??
 
@@ -705,7 +332,7 @@ int main(int argc, char **argv) {
 				// int 0x21
 
 top:
-	ax=0xcccd;		// load rrrola constant 
+	ax=0xcccd;		// load rrrola constant
 	mul_16(di);		// multiply
 	temp=(ax&0xff)+((ax>>8)&0xff);	// add al,ah
 	ax=ax&0xff00;
@@ -734,7 +361,7 @@ top:
 		default: printf("Trying effect %d\n",bx&0xff);
 	}
 				// stosb
-	write_framebuffer((es<<4)+di, ax&0xff);
+	framebuffer_write_20bit((es<<4)+di, ax&0xff);
 	di++;
 
 //	printf("Writing %d to %x (%x:%x)\n",ax&0xff,(es<<4)+di,es,di);
@@ -742,7 +369,7 @@ top:
 	di++;			// inc di
 	if (di!=0) goto top;
 //	printf("Done frame\n");
-	mode13h_graphics_update(framebuffer,&pal);
+	mode13h_graphics_update();
 
 	// timer emulate
 	usleep(10000);
