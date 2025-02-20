@@ -20,6 +20,7 @@ struct vga_palette {
 static unsigned char vga_ram[65536];
 static struct vga_palette vga_pal[256];
 static int num_colors=0;
+static int six_bit_palette=1;
 
 static int debug=0;
 
@@ -29,8 +30,20 @@ static int debug=0;
 #define OUTPUT_PASCAL	3
 
 
-int lookup_color(int r,int g,int b) {
-	int i;
+int lookup_color(int raw_r,int raw_g,int raw_b) {
+
+	int i,r,g,b;
+
+	if (six_bit_palette) {
+		r=raw_r>>2;
+		g=raw_g>>2;
+		b=raw_b>>2;
+	}
+	else {
+		r=raw_r;
+		g=raw_g;
+		b=raw_b;
+	}
 
 	if (debug) printf("Looking for color %d,%d,%d (in set of %d)\n",
 		r,g,b,num_colors);
@@ -211,19 +224,14 @@ int loadpng(char *filename,
 
 
 
-
-/* Converts a PNG to RAW 8K Hires Image */
-
-
 static void print_help(char *name,int version) {
 
-	printf("\npng2hgr version %s\n",VERSION);
+	printf("\npng2vga version %s\n",VERSION);
 
 	if (version) exit(1);
 
-	printf("\nUsage: %s [-r] [-s] PNGFILE\n\n",name);
-	printf("\t[-r] raw, don't prepend with BLOAD addr/size\n");
-	printf("\t[-s] short, leave off bottom text area\n");
+	printf("\nUsage: %s [-v] [-h] [-w] PNGFILE\n\n",name);
+	printf("\t[-w] write out 8-bit palette instead of 6-bit\n");
 	printf("\n");
 
 	exit(1);
@@ -241,7 +249,7 @@ int main(int argc, char **argv) {
 
 	/* Parse command line arguments */
 
-	while ( (c=getopt(argc, argv, "hvd") ) != -1) {
+	while ( (c=getopt(argc, argv, "hvdw") ) != -1) {
 
 		switch(c) {
 
@@ -253,6 +261,9 @@ int main(int argc, char **argv) {
 				break;
                         case 'd':
 				debug=1;
+				break;
+			case 'w':
+				six_bit_palette=0;
 				break;
 			default:
 				print_help(argv[0],0);

@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 	mode13h_graphics_init("image_viewer",2);
 
 	for(i=0;i<256;i++) {
-		set_pal(i,pal_r[i],pal_g[i],pal_b[i]);
+		set_pal(i,pal_r[i]<<2,pal_g[i]<<2,pal_b[i]<<2);
 	}
 
 	memcpy(framebuffer,image,65536);

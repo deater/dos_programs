@@ -171,9 +171,11 @@ void set_default_pal(void) {
 
 void set_pal(int which, int r, int g, int b) {
 
-	pal.red[which]=r;
-	pal.green[which]=g;
-	pal.blue[which]=b;
+	/* mode13h palette is only 6 bits per color */
+
+	pal.red[which]=r&0xfc;
+	pal.green[which]=g&0xfc;
+	pal.blue[which]=b&0xfc;
 
 	return;
 
