@@ -16,6 +16,7 @@ int graphics_input(void);
 
 void framebuffer_write_20bit(int address, int value);
 void framebuffer_write(int address, int value);
+void framebuffer_putpixel(int x, int y, int color);
 
 void outp(short address, int value);
 int inp(short addr);

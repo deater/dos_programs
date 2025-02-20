@@ -235,6 +235,15 @@ void framebuffer_write(int address, int value) {
 }
 
 
+void framebuffer_putpixel(int x, int y, int color) {
+
+
+	framebuffer[(y*320)+x]=color;
+
+}
+
+
+
 
 
 static int dac_write_address=0,dac_write_which=0;
