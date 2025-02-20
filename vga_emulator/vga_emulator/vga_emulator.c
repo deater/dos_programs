@@ -230,7 +230,7 @@ void framebuffer_write(int address, int value) {
 	}
 	}
 
-	framebuffer[address]=value;
+	framebuffer[(address&0xffff)]=value;
 
 }
 
@@ -329,4 +329,41 @@ int inp(short address) {
 	}
 
         return retval;
+}
+
+int int10h(int ax, int cx, int dx) {
+	int ah,al;
+
+	ah=ax>>8;
+	al=ax&0xff;
+
+	switch(ah) {
+		case 0:	/* set video mode */
+			if (al==0x13) {
+				fprintf(stderr,"Set 320x200x256\n");
+			}
+			else {
+				fprintf(stderr,"Unknown video mode!\n");
+			}
+			break;
+		case 0xC: /* set single pixel */
+			/* al=color, cx=column, dx=row */
+
+			if (debug) {
+				printf("Plotting %d,%d = %d\n",cx,dx,al);
+			}
+
+//			if ( (cx>319) || (dx>199)) {
+//				fprintf(stderr,"Too big Framebuffer %d,%d=%d\n",cx,dx,al);
+//			} else {
+				framebuffer_write((dx*320)+cx,al);
+//			}
+			break;
+
+
+		default:
+			fprintf(stderr,"Unknown int10h %x/%x\n",ah,al);
+			break;
+	}
+	return 0;
 }

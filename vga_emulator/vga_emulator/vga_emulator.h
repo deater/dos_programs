@@ -19,3 +19,5 @@ void framebuffer_write(int address, int value);
 
 void outp(short address, int value);
 int inp(short addr);
+
+int int10h(int ax, int cx, int dx);

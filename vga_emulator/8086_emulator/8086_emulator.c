@@ -8,6 +8,32 @@ unsigned short ax,bx,cx,dx,si,di,bp,cs,ds,es,fs;
 int cf=0,of=0,zf=0,sf=0;
 int sp=0;
 
+
+/* unsigned multiply */
+void mul_8(char value) {
+
+	unsigned short result;
+	unsigned char src;
+
+	src=ax;
+
+	result=src*value;
+
+//	printf("mul: %d*%d=%d\n",src,value,result);
+
+	ax=result;
+
+	if (ax==(ax&0xff)) {
+		cf=0;
+		of=0;
+	}
+	else {
+		cf=1;
+		of=1;
+	}
+
+}
+
 /* unsigned multiply */
 void mul_16(unsigned short value) {
 	unsigned int result;
@@ -225,6 +251,14 @@ unsigned short sar(unsigned short value,int shift) {
 	return temp;
 
 }
+
+void shld_ax_cx(int shift) {
+//	printf("shld %x %x %x =",ax,cx,shift);
+	if (shift == 0) return;
+	ax = (ax << shift) | (cx >> (16 - shift));
+//	printf("%x\n",ax);
+}
+
 
 void push(int value) {
 	//printf("Pushing %x\n",value);
