@@ -11,15 +11,18 @@
 
 #include <png.h>
 
-static unsigned char cga_ram[16384];
-static int which_pal=0;
-
-static int debug=0;
-
 #define OUTPUT_C	0
 #define OUTPUT_ASM	1
 #define OUTPUT_RAW	2
 #define OUTPUT_PASCAL	3
+
+static unsigned char cga_ram[16384];
+static int which_pal=0;
+static int output_type=OUTPUT_C;
+
+static int debug=0;
+
+
 
 
 int lookup_color(int r,int g,int b) {
@@ -219,8 +222,10 @@ static void print_help(char *name,int version) {
 
 	if (version) exit(1);
 
-	printf("\nUsage: %s [-v] [-h] [-w] PNGFILE\n\n",name);
-	printf("\t[]\n");
+	printf("\nUsage: %s [-v] [-h] [-r] [-p] [-c]  PNGFILE\n\n",name);
+	printf("\t[-r] output raw binary\n");
+	printf("\t[-p] output Pascal code\n");
+	printf("\t[-c] output C code\n");
 	printf("\n");
 
 	exit(1);
@@ -238,7 +243,7 @@ int main(int argc, char **argv) {
 
 	/* Parse command line arguments */
 
-	while ( (c=getopt(argc, argv, "hvdw") ) != -1) {
+	while ( (c=getopt(argc, argv, "hvdrpc") ) != -1) {
 
 		switch(c) {
 
@@ -251,6 +256,16 @@ int main(int argc, char **argv) {
                         case 'd':
 				debug=1;
 				break;
+			case 'r':
+				output_type=OUTPUT_RAW;
+				break;
+			case 'p':
+				output_type=OUTPUT_PASCAL;
+				break;
+			case 'c':
+				output_type=OUTPUT_C;
+				break;
+
 			default:
 				print_help(argv[0],0);
 				break;
@@ -281,7 +296,7 @@ int main(int argc, char **argv) {
 			c4=image[(y*320)+(x*4)+3];
 			color=(c1<<6)|(c2<<4)|(c3<<2)|c4;
 
-			cga_ram[(0x2000*(y%1))+(y*80)+x]=color;
+			cga_ram[(0x2000*(y&1))+((y/2)*80)+x]=color;
 		}
 	}
 //	memcpy(cga_ram,image,320*200);
@@ -289,17 +304,39 @@ int main(int argc, char **argv) {
 	fprintf(stderr,"Loaded image %d by %d, Palette %d\n",
 		xsize,ysize,which_pal);
 
-	printf("/* Palette %d */\n",which_pal);
-
 	/* dump image */
 
-	printf("unsigned char image[16384]={\n");
-	for(x=0;x<16384;x++) {
-		if (x%8==0) printf("\t");
-		printf("0x%02X,",cga_ram[x]);
-		if (x%8==7) printf("\n");
+	if (output_type==OUTPUT_PASCAL) {
+		printf("{ png2cga output}\n");
+		printf("const\n");
+		printf("\tIMAGEDATA : array [1..16384] of Char = (\n");
+		for(x=0;x<16384;x++) {
+			if (x%8==0) printf("\t");
+			printf("#$%02X",cga_ram[x]);
+			if (x!=16383) printf(",");
+			if (x%8==7) printf("\n");
+		}
+		printf(");\n");
 	}
-	printf("};\n");
+
+	if (output_type==OUTPUT_ASM) {
+	}
+
+	if (output_type==OUTPUT_RAW) {
+		write(1,cga_ram,16384);
+	}
+
+	if (output_type==OUTPUT_C) {
+		printf("/* Palette %d */\n",which_pal);
+		printf("unsigned char image[16384]={\n");
+		for(x=0;x<16384;x++) {
+			if (x%8==0) printf("\t");
+			printf("0x%02X,",cga_ram[x]);
+			if (x%8==7) printf("\n");
+		}
+		printf("};\n");
+	}
+
 
 	return 0;
 }
