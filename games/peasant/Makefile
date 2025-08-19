@@ -1,4 +1,6 @@
-PNG2CGA = ../../utils/cga-utils/png2cga -p ./pq_cga.png
+PNG2CGA = ../../utils/cga-utils/png2cga
+ZX02 = ~/research/6502_compression/zx02.git/build/zx02
+BIN2PAS = ../../utils/pas-utils/bin2pas
 
 all:	peasant.img
 
@@ -11,8 +13,14 @@ PEASANT.EXE:	peasant.pas IMAGE.PAS
 	dosbox -conf build.conf
 	cp /home/vince/dos/dos/TP/PEASANT.EXE .
 
-IMAGE.PAS:	pq_cga.png
-	$(PNG2CGA) -p ./pq_cga.png > IMAGE.PAS
+IMAGE.PAS:	pq_cga.zx02
+	$(BIN2PAS) -l IMAGEDATA pq_cga.zx02 > IMAGE.PAS
+
+pq_cga.zx02:	pq_cga.cga
+	$(ZX02) -f pq_cga.cga pq_cga.zx02
+
+pq_cga.cga:	pq_cga.png
+	$(PNG2CGA) -r ./pq_cga.png > pq_cga.cga
 
 
 clean:	
