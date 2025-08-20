@@ -1,7 +1,7 @@
 program peasants_quest;
 {by Vince 'Deater' Weaver}
 
-uses crt;
+uses crt,zx02;
 
 {$I image.pas}
 
@@ -98,8 +98,10 @@ var
 
 begin
 	SetCGAMode4;
-	writeln('hello');
-	move(IMAGEDATA,screen,16384);
+
+	decompress(@screen,@IMAGEDATA);
+
+{	move(IMAGEDATA,screen,16384);}
 	repeat until keypressed;
 	SetText80;
 end.
