@@ -10,7 +10,7 @@ UNIT zx02;
 INTERFACE
 
 type
-	buffer = Array [1..16384] of byte;
+	buffer = Array [0..16383] of byte;
 	buffer_ptr = ^buffer;
 
 
