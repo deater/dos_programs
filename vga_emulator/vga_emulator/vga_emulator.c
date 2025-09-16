@@ -169,6 +169,16 @@ void set_default_pal(void) {
 
 }
 
+void get_pal(int which, unsigned char *dest) {
+
+	dest[0]=pal.red[which];
+	dest[1]=pal.green[which];
+	dest[2]=pal.blue[which];
+
+	return;
+
+}
+
 void set_pal(int which, int r, int g, int b) {
 
 	/* mode13h palette is only 6 bits per color */
@@ -180,6 +190,7 @@ void set_pal(int which, int r, int g, int b) {
 	return;
 
 }
+
 
 
 int graphics_input(void) {

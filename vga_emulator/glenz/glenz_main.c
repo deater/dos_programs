@@ -1,51 +1,35 @@
 #include <stdio.h>
 #include <math.h>
-#include <conio.h>
-#include <memory.h>
-#include <dos.h>
+#include <string.h>
 #include <stdlib.h>
-#include "..\dis\dis.h"
-#include "..\common.h"
-#include "..\..\shims.h"
+#include "dis.h"
+#include "../vga_emulator/vga_emulator.h"
+#include "glenz.h"
+#include "vec.h"
 
-extern short sin1024[];
+extern int sin1024[];
 
-extern void zoomer1(char *pic);
-extern void zoomer2(char *pic);
-
-void cglenzinit();
-void cglenzpolylist( short * polylist );
-void cglenzdone();
-void init320x200();
+void zoomer1(char *pic);
 
 char bgpic[65535];
 
-extern char fc[];
+//extern char fc[];
 char *fcrow[100];
 char *fcrow2[16];
 
 //char far *vram=(char far *)0xa0000000L;
-#define vram shim_vram
 
-extern char lightshift;
+extern int lightshift;
 
-extern int _ndebug1;
+//extern int _ndebug1;
 
-extern char asmtestmode;
+//extern char asmtestmode;
 
-extern int csetmatrix(short *,long,long,long);
-extern int crotlist(long *,long *);
-extern int cclipedges(int *,int *,long *); // modifies given point list
-extern int cprojlist(long *,long *);
-extern int ccliplist(long *);
-extern int cdrawpolylist(int *);
-extern int cmatrix_yxz(short, short, short, short *);
-extern int cpolylist(int *polylist,int *polys,int *edges,long *points3);
-extern int ceasypolylist(short *polylist,unsigned short *polys,long *points3);
 
-extern int demomode[];
+extern void (*demomode[])(int, int*);
 
-long    cubepoints[]={8,
+#if 0
+int    cubepoints[]={8,
 -999,-999,-999,
 999,-999,-999,
 999,999,-999,
@@ -55,7 +39,7 @@ long    cubepoints[]={8,
 999,999,999,
 -999,999,999
 };
-unsigned short cubeepolys[]={
+int cubeepolys[]={
 4,0x4002,0,1,2,3,
 4,0x4004,4,5,6,7,
 4,0x4008,0,1,5,4,
@@ -63,11 +47,12 @@ unsigned short cubeepolys[]={
 4,0x400c,2,3,7,6,
 4,0x400a,3,0,4,7,
 0};
+#endif
 
 #define ZZZ 50
 #define QQQ 99
 
-long    points[64]={14,
+int    points[64]={14,
 -100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,100*ZZZ,-100*ZZZ,
@@ -82,7 +67,8 @@ long    points[64]={14,
 -170*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,170*ZZZ,0*ZZZ,
 0*ZZZ,-170*ZZZ,0*ZZZ};
-long    points1[64]={14,
+#if 0
+int    points1[64]={14,
 -100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,100*ZZZ,-100*ZZZ,
@@ -97,7 +83,7 @@ long    points1[64]={14,
 -170*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,170*ZZZ,0*ZZZ,
 0*ZZZ,-170*ZZZ,0*ZZZ};
-long    points9[64]={14,
+int    points9[64]={14,
 -111*ZZZ,-111*ZZZ,-111*ZZZ,
 111*ZZZ,-111*ZZZ,-111*ZZZ,
 111*ZZZ,111*ZZZ,-111*ZZZ,
@@ -112,7 +98,7 @@ long    points9[64]={14,
 -144*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,122*ZZZ,0*ZZZ,
 0*ZZZ,-144*ZZZ,0*ZZZ};
-long    points8[64]={14,
+int    points8[64]={14,
 -140*ZZZ,-140*ZZZ,-140*ZZZ,
 140*ZZZ,-140*ZZZ,-140*ZZZ,
 140*ZZZ,140*ZZZ,-140*ZZZ,
@@ -127,7 +113,7 @@ long    points8[64]={14,
 -190*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,140*ZZZ,0*ZZZ,
 0*ZZZ,-140*ZZZ,0*ZZZ};
-long    points7[64]={14,
+int    points7[64]={14,
 -100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,-100*ZZZ,-100*ZZZ,
 100*ZZZ,100*ZZZ,-100*ZZZ,
@@ -142,7 +128,8 @@ long    points7[64]={14,
 -170*ZZZ,0*ZZZ,0*ZZZ,
 0*ZZZ,170*ZZZ,0*ZZZ,
 0*ZZZ,-170*ZZZ,0*ZZZ};
-long    pointsb[64]={14,
+#endif
+int    pointsb[64]={14,
 -60*QQQ,-60*QQQ,-60*QQQ,
 60*QQQ,-60*QQQ,-60*QQQ,
 60*QQQ,60*QQQ,-60*QQQ,
@@ -157,9 +144,10 @@ long    pointsb[64]={14,
 -105*QQQ,0,0,
 0,105*QQQ,0,
 0,-105*QQQ,0};
-long    points2[256];
-long    points2b[256];
+int    points2[256];
+int    points2b[256];
 int points3[256*2];
+#if 0
 int edges[64]={12,0,
 0,1,0,0,
 1,2,0,0,
@@ -174,7 +162,7 @@ int edges[64]={12,0,
 2,6,0,0,
 3,7,0,0};
 int edges2[64];
-unsigned short polys[64]={
+int polys[64]={
 4,0x4010,0,1,2,3,
 4,0x4008,0,8,4,9,
 4,0x4010,1,9,5,10,
@@ -182,8 +170,9 @@ unsigned short polys[64]={
 4,0x4040,3,11,7,12,
 4,0x4080,4,5,6,7,
 0};
+#endif
 
-unsigned short epolys[]={
+int epolys[]={
 3,0x4002,0,1,8,
 3,0x4004,1,2,8,
 3,0x4006,2,3,8,
@@ -216,7 +205,7 @@ unsigned short epolys[]={
 
 0};
 
-unsigned short epolysb[]={
+int epolysb[]={
 3,0x4004,0,1,8,
 3,0x4002,1,2,8,
 3,0x4004,2,3,8,
@@ -248,23 +237,48 @@ unsigned short epolysb[]={
 3,0x4002,6,5,9,
 
 0};
-short polylist[256];
-short matrix[9];
+int polylist[256];
+int matrix[9];
 
 extern  char    backpal[16*3];
-char    pal[768];
+unsigned char    pal[768];
 
+static char fc[]={
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00,
+0x0d, 0x09, 0x0d,
+0x10, 0x0b, 0x10,
+0x12, 0x0d, 0x12,
+0x14, 0x0f, 0x14,
+0x16, 0x10, 0x16,
+0x18, 0x12, 0x18,
+0x1a, 0x14, 0x1b,
+0x18, 0x12, 0x1b,
+0x16, 0x10, 0x19,
+0x14, 0x0f, 0x17,
+0x12, 0x0e, 0x15,
+0x10, 0x0d, 0x13,
+0x0e, 0x0b, 0x11,
+0x0c, 0x0a, 0x0f,
+//0x0b, 0x09, 0x0d
+0x20, 0x20, 0x20	// CM: Workaround for chessboard fadeout
+};
+
+#if 0
 int testlist[]={
 3,16, 190,100, 90,50, 110,150,
 3,20, 10,100, 90,50, 99,150,
 0};
+#endif
 
-// void    waitb(void)
-// {
-//     while(!(inp(0x3da)&8));
-//     while((inp(0x3da)&8));
-//}
-#define waitb dis_waitb
+void    waitb(void)
+{
+#if 0
+    while(!(inp(0x3da)&8));
+    while((inp(0x3da)&8));
+#endif
+}
 
 char tmppal[768];
 
@@ -272,58 +286,49 @@ int repeat=0;
 int frame=0;
 
 //#pragma check_stack(off)
-void copper(void)
+void /*_loadds*/ copper(void)
 {
 	int	a;
 	repeat++;
-  shim_outp(0x3c8,0);
-        for(a=0;a<16*3;a++) shim_outp(0x3c9,pal[a]);
+        for(a=0;a<16;a++) set_pal(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
 }
-//#pragma check_stack(on)
 
-void glenz_main()
-{
-    int a,b,c,x,y,rx,ry,rz,n=8,p1,p2,r,g,zpos=7500,y1,y2,rya,ypos,yposa;
-    int ya,yy,boingm=6,boingd=7;
-    int jello=0,jelloa=0,bigjello=0,bigjelloa=0;
-    int xscale=120,yscale=120,zscale=120,bscale=0;
-    int oxp=0,oyp=0,ozp=0;
-    int oxb=0,oyb=0,ozb=0;
-    int bscaleflag=0;
-    int	repec;
-    int pdy;
-    int lasta=-1;
-    char    *ps,*pd,*pp;
-    unsigned int u;
+int main(int argc, char **argv) {
 
-    //dis_partstart();
+	int a,b,c,/*x,*/y,rx,ry,rz,/*n=8,p1,p2,*/r,g,zpos=7500,y1,y2,/*rya,*/ypos,yposa;
+	int ya,yy,boingm=6,boingd=7;
+	int jello=0,jelloa=0/*,bigjello=0,bigjelloa=0*/;
+	int xscale=120,yscale=120,zscale=120,bscale=0;
+	int oxp=0,oyp=0,ozp=0;
+	int oxb=0,oyb=0,ozb=0;
+	//int bscaleflag=0;
+	//int	repec;
+	//int pdy;
+	//int lasta=-1;
+	char *ps,*pd,*pp;
+	//unsigned int u;
 
-    if (!demo_isfirstpart())
-    {
-      while(!dis_exit() && dis_musplus()<-19)
-      {
-              dis_waitb();
-              demo_blit();
-      };
-    }
-    dis_setmframe(0);
+	dis_partstart();
 
-    zoomer2(NULL);
+	while(!dis_exit() && dis_musplus()<-19) ;
+	dis_setmframe(0);
 
-    //_asm mov dx,3c4h
-    //_asm mov ax,0f02h
-    //_asm out dx,ax
+	zoomer2();
+
+	mode13h_graphics_init("glenz",2);
+
+#if 0
+    _asm mov dx,3c4h
+    _asm mov ax,0f02h
+    _asm out dx,ax
     memset(vram,0,65535);
-    /*
     _asm
     {
         mov ax,13h
         int 010h
     }
-    */
-    //testasm();
-    demo_changemode( 320, 200 );
-    init320x200();
+    testasm();
+#endif
 
     for(a=0;a<100;a++)
     {
@@ -334,10 +339,15 @@ void glenz_main()
         fcrow2[a]=fc+768+16+a*320+100*320;
     }
     
-    shim_outp(0x3c8,0);
-    for(a=0;a<768;a++) shim_outp(0x3c9,0);
-    shim_outp(0x3c8,0);
-    for(a=0;a<16*3;a++) shim_outp(0x3c9,fc[a+16]);
+#if 0
+    outp(0x3c8,0);
+    for(a=0;a<768;a++) outp(0x3c9,0);
+    outp(0x3c8,0);
+    for(a=0;a<16*3;a++) outp(0x3c9,fc[a+16]);
+#endif
+
+    for(a=0;a<16;a++) set_pal(a,fc[(a+16)*3],fc[(a+16)*3+1],fc[(a+16)*3+2]);
+
     yy=0; ya=0;
     while(!dis_exit())
     {
@@ -352,32 +362,28 @@ void glenz_main()
         y1=130+y/2;
         y2=130+y*3/2;
         if(y2!=y1) b=25600/(y2-y1);
-        pd=vram+(y1-4)*320; pdy=y1;
+        //pd=vram+(y1-4)*320; pdy=y1;
         for(ry=y1-4;ry<y1;ry++,pd+=320)
         {
             if(ry>199) continue;
-            memset(pd,0,320);
+            //memset(pd,0,320);
         }
         for(c=0,ry=y1;ry<y2;ry++,pd+=320,c+=b)
         {
             if(ry>199) continue;
-            memcpy(pd,fcrow[c/256],320);
+            //memcpy(pd,fcrow[c/256],320);
         }
         for(c=0;c<16;c++,pd+=320,ry++)
         {
             if(ry>199) continue;
-            if(c>7) memset(pd,0,320);
-            else memcpy(pd,fcrow2[c],320);
+            //if(c>7) memset(pd,0,320);
+            //else memcpy(pd,fcrow2[c],320);
         }
-        demo_blit();
         waitb();
     }
     
-    while(!dis_exit() && dis_getmframe()<300)
-    {
-      dis_waitb();
-      demo_blit();
-    }
+    //while(!dis_exit() && dis_getmframe()<300);
+    dis_waitb();
 
     //initnewgroup();
     for(a=0;a<16;a++)
@@ -412,40 +418,38 @@ void glenz_main()
 	*pp++=g;
 	*pp++=b;
     }
-    shim_outp(0x3c8,0);
-    for(a=0;a<768;a++)
+    for(a=0;a<768/3;a++)
     {
-      shim_outp(0x3c9,tmppal[a]);
+	set_pal(a, tmppal[a*3], tmppal[a*3+1], tmppal[a*3+2]);
     }
     lightshift=9;
     rx=ry=rz=0;
     ypos=-9000; yposa=0;
     dis_waitb();
-    memcpy(bgpic,vram,64000);
-
-    while(!dis_exit() && dis_getmframe()<333)
-    {
-      dis_waitb();
-      demo_blit();
-    }
+    //memcpy(bgpic,vram,64000);
+    
+    //while(!dis_exit() && dis_getmframe()<333);
 
     memcpy(pal,backpal,16*3);
-//     dis_partstart();
-//     dis_waitb();
+    dis_partstart();
+    dis_waitb();
 
-    shim_outp(0x3c7,0);
-    for(a=0;a<16*3;a++) pal[a]= shim_inp(0x3c9);
+    for(a=0;a<16;a++) get_pal(a,&pal[a*3]);
     //dis_setcopper(0,copper);
     while(frame<7000 && !dis_exit())
     {
-        if (!demo_isfirstpart())
-        {
-            a=dis_musplus(); if(a<0 && a>-16) break;
-        }
+	//poll_event();
+	//clear_screen();
+	copper();
 
+        a=dis_musplus(); if(a<0 && a>-16) break;
+        
 	repeat=dis_waitb();
-  shim_outp(0x3c8,0);
-        for(a=0;a<16*3;a++) shim_outp(0x3c9,pal[a]);
+        //outp(0x3c8,0);
+        //for(a=0;a<16*3;a++) outp(0x3c9,pal[a]);
+        for(a=0;a<16;a++) set_pal(a, pal[a*3], pal[a*3+1], pal[a*3+2]);
+	//set_pal(0, 8, 8, 8);	// XXX
+	//set_pal(4, 12, 12, 12);
 	
 	while(repeat--)
         {
@@ -493,9 +497,9 @@ void glenz_main()
 		{
 			a=frame-1800+64;
 			if(a>1024) a=1024;
-	                oxb=(long)(-sin1024[(a*6)&1023])*(long)a/40L;
-	                oyb=(long)(-sin1024[(a*7)&1023])*(long)a/40L;
-	                ozb=(long)(sin1024[(a*8)&1023]+128)*(long)a/40L;
+	                oxb=(int)(-sin1024[(a*6)&1023])*(int)a/40L;
+	                oyb=(int)(-sin1024[(a*7)&1023])*(int)a/40L;
+	                ozb=(int)(sin1024[(a*8)&1023]+128)*(int)a/40L;
 		}
 		else
 		{
@@ -586,7 +590,7 @@ void glenz_main()
 	            {
 	                y=150+(frame-765)*2;
 	                memset(bgpic+y*320,0,640);
-	                memset(vram+y*320,0,640);
+	                //memset(vram+y*320,0,640);
 	                if(frame>785) for(a=0;a<16;a++)
 	                {
 	                    r=g=b=0;
@@ -625,6 +629,31 @@ void glenz_main()
 
         cglenzinit();
 
+        if(frame>800 && bscale>4)
+        {       
+            demomode[0]=demomode[2];
+            cmatrix_yxz(3600-rx/3,3600-ry/3,3600-rz/3,matrix);
+            csetmatrix(matrix,0,0,0);
+            points2b[0]=0; crotlist(points2b,pointsb);
+            matrix[0]=bscale*64;
+            matrix[1]=0;
+            matrix[2]=0;
+            matrix[3]=0;
+            matrix[4]=bscale*64;
+            matrix[5]=0;
+            matrix[6]=0;
+            matrix[7]=0;
+            matrix[8]=bscale*64;
+            csetmatrix(matrix,0+oxb,ypos+1500+oyb,zpos+ozb);
+            points2[0]=0; crotlist(points2,points2b);
+            points3[0]=0; cprojlist((int *)points3,points2);
+            ceasypolylist(polylist,epolysb,points3);
+            //cglenzpolylist(polylist);
+
+	    blend_alpha();
+            draw_poly(polylist);
+        }
+
         if(xscale>4)
         {
             demomode[0]=demomode[1];
@@ -643,40 +672,32 @@ void glenz_main()
             csetmatrix(matrix,0+oxp,ypos+1500+oyp,zpos+ozp);
             points2[0]=0; crotlist(points2,points2b);
             if(frame<800) ccliplist(points2);
-            points3[0]=0; cprojlist((long *)points3,points2);
+            points3[0]=0; cprojlist((int *)points3,points2);
             ceasypolylist(polylist,epolys,points3);
-            cglenzpolylist(polylist);
-        }
+            //cglenzpolylist(polylist);
 
-        if(frame>800 && bscale>4)
-        {       
-            demomode[0]=demomode[2];
-            cmatrix_yxz(3600-rx/3,3600-ry/3,3600-rz/3,matrix);
-            csetmatrix(matrix,0,0,0);
-            points2b[0]=0; crotlist(points2b,pointsb);
-            matrix[0]=bscale*64;
-            matrix[1]=0;
-            matrix[2]=0;
-            matrix[3]=0;
-            matrix[4]=bscale*64;
-            matrix[5]=0;
-            matrix[6]=0;
-            matrix[7]=0;
-            matrix[8]=bscale*64;
-            csetmatrix(matrix,0+oxb,ypos+1500+oyb,zpos+ozb);
-            points2[0]=0; crotlist(points2,points2b);
-            points3[0]=0; cprojlist((long *)points3,points2);
-            ceasypolylist(polylist,epolysb,points3);
-            cglenzpolylist(polylist);
+	    blend_color();
+
+	    if (frame < 780) {
+            	draw_fc();
+	    }
+
+            draw_poly(polylist);
         }
         
         cglenzdone();
-        demo_blit();
+
+	mode13h_graphics_update();
+
     }
     dis_setcopper(0,NULL);
+#if 0
     if(!dis_indemo())
     {
         _asm mov ax,3
         _asm int 10h
     }
+#endif
+
+    return 0;
 }

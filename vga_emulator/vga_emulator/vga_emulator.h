@@ -11,6 +11,7 @@ int mode13h_graphics_update(void);
 
 void set_default_pal(void);
 void set_pal(int which, int r, int g, int b);
+void get_pal(int which, unsigned char *dest);
 
 int graphics_input(void);
 
