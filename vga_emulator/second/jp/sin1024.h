@@ -1,1 +1,1 @@
-extern signed int sin1024[1024];
+extern int16_t sin1024[1024];

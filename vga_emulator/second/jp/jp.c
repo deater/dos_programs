@@ -1,6 +1,9 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "../dis/dis.h"
+#include "../../vga_emulator/vga_emulator.h"
 
 #include "asm.h"
 #include "sin1024.h"
@@ -9,26 +12,27 @@ FILE	*f1;
 
 #include "readp.h"
 
-extern char pic[];
+#include "icekngdm.h"
 
-char *vram=(char *)0xa0000000L;
 
-char	rowdata1[200][186];
-char	rowdata2[200][186];
-char	*row[400];
+//extern char pic[];
 
-char	pal2[768];
-char	palette[768];
-char	rowbuf[640];
+static char *vram=(char *)0xa0000000L;
 
-extern int sin1024[];
+static char rowdata1[200][186];
+static char rowdata2[200][186];
+static char *row[400];
 
-int	framey1[200];
-int	framey2[200];
-int	framey1t[800];
-int	framey2t[800];
-int	lasty[400];
-int	lasts[400];
+//static char pal2[768];
+static unsigned char palette[768];
+static unsigned char rowbuf[640];
+
+static int framey1[200];
+static int framey2[200];
+static int framey1t[800];
+static int framey2t[800];
+static int lasty[400];
+static int lasts[400];
 
 static void scrolly(int y) {
 
@@ -58,21 +62,6 @@ int waitb(void) {
 	return(dis_waitb());
 }
 
-#if 0
-static int calc(int y, int c) {
-
-	_asm
-	{
-		mov	ax,y
-		sub	ax,400
-		add	ax,c
-		mov	dx,400
-		imul	dx
-		mov	cx,c
-		idiv	cx
-	}
-}
-#endif
 
 
 void doit(void) {
@@ -125,15 +114,16 @@ int main(int argc, char **argv) {
 
 	dis_partstart();
 
+	/* set up pointers? */
 	for(a=0;a<200;a++) row[a]=rowdata1[a];
 	for(a=0;a<200;a++) row[a+200]=rowdata2[a];
 
 	frame=0;
-//	ysz=400*16; ysza=-460/6;
 	y=0;
 	y1=0; y1a=500;
 	y2=399*16; y2a=500;
 	mika=1;
+
 
 	for(frame=0;frame<200;frame++) {
 
@@ -186,36 +176,42 @@ int main(int argc, char **argv) {
 		framey2t[a]=(framey2[b]*d+framey2[b+1]*c)/3;
 	}
 
-#if 0
-	_asm mov ax,13h
-	_asm int 10h
-#endif
+	/* Init Mode 13h graphics */
+	mode13h_graphics_init("jp",2);
+
+	/* put it in 320x400 mode */
 	inittwk();
-#if 0
-	_asm
-	{
-		mov	dx,3c0h
-		mov	al,11h
-		out	dx,al
-		mov	al,255
-		out	dx,al
-		mov	al,20h
-		out	dx,al
-	}
-#endif
-	readp(palette,-1,pic);
+
+	/* set border color? */
+
+		// mov	dx,3c0h		; screen border color
+		// mov	al,11h
+		// out	dx,al
+
+		// mov	al,255		; color 255?
+		// out	dx,al
+
+		// mov	al,20h		; colore 32?
+		// out	dx,al
+
+	/* read the palette from the picture */
+	readp(palette,-1,ICEKNGDM_up);
+
+	/* set color 64 to black? */
 	palette[64*3+0]=0;
 	palette[64*3+1]=0;
 	palette[64*3+2]=0;
 
+	/* ????? */
 	for(y=0;y<400;y++) {
-		readp(rowbuf,y,pic);
+		readp(rowbuf,y,ICEKNGDM_up);
 		memcpy(row[y],rowbuf+70,184);
 		row[y][184]=65;
 	}
 
 	setpalarea(palette,0,256);
 
+	/* get from color 0 to color 64 (special black?) */
 	for(a=0;a<400;a++) {
 		for(b=0;b<184;b++) if(row[a][b]==0) row[a][b]=64;
 	}
@@ -227,9 +223,12 @@ int main(int argc, char **argv) {
 	scrolly(400);
 	dis_waitb();
 
+
+
 	for(y=0;y<400;y++) {
 		linezoom(vram+y*80,row[y],184);
 	}
+
 
 	a=64; y=400*64;
 	while(y>0) {
@@ -242,12 +241,18 @@ int main(int argc, char **argv) {
 
 //	storea=a;
 	dis_waitb();
+
+	return 0;
+
+
 	doit();
 
-#if 0
+
+	/* restore text mode? */
+
 	//_asm mov ax,3
 	//_asm int 10h
 	//printf("%i\n",storea);
-#endif
+
 	return 0;
 }

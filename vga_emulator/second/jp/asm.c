@@ -36,6 +36,7 @@ void inittwk(void) {
 //	push	si
 //	push	di
 //	push	ds
+
 //	;clear palette
 //	mov	dx,3c8h
 //	xor	al,al
@@ -44,24 +45,36 @@ void inittwk(void) {
 //	mov	cx,768
 //@@1:	out	dx,al
 //	loop	@@1
+
 //	;400 rows
-//	mov	dx,3d4h
-//	mov	ax,00009h
-//	out	dx,ax
+//	mov	dx,3d4h			; CRTC index register
+//	mov	ax,00009h		; maximum scan line
+//	out	dx,ax			; port 09 value 00?
+
+
+
 //	;tweak
-//	mov	dx,3d4h
-//	mov	ax,00014h
-//	out	dx,ax
-//	mov	ax,0e317h
-//	out	dx,ax
+//	mov	dx,3d4h			; CRTC index register
+//	mov	ax,00014h		; port 14 value 00?
+//	out	dx,ax			; underline location?
+
+//	mov	ax,0e317h		; port 17 value e3? 1110 0011
+//	out	dx,ax			; 
+
 //	mov	dx,3c4h
-//	mov	ax,0604h
+//	mov	ax,0604h		; port 04 / value 06
 //	out	dx,ax
 //	;
-//	mov	dx,3c4h
+//	mov	dx,3c4h			; port 02/value 0f
 //	mov	ax,0f02h
 //	out	dx,ax
-//	mov	ax,0a000h
+
+
+/* clear memory */
+/* possibly this is needed as the original mode13h call only cleared */
+/* the one half */
+
+//	mov	ax,0a000h		; write 0s to memory
 //	mov	es,ax
 //	xor	di,di
 //	mov	cx,32768
@@ -110,7 +123,7 @@ void lineblit(void) {
 //_lineblit ENDP
 }
 
-void setpalarea(char *p,int a, int b) {
+void setpalarea(unsigned char *p,int a, int b) {
 //PUBLIC _setpalarea
 //_setpalarea PROC FAR
 //	push	bp
