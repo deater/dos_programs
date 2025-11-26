@@ -7,11 +7,18 @@
 
 /* technically bigger than 320x200 but some code writes off edge... */
 /* in theory 16-bit pointer can't write beyond this */
-unsigned char framebuffer[65536];
+
+/* Actual VGA card has 256k but accesses through a 64k window */
+/* So emulate all the RAM but mask it where appropriate */
+unsigned char framebuffer[65536*4];
 
 static SDL_Surface *sdl_screen=NULL;
 
 static struct palette pal;
+
+static int sequencer_index=0x0,map_mask=0x1;
+static int dac_write_address=0,dac_write_which=0;
+static int dac_read_address=0,dac_read_which=0;
 
 static int debug=0;
 
@@ -241,7 +248,18 @@ void framebuffer_write(int address, int value) {
 	}
 	}
 
-	framebuffer[(address&0xffff)]=value;
+	if (map_mask&1) {
+		framebuffer[(address&0xffff)]=value;
+	}
+	if (map_mask&2) {
+		framebuffer[(address&0xffff)+0x10000]=value;
+	}
+	if (map_mask&4) {
+		framebuffer[(address&0xffff)+0x20000]=value;
+	}
+	if (map_mask&8) {
+		framebuffer[(address&0xffff)+0x30000]=value;
+	}
 
 }
 
@@ -257,12 +275,30 @@ void framebuffer_putpixel(int x, int y, int color) {
 
 
 
-static int dac_write_address=0,dac_write_which=0;
-static int dac_read_address=0,dac_read_which=0;
+
+
+
 
 void outp(short address, int value) {
 
 	switch(address) {
+
+
+	/* Sequencer Address Register */
+	case  0x3c4:
+		if (debug) fprintf(stderr,"Setting sequencer to 0x%x\n",value);
+		sequencer_index=value;
+		break;
+
+	/* Sequencer Address Register */
+	case  0x3c5:
+		switch(sequencer_index) {
+			case 2:
+				map_mask=value;
+				break;
+			default: fprintf(stderr,"Unhandled sequencer index 0x%x\n",value);
+		}
+		break;
 
 	/* DAC read address */
 	case 0x3c7:

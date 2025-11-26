@@ -1,4 +1,6 @@
-extern unsigned char framebuffer[65536];
+extern unsigned char framebuffer[65536*4];
+
+extern int vga_map_mask;
 
 struct palette {
         unsigned char red[256];
