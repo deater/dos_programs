@@ -1,0 +1,15 @@
+
+
+
+
+
+
+JP: bouncing image
+
+	uses 320x400 mode
+
+	scrolllock (?) enables debugging in the border
+
+	uses hardware scrolling (?)
+	massively unrolls the wiggle code (?)
+

@@ -14,14 +14,18 @@ FILE	*f1;
 
 #include "icekngdm.h"
 
+/* keyboard status flag */
+/* insert/caps-lock/num-lock/scroll-lock/AKT/CTRL/L-shift/R-Shift */
+//char *shiftstatus=(char *)0x0417;
+
 
 //extern char pic[];
 
-static char *vram=(char *)0xa0000000L;
+uint32_t vram=0xa0000000;
 
-static char rowdata1[200][186];
-static char rowdata2[200][186];
-static char *row[400];
+static unsigned char rowdata1[200][186];
+static unsigned char rowdata2[200][186];
+static unsigned char *row[400];
 
 //static char pal2[768];
 static unsigned char palette[768];
@@ -36,27 +40,29 @@ static int lasts[400];
 
 static void scrolly(int y) {
 
-#if 0
 	int a;
 
 	a=y*80;
 
-	_asm
-	{
-		mov	dx,3d4h
-		mov	al,0dh
-		mov	ah,byte ptr a[0]
-		out	dx,ax
-		mov	dx,3d4h
-		mov	al,0ch
-		mov	ah,byte ptr a[1]
-		out	dx,ax
-	}
-#endif
+
+		// mov	dx,3d4h
+		// mov	al,0dh
+		// mov	ah,byte ptr a[0]
+		// out	dx,ax
+	outp(0x3d4,0x0d);
+	outp(0x3d5,a&0xff);
+
+		// mov	dx,3d4h
+		// mov	al,0ch
+		// mov	ah,byte ptr a[1]
+		// out	dx,ax
+	outp(0x3d4,0x0c);
+	outp(0x3d5,((a>>8)&0xff));
+
 }
 
 
-char *shiftstatus=(char *)0x0417;
+
 
 int waitb(void) {
 	return(dis_waitb());
@@ -74,9 +80,15 @@ void doit(void) {
 
 	while(!dis_exit() && frame<700) {
 
-		if (*shiftstatus&16) setborder(0);
+		/* change border color if scroll lock set? */
+		/* probably doing debug timing */
+
+//		if (*shiftstatus&16) setborder(0);
+
 		c=waitb();
-		if (*shiftstatus&16) setborder(127);
+
+//		if (*shiftstatus&16) setborder(127);
+
 		frame+=c;
 		if (frame>511) {
 			c=400;
@@ -102,6 +114,14 @@ void doit(void) {
 				}
 			}
 		}
+
+		mode13h_graphics_update();
+
+		if (graphics_input()) {
+			return ;
+		}
+
+
 	}
 }
 
@@ -202,6 +222,8 @@ int main(int argc, char **argv) {
 	palette[64*3+1]=0;
 	palette[64*3+2]=0;
 
+
+
 	/* ????? */
 	for(y=0;y<400;y++) {
 		readp(rowbuf,y,ICEKNGDM_up);
@@ -210,6 +232,8 @@ int main(int argc, char **argv) {
 	}
 
 	setpalarea(palette,0,256);
+
+set_default_pal();
 
 	/* get from color 0 to color 64 (special black?) */
 	for(a=0;a<400;a++) {
@@ -241,9 +265,6 @@ int main(int argc, char **argv) {
 
 //	storea=a;
 	dis_waitb();
-
-	return 0;
-
 
 	doit();
 

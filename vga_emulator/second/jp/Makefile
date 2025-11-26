@@ -8,10 +8,10 @@ all:	jp
 
 ###
 
-jp:	jp.o asm.o readp.o sin1024.o \
+jp:	jp.o asm.o readp.o sin1024.o zoom.o \
 	../dis/disc.o \
 	../../vga_emulator/vga_emulator.o ../../8086_emulator/8086_emulator.o
-	$(CC) -o jp jp.o asm.o readp.o sin1024.o \
+	$(CC) -o jp jp.o asm.o readp.o sin1024.o zoom.o  \
 		../dis/disc.o \
 		../../vga_emulator/vga_emulator.o \
 		../../8086_emulator/8086_emulator.o \
@@ -39,6 +39,9 @@ readp.o:	readp.c readp.h
 
 sin1024.o:	sin1024.c sin1024.h
 	$(CC) $(CFLAGS) $(SDL_INCLUDE) -c sin1024.c
+
+zoom.o:	zoom.c zoom.h
+	$(CC) $(CFLAGS) $(SDL_INCLUDE) -c zoom.c
 
 ###
 
