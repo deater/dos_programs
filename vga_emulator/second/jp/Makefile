@@ -26,6 +26,16 @@ icekngdm.h:	ICEKNGDM.up
 ../dis/disc.o:	
 	cd ../dis && make
 
+###
+
+dol.o:	dol.c
+	$(CC) $(CFLAGS) -c dol.c
+
+dol:	dol.o
+	$(CC) $(LFLAGS) -o dol dol.o
+
+zoom.c:	dol
+	./dol
 ####
 
 asm.o:	asm.c asm.h

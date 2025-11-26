@@ -12,4 +12,4 @@ JP: bouncing image
 
 	uses hardware scrolling (?)
 	massively unrolls the wiggle code (?)
-
+		ZOOM.INC = 16k lines of generated assembly
