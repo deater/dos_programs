@@ -94,6 +94,80 @@ int mode13h_graphics_update(void) {
 }
 
 
+/* assume 640x400 screen */
+/* so two-wide pixels */
+int mode13h_graphics_update_400(void) {
+
+        unsigned int *t_pointer;
+
+        int x,y,temp,in_ptr,out_ptr,color;
+
+        /* point to SDL output pixels */
+        t_pointer=((Uint32 *)sdl_screen->pixels);
+
+	out_ptr=0;
+	for(y=0;y<400;y++) {
+	        for(x=0;x<80;x++) {
+			in_ptr=(y*80)+x;
+
+			/* plane 0 */
+			color=framebuffer[in_ptr];
+
+	                temp=(pal.red[color]<<16)|
+        	                (pal.green[color]<<8)|
+                	        (pal.blue[color]<<0)|0;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+
+			/* plane 1 */
+			color=framebuffer[in_ptr+0x10000];
+
+	                temp=(pal.red[color]<<16)|
+        	                (pal.green[color]<<8)|
+                	        (pal.blue[color]<<0)|0;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+
+			/* plane 2 */
+			color=framebuffer[in_ptr+0x20000];
+
+	                temp=(pal.red[color]<<16)|
+        	                (pal.green[color]<<8)|
+                	        (pal.blue[color]<<0)|0;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+
+			/* plane 3 */
+			color=framebuffer[in_ptr+0x30000];
+
+	                temp=(pal.red[color]<<16)|
+        	                (pal.green[color]<<8)|
+                	        (pal.blue[color]<<0)|0;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+			t_pointer[out_ptr]=temp;
+			out_ptr++;
+
+
+		}
+        }
+
+        SDL_UpdateRect(sdl_screen, 0, 0, xsize, ysize);
+
+        return 0;
+}
+
+
+
+
+
+
 /* output of vgapal https://github.com/canidlogic/vgapal */
 static unsigned char default_pal[3*256]=
 { 0,   0,   0,    0,   0, 170,    0, 170,   0,    0, 170, 170,

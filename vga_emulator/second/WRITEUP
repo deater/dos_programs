@@ -54,6 +54,9 @@ JP: bouncing image
 
 	uses 320x400 mode
 
+	uses VGA scrolling to scroll image onto screen before launching
+		into the bouncing
+
 	scrolllock (?) enables debugging in the border
 
 	uses hardware scrolling (?)

@@ -10,6 +10,7 @@ struct palette {
 
 int mode13h_graphics_init(char *name, int scale);
 int mode13h_graphics_update(void);
+int mode13h_graphics_update_400(void);
 
 void set_default_pal(void);
 void set_pal(int which, int r, int g, int b);

@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "../dis/dis.h"
 #include "../../vga_emulator/vga_emulator.h"
@@ -85,7 +86,12 @@ void doit(void) {
 
 //		if (*shiftstatus&16) setborder(0);
 
-		c=waitb();
+//		c=waitb();
+
+		c=1;
+		usleep(10000);
+
+		printf("VMW: frame=%d\n",frame);
 
 //		if (*shiftstatus&16) setborder(127);
 
@@ -115,7 +121,7 @@ void doit(void) {
 			}
 		}
 
-		mode13h_graphics_update();
+		mode13h_graphics_update_400();
 
 		if (graphics_input()) {
 			return ;
@@ -281,6 +287,12 @@ int main(int argc, char **argv) {
 
 	doit();
 
+	while(1) {
+		usleep(10000);
+		if (graphics_input()) {
+			return 1;
+		}
+	}
 
 	/* restore text mode? */
 
