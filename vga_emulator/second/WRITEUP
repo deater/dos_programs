@@ -1,7 +1,53 @@
+VGA "tweaked" 320x400 mode:
+	+ See Chapter 31 of Abrash's "Game Programming Black Book"
+	+ start with mode13h and "tweak" some settings
+	+ is actually sort of the same as 320x200 in some ways, as 320x200
+		mode essentially is 320x400 but with double-height pixels
+	+ in tweaked mode
+		lines split across 4 banks
+		pixel0 -> bank0 0
+		pixel1 -> bank1 0
+		pixel2 -> bank2 0
+		pixel3 -> bank3 0
+		pixel4 -> bank0 1
 
+	abrash sets things up:
+		mov	ax,13h
+		int	10h
+		
+		out 0x3c4,4	; SC_INDEX, MEMORY_MODE
 
+		in  al,0x3c5
+		and al,~0x8	; turn off chain 4
+		or  al,0x4	; turn off odd/even
+		out 0x3c5
 
+		out 0x3ce,5	; GC_INDEX, GRAPHICS_mode
+		in  al,0x3cf
+		and al,~0x10	; turn off odd/even
+		out 0x3cd,al
 
+		out 0x3ce,6	; MISCELLANEOUS
+		in  al, 0x3cf
+		and al,~0x2	; turn off chain
+
+		; clears it
+
+				; do not scan twice
+		out	0x3d4,9	; CRTC_INDEX,MAX_SCAN_LINE
+		in	al,0x3d5
+		and	al,~0x1f	; set max scaline 0
+		out	0x3d5,al
+
+		out	0x3d4,0x14	; UNDERLINE
+		in	al,0x3d5
+		and	al,~0x40
+		out	0x3d5,al	 turn off doublewod
+
+		out	0x3d4,0x17	; MODE CONTROL
+		in	al,0x3d5
+		or	al,0x40		; turn on byte mode bit
+		out	0x3d5,al
 
 
 JP: bouncing image
@@ -13,3 +59,5 @@ JP: bouncing image
 	uses hardware scrolling (?)
 	massively unrolls the wiggle code (?)
 		ZOOM.INC = 16k lines of generated assembly
+
+	chunks of code not used?

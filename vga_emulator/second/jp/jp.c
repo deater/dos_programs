@@ -217,11 +217,19 @@ int main(int argc, char **argv) {
 	/* read the palette from the picture */
 	readp(palette,-1,ICEKNGDM_up);
 
+	fprintf(stderr,"VMW3 0=%d,%d,%d 1=%d,%d,%d\n",
+                                palette[0],palette[1],palette[2],
+                                palette[3],palette[4],palette[5]);
+
+
 	/* set color 64 to black? */
 	palette[64*3+0]=0;
 	palette[64*3+1]=0;
 	palette[64*3+2]=0;
 
+	fprintf(stderr,"VMW4 0=%d,%d,%d 1=%d,%d,%d\n",
+                                palette[0],palette[1],palette[2],
+                                palette[3],palette[4],palette[5]);
 
 
 	/* ????? */
@@ -231,9 +239,14 @@ int main(int argc, char **argv) {
 		row[y][184]=65;
 	}
 
+	fprintf(stderr,"VMW5 0=%d,%d,%d 1=%d,%d,%d\n",
+                                palette[0],palette[1],palette[2],
+                                palette[3],palette[4],palette[5]);
+
+
 	setpalarea(palette,0,256);
 
-set_default_pal();
+//set_default_pal();
 
 	/* get from color 0 to color 64 (special black?) */
 	for(a=0;a<400;a++) {

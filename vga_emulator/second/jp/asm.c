@@ -1,7 +1,11 @@
+#include <stdio.h>
+
 #include "asm.h"
 #include "zoom.h"
 
 #include "../../vga_emulator/vga_emulator.h"
+
+static int debug=1;
 
 //code 	SEGMENT para public 'CODE'
 //	ASSUME cs:code
@@ -163,6 +167,8 @@ void setpalarea(unsigned char *src,int start,int count) {
 
 	int i;
 
+	if (debug) fprintf(stderr,"Entering setpalarea\n");
+
 //PUBLIC _setpalarea
 //_setpalarea PROC FAR
 //	push	bp
@@ -176,6 +182,8 @@ void setpalarea(unsigned char *src,int start,int count) {
 //	mov	dx,3c8h
 //	out	dx,al
 
+	if (debug) fprintf(stderr,"Starting at %d\n",start&0xff);
+
 	outp(0x3c8,start&0xff);
 
 				//	inc	dx
@@ -188,7 +196,10 @@ void setpalarea(unsigned char *src,int start,int count) {
 //	max+=start;		//	add	cx,ax
 
 	for(i=0;i<count*3;i++) {
-		outp(0x3c9,src[count]);
+		if (debug) if (i%3==0) fprintf(stderr,"%d: ",i/3);
+		fprintf(stderr,"%d ",src[i]);
+		outp(0x3c9,src[i]);
+		if (debug) if (i%3==2) fprintf(stderr,"\n");
 	}
 //	rep	outsb
 //	pop	ds

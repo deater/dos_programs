@@ -1,10 +1,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "readp.h"
 
-static int debug=0;
+static int debug=1;
 
 /* for ICEKNGDM.UP */
 
@@ -38,14 +39,25 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 	hdr.colors=(src[7]<<8)+src[6];
 	hdr.add=(src[9]<<8)+src[8];
 
-	if (debug) printf("Looking for row: %d Header: magic %hx, %hd x %hd\n",
+	if (debug) {
+		fprintf(stderr,"Looking for row: %d Header: magic %hx, %hd x %hd\n",
 		row,hdr.magic,hdr.width,hdr.height);
+	}
 
 	/* if row == -1 then read palette */
 	/* looks like it starts at src+16? */
 
 	if(row==-1) {
+		if (debug) {
+			fprintf(stderr,"Copying palette\n");
+		}
+
 		memcpy(dest,src+16,hdr.colors*3);
+		if (debug) {
+			fprintf(stderr,"0=%d,%d,%d 1=%d,%d,%d\n",
+				dest[0],dest[1],dest[2],
+				dest[3],dest[4],dest[5]);
+		}
 		return;
 	}
 
@@ -75,7 +87,7 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 	/* skip to the actual source */
 	src+=2;
 
-	int8_t ah,al;
+	uint8_t ah,al;
 	int src_ptr=0,dest_ptr=0;
 
 //		push	si			// save si
@@ -87,11 +99,23 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 //		add	cx,si			// cx points to end?
 //		les	di,dest			// load es:di with dest
 	l1:
+
+		if (dest_ptr<0) {
+			fprintf(stderr,"URGHURGH\n");
+			exit(1);
+		}
+
+		if (dest_ptr>640) {
+			fprintf(stderr,"URGHURGH2 %d\n",dest_ptr);
+			exit(1);
+		}
+
 		al=src[src_ptr];		// mov	al,ds:[si]
 		src_ptr++;			// inc	si
 
 //		or	al,al			// set flags
-		if (al>0) goto l2;		// jns	l2
+		if (!(al&0x80)) goto l2;		// jns	l2
+						//   jump if not sign (not neg)
 						// if positive goto l2
 		ah=al;				// mov	ah,al
 		ah=ah&0x7f;			// clear sign
@@ -104,7 +128,7 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 		ah--;				// dec	ah
 		if (ah!=0) goto l4;		// jnz	l4
 		if (src_ptr<bytes) goto l1;	// cmp	si,cx
-						// jb	l1
+						// jb	l1 (jump if below)
 		goto l3;			// jmp	l3
 	l2:
 		dest[dest_ptr]=al;		// mov	es:[di],al
