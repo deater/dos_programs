@@ -44,6 +44,11 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 		row,hdr.magic,hdr.width,hdr.height);
 	}
 
+	if (hdr.magic!=0xfcfd) {
+		fprintf(stderr,"Error! Invalid UP magic %x\n",hdr.magic);
+		return;
+	}
+
 	/* if row == -1 then read palette */
 	/* looks like it starts at src+16? */
 
