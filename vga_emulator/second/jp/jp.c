@@ -9,7 +9,9 @@
 #include "asm.h"
 #include "sin1024.h"
 
-FILE	*f1;
+static int debug=0;
+
+//FILE	*f1;
 
 #include "readp.h"
 
@@ -19,16 +21,12 @@ FILE	*f1;
 /* insert/caps-lock/num-lock/scroll-lock/AKT/CTRL/L-shift/R-Shift */
 //char *shiftstatus=(char *)0x0417;
 
-
-//extern char pic[];
-
 uint32_t vram=0xa0000000;
 
 static unsigned char rowdata1[200][186];
 static unsigned char rowdata2[200][186];
 static unsigned char *row[400];
 
-//static char pal2[768];
 static unsigned char palette[768];
 static unsigned char rowbuf[640];
 
@@ -91,7 +89,9 @@ void doit(void) {
 		c=1;
 		usleep(10000);
 
-		printf("VMW: frame=%d\n",frame);
+		if (debug) {
+			printf("VMW: frame=%d\n",frame);
+		}
 
 //		if (*shiftstatus&16) setborder(127);
 
@@ -136,20 +136,20 @@ int main(int argc, char **argv) {
 	int frame,halt=0;
 	int a,b,c,d,y,la;
 	int y1,y2,y1a,y2a,mika;
-//	int ysz,ysza,storea=0;
 
 	dis_partstart();
 
-	/* set up pointers? */
-	for(a=0;a<200;a++) row[a]=rowdata1[a];
-	for(a=0;a<200;a++) row[a+200]=rowdata2[a];
+	/* set up pointers */
+	for(a=0;a<200;a++) {
+		row[a]=rowdata1[a];
+		row[a+200]=rowdata2[a];
+	}
 
 	frame=0;
 	y=0;
 	y1=0; y1a=500;
 	y2=399*16; y2a=500;
 	mika=1;
-
 
 	for(frame=0;frame<200;frame++) {
 
@@ -223,20 +223,22 @@ int main(int argc, char **argv) {
 	/* read the palette from the picture */
 	readp(palette,-1,ICEKNGDM_up);
 
-	fprintf(stderr,"VMW3 0=%d,%d,%d 1=%d,%d,%d\n",
+	if (debug) {
+		fprintf(stderr,"VMW3 0=%d,%d,%d 1=%d,%d,%d\n",
                                 palette[0],palette[1],palette[2],
                                 palette[3],palette[4],palette[5]);
-
+	}
 
 	/* set color 64 to black? */
 	palette[64*3+0]=0;
 	palette[64*3+1]=0;
 	palette[64*3+2]=0;
 
-	fprintf(stderr,"VMW4 0=%d,%d,%d 1=%d,%d,%d\n",
+	if (debug) {
+		fprintf(stderr,"VMW4 0=%d,%d,%d 1=%d,%d,%d\n",
                                 palette[0],palette[1],palette[2],
                                 palette[3],palette[4],palette[5]);
-
+	}
 
 	/* ????? */
 	for(y=0;y<400;y++) {
@@ -245,14 +247,14 @@ int main(int argc, char **argv) {
 		row[y][184]=65;
 	}
 
-	fprintf(stderr,"VMW5 0=%d,%d,%d 1=%d,%d,%d\n",
+	if (debug) {
+		fprintf(stderr,"VMW5 0=%d,%d,%d 1=%d,%d,%d\n",
                                 palette[0],palette[1],palette[2],
                                 palette[3],palette[4],palette[5]);
+	}
 
 
 	setpalarea(palette,0,256);
-
-//set_default_pal();
 
 	/* get from color 0 to color 64 (special black?) */
 	for(a=0;a<400;a++) {
@@ -282,10 +284,12 @@ int main(int argc, char **argv) {
 		dis_waitb();
 	}
 
-//	storea=a;
 	dis_waitb();
 
 	doit();
+
+
+	/* wait for keypress before exiting */
 
 	while(1) {
 		usleep(10000);

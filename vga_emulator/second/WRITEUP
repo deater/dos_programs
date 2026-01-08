@@ -52,6 +52,9 @@ VGA "tweaked" 320x400 mode:
 
 JP: bouncing image
 
+	image is 320x400 LBM, only using 64 colors?
+	color #64 has special meaning?
+
 	uses 320x400 mode
 
 	uses VGA scrolling to scroll image onto screen before launching
