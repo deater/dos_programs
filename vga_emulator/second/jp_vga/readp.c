@@ -44,6 +44,11 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 		row,hdr.magic,hdr.width,hdr.height);
 	}
 
+	if ((hdr.magic&0xffff)!=0xfcfd) {
+		fprintf(stderr,"Error! Invalid UP magic %x\n",hdr.magic);
+		return;
+	}
+
 	/* if row == -1 then read palette */
 	/* looks like it starts at src+16? */
 
@@ -69,20 +74,23 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 
 	/* navigate to the proper row */
 	while(row) {
-		if (debug) printf("row: %d srcadd: %x src: %p\n",row,*(int16_t *)src,src);
+		bytes=(src[0]&0xff)|((src[1]&0xff)<<8);
+		if (debug) fprintf(stderr,"row: %d srcadd: %d (0x%x) src: %p\n",row,
+			bytes,bytes,src);
 
 		/* grab two bytes to next row, and add it in */
-		/* note: probably not endian safe */
-		src+=*(int16_t *)src;
+
+		src+=bytes;
 
 		/* need to add two more to skip the address */
 		src+=2;
-		if (debug) printf("row: %d src: %p\n",row,src);
+		if (debug) fprintf(stderr,"rowend: %d src: %p\n",row,src);
 		row--;
 	}
 
 	/* get count of bytes in line */
-	bytes=*(int16_t *)src;
+	bytes=(src[0]&0xff)|((src[1]&0xff)<<8);
+	if (debug) fprintf(stderr,"bytes in line %d (0x%x)\n",bytes,bytes);
 
 	/* skip to the actual source */
 	src+=2;
@@ -101,12 +109,12 @@ void readp(unsigned char *dest, int row, unsigned char *src) {
 	l1:
 
 		if (dest_ptr<0) {
-			fprintf(stderr,"URGHURGH\n");
+			fprintf(stderr,"Invalid destination\n");
 			exit(1);
 		}
 
 		if (dest_ptr>640) {
-			fprintf(stderr,"URGHURGH2 %d\n",dest_ptr);
+			fprintf(stderr,"Column size too big %d\n",dest_ptr);
 			exit(1);
 		}
 

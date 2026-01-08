@@ -1,6 +1,8 @@
 CC = gcc
 CFLAGS = -O2 -Wall -g -I../../8086_emulator -I../../vga_emulator
 
+PNG2UP = ../../../utils/vga-utils/png2up
+
 SDL_LIBS= `sdl-config --libs`
 SDL_INCLUDE= `sdl-config --cflags`
 
@@ -17,6 +19,9 @@ jp:	jp.o asm.o readp.o sin1024.o zoom.o \
 		../../8086_emulator/8086_emulator.o \
 		$(LFLAGS) $(SDL_LIBS)
 ####
+
+ICEKNGDM.up:	ICEKNGDM.png
+	$(PNG2UP) ICEKNGDM.png > ICEKNGDM.up
 
 icekngdm.h:	ICEKNGDM.up
 	xxd -i ICEKNGDM.up > icekngdm.h
@@ -56,4 +61,4 @@ zoom.o:	zoom.c zoom.h
 ###
 
 clean:	
-	rm -f *~ *.o jp dol
+	rm -f *~ *.o *.up jp dol

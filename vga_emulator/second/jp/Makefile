@@ -61,4 +61,4 @@ zoom.o:	zoom.c zoom.h
 ###
 
 clean:	
-	rm -f *~ *.o jp
+	rm -f *~ *.o *.up jp

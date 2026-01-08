@@ -40,17 +40,20 @@ struct st_readp {
 	int16_t height;		// 0x0190 = 400
 	int16_t colors;		// 0x0100 = 256
 	int16_t add;		// 0x0031 = 49?
+				// (header_size + (colors*3))/16
+				// 16 + 768 = 784 / 16 = 49
 };
 
 #define HEADER_SIZE	16
 
 int write_up(unsigned char *image,int xsize, int ysize) {
 
-	int i;
+	int i,row,col,run,line_length,last_color,line_ptr,current_color;
 	int colors=256;		/* hard coded? */
 	struct st_readp header;
 	unsigned char raw_header[HEADER_SIZE];
 	unsigned char pal_entry[3];
+	unsigned char raw_line[1024];
 
 	/* write header */
 
@@ -60,7 +63,7 @@ int write_up(unsigned char *image,int xsize, int ysize) {
 	header.width=xsize;
 	header.height=ysize;
 	header.colors=256;
-	header.add=49;
+	header.add=(16+(colors*3))/16;
 
 	raw_header[0]=header.magic&0xff;
 	raw_header[1]=(header.magic>>8)&0xff;
@@ -83,6 +86,77 @@ int write_up(unsigned char *image,int xsize, int ysize) {
 		pal_entry[1]=vga_pal[i].g>>2;
 		pal_entry[2]=vga_pal[i].b>>2;
 		fwrite(pal_entry,3,1,stdout);
+	}
+
+	/* Skip to proper offset */
+	fseek(stdout,header.add*16,SEEK_SET);
+
+	/* RLE each line */
+
+	/* first 2 bytes is little endian size of data this line */
+	/*	to get to next line add this plus 2 */
+
+
+	// then loop
+
+	// if top bit set (negative)
+	//   first byte = length|0x80
+	//   second byte = color
+	// else
+	//   first byte = color
+
+	// note: it will draw two single bytes of same color rather than
+	//       a run of 2
+
+	for(row=0;row<header.height;row++) {
+
+		run=0;
+		last_color=-1;
+		line_length=0;
+		line_ptr=2;
+
+		for(col=0;col<header.width;col++) {
+			current_color=image[(row*header.width)+col];
+			if (last_color==-1) last_color=current_color;
+
+			if ((current_color!=last_color)||
+				(run>126) ||
+				(col==header.width-1))  {
+
+				if (col==header.width-1) {
+					run++;
+				}
+
+				if (run==1) {
+				}
+				else if (run==2) {
+					/* dupe it, rather than a run */
+					raw_line[line_ptr]=last_color;
+					line_ptr++;
+				}
+				else {
+					raw_line[line_ptr]=run|0x80;
+					line_ptr++;
+				}
+				raw_line[line_ptr]=last_color;
+				line_ptr++;
+				last_color=current_color;
+				run=0;
+			}
+			run++;
+		}
+
+		line_length=line_ptr-2;
+
+		if (line_length>16383) {
+			fprintf(stderr,"Line too long!\n");
+			return -1;
+		}
+
+		raw_line[0]=line_length&0xff;
+		raw_line[1]=(line_length>>8)&0xff;
+
+		fwrite(raw_line,line_length+2,1,stdout);
 	}
 
 	return 0;
