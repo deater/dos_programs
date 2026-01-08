@@ -28,14 +28,14 @@ icekngdm.h:	ICEKNGDM.up
 
 ###
 
-make_zoom.o:	make_zoom.c
-	$(CC) $(CFLAGS) -c make_zoom.c
+dol.o:	dol.c
+	$(CC) $(CFLAGS) -c dol.c
 
-make_zoom:	make_zoom.o
-	$(CC) $(LFLAGS) -o make_zoom make_zoom.o
+dol:	dol.o
+	$(CC) $(LFLAGS) -o dol dol.o
 
-zoom.c:	make_zoom
-	./make_zoom
+zoom.c:	dol
+	./dol
 ####
 
 asm.o:	asm.c asm.h
@@ -56,4 +56,4 @@ zoom.o:	zoom.c zoom.h
 ###
 
 clean:	
-	rm -f *~ *.o jp
+	rm -f *~ *.o jp dol
