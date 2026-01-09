@@ -6,7 +6,17 @@ PNG2UP = ../../../utils/vga-utils/png2up
 SDL_LIBS= `sdl-config --libs`
 SDL_INCLUDE= `sdl-config --cflags`
 
-all:	jp
+all:	jp jp_patch
+
+###
+
+rr:	give_you.h
+
+give_you.up: give_you.png
+	$(PNG2UP) give_you.png > give_you.up
+
+give_you.h:	give_you.up
+	xxd -i give_you.up > give_you.h
 
 ###
 
@@ -60,5 +70,14 @@ zoom.o:	zoom.c zoom.h
 
 ###
 
+jp_patch:	jp_patch.o
+	$(CC) -o jp_patch jp_patch.o $(LFLAGS)
+
+jp_patch.o:	jp_patch.c
+	$(CC) $(CFLAGS) -c jp_patch.c
+
+
+###
+
 clean:	
-	rm -f *~ *.o *.up jp
+	rm -f *~ *.o *.up jp jp_patch

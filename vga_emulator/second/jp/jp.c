@@ -16,6 +16,8 @@ static int debug=0;
 #include "readp.h"
 
 #include "icekngdm.h"
+//#include "give_you.h"
+
 
 /* keyboard status flag */
 /* insert/caps-lock/num-lock/scroll-lock/AKT/CTRL/L-shift/R-Shift */

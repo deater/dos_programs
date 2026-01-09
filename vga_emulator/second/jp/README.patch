@@ -1,0 +1,17 @@
+To patch things so you can run them
+
+To get it to run from the git repository:
+	Copy U2.EXE to MAIN/DATA/SECOND.EXE
+	Run SECOND.EXE
+
+To patch things:
+	Need to decompress twice
+	UNP.EXE MAIN/DATA/JPLOGO.EXE
+	UNP.EXE MAIN/DATA/JPLOGO.EXE
+
+	run the jp_patch tool on it
+
+	optionally run LZEXE.EXE on it to recompress?
+
+Need to run dosbox -conf dosbox.conf which enables gus support
+	the 3dsine doesn't seem to work w/o it
