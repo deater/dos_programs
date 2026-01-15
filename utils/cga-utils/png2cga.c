@@ -288,6 +288,9 @@ int main(int argc, char **argv) {
 
 	int c1,c2,c3,c4,color;
 
+	/* 2 bits-per-pixel for color */
+	/* even rows start at offset 0, odd rows at offset 8192 */
+
 	for(y=0;y<200;y++) {
 		for(x=0;x<320/4;x++) {
 			c1=image[(y*320)+(x*4)+0];
