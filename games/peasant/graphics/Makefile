@@ -3,7 +3,7 @@ ZX02 = ~/research/6502_compression/zx02.git/build/zx02
 BIN2PAS = ../../../utils/pas-utils/bin2pas
 
 
-all:	PQ_KER1.PAS PQ_KNGHT.PAS
+all:	PQ_KER1.PAS PQ_KNGHT.PAS PQ_YTREE.PAS
 
 ####
 
@@ -27,6 +27,19 @@ pq_knight.zx02:	pq_knight.cga
 
 pq_knight.cga:	pq_knight.png
 	$(PNG2CGA) -r ./pq_knight.png > pq_knight.cga
+
+####
+
+PQ_YTREE.PAS:	pq_ytree.zx02
+	$(BIN2PAS) -l PQ_YTREE pq_ytree.zx02 > PQ_YTREE.PAS
+
+pq_ytree.zx02:	pq_ytree.cga
+	$(ZX02) -f pq_ytree.cga pq_ytree.zx02
+
+pq_ytree.cga:	pq_ytree.png
+	$(PNG2CGA) -r ./pq_ytree.png > pq_ytree.cga
+
+####
 
 
 

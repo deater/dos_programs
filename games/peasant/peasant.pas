@@ -5,6 +5,7 @@ uses crt,zx02;
 
 {$I pq_ker1.pas}
 {$I pq_knght.pas}
+{$I pq_ytree.pas}
 
 { BH = page number,
   DH = row (0 top)
@@ -132,7 +133,19 @@ begin
 	PrintStringXor('Peasant''s Quest',24,0);
 
 	repeat until keypressed;
+	ch:=readkey;
 
+	decompress(@screen,@PQ_YTREE);
+	PrintStringXor('Score:0 out of 150',0,0);
+	PrintStringXor('Peasant''s Quest',24,0);
+
+	repeat until keypressed;
+	ch:=readkey;
+
+	SetPalette(0);
+
+	repeat until keypressed;
+	ch:=readkey;
 
 
 {	move(PQ_KERREK1,screen,16384);}
