@@ -8,10 +8,72 @@ uses crt,zx02;
 {$I pq_ytree.pas}
 {$I pq_inn.pas}
 
+type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
+
+var 
+	screen:screentype absolute $B800:0000;
+
+CONST cga = $b800;
+
 { BH = page number,
   DH = row (0 top)
   DL = col (0 top)
 }
+
+{ assume 8 pixels wide for now }
+
+Procedure SpriteXY(x,y: word);
+
+var boffset,width,height:word;
+label loopy;
+
+begin
+	boffset:=((y div 2)*80)+(x div 4);
+
+	asm
+
+		push	ds
+		push	es
+		mov	ax,cga
+		mov	es,ax
+		mov	di,boffset
+
+		mov	dx,20
+loopy:
+		mov	ax,0
+		mov	cx,4
+		rep stosb
+		
+		add	di,(80-4)
+
+		dec	dx
+		jne	loopy
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
+
+
+
+Procedure PutPixelXY(x,y: word);
+
+var offset,width,height:word;
+
+begin
+
+	offset:=((y div 2)*80)+(x div 4);
+
+	if (y mod 2 = 1) then offset:=offset+8192;
+
+	mem[cga:offset]:=0;
+
+end;
+
+
 
 Procedure GotoXY(x,y: byte);
 begin
@@ -113,11 +175,11 @@ end;
 
 
 
-type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
+
 
 var
-	screen:screentype absolute $B800:0000;
 	ch:char;
+	i:word;
 
 begin
 	{Set CGA mode 4}
@@ -153,19 +215,14 @@ begin
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',24,0);
 
+	SpriteXY(8,100);
+
+	for i:=0 to 10 do begin
+		PutPixelXY(0,50+i);
+	end;
+
 	repeat until keypressed;
 	ch:=readkey;
-
-	SetPalette(0);
-
-	repeat until keypressed;
-	ch:=readkey;
-
-
-
-{	move(PQ_KERREK1,screen,16384);}
-
-
 
 	{ Restore Text Mode}
 	SetCGAMode(3);
