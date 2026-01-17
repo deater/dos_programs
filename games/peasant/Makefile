@@ -14,8 +14,10 @@ peasant.img:	PEASANT.EXE
 ###
 
 PEASANT.EXE:	peasant.pas zx02.pas \
+	graphics/PQ_INN.PAS \
 	graphics/PQ_KER1.PAS graphics/PQ_KNGHT.PAS graphics/PQ_YTREE.PAS
 	cp peasant.pas zx02.pas $(TPDIR)
+	cp graphics/PQ_INN.PAS $(TPDIR)
 	cp graphics/PQ_KER1.PAS $(TPDIR)
 	cp graphics/PQ_KNGHT.PAS $(TPDIR)
 	cp graphics/PQ_YTREE.PAS $(TPDIR)
