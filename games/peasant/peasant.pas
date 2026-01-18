@@ -3,6 +3,8 @@ program peasants_quest;
 
 uses crt,zx02;
 
+{$I pq_vid.pas}
+{$I pq_title.pas}
 {$I pq_ker1.pas}
 {$I pq_knght.pas}
 {$I pq_ytree.pas}
@@ -185,22 +187,31 @@ begin
 	{Set CGA mode 4}
 
 	SetCGAMode(4);
+
 	SetPalette(1);
 
-	decompress(@screen,@PQ_KERREK1);
+	decompress(@screen,@PQ_VID);
 	repeat until keypressed;
 	ch:=readkey;
 
+	SetPalette(0);
+
+	decompress(@screen,@PQ_TITLE);
+	repeat until keypressed;
+	ch:=readkey;
+
+	SetPalette(1);
+
 	decompress(@screen,@PQ_KNIGHT);
 	PrintStringXor('Score:0 out of 150',0,0);
-	PrintStringXor('Peasant''s Quest',24,0);
+	PrintStringXor('Peasant''s Quest',25,0);
 
 	repeat until keypressed;
 	ch:=readkey;
 
 	decompress(@screen,@PQ_YTREE);
 	PrintStringXor('Score:0 out of 150',0,0);
-	PrintStringXor('Peasant''s Quest',24,0);
+	PrintStringXor('Peasant''s Quest',25,0);
 
 	repeat until keypressed;
 	ch:=readkey;
@@ -226,4 +237,5 @@ begin
 
 	{ Restore Text Mode}
 	SetCGAMode(3);
+
 end.

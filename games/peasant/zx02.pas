@@ -20,12 +20,12 @@ IMPLEMENTATION
 
 
 var
-	bitr : byte;		{ bit reserve }
+	bitr : byte;		{ * bit reserve }
 	extra_bit: byte;	{ extra bit to inject }
 	offset: word;		{ last offset }
-	ipos: word;		{ input position }
-	opos: word;		{ output position }
-	input,output: buffer_ptr;
+	ipos: word;		{ * input position }
+	opos: word;		{ * output position }
+	input,output: buffer_ptr; { ** }
 
 
 {************ get byte *************}
@@ -171,7 +171,7 @@ early_out:
 
 end;
 
-{************ decode match *************}
+{************ decode offset *************}
 
 function decode_offset:word;
 
@@ -258,6 +258,9 @@ begin
 	opos := 0;
 	bitr := $80;
 	ipos := 0;
+
+	extra_bit:=0;
+	offset:=0;
 
 	input := src;
 	output := dest;

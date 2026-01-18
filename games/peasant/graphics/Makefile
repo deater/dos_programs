@@ -3,7 +3,31 @@ ZX02 = ~/research/6502_compression/zx02.git/build/zx02
 BIN2PAS = ../../../utils/pas-utils/bin2pas
 
 
-all:	PQ_INN.PAS PQ_KER1.PAS PQ_KNGHT.PAS PQ_YTREE.PAS
+all:	PQ_VID.PAS PQ_TITLE.PAS \
+	PQ_INN.PAS PQ_KER1.PAS PQ_KNGHT.PAS PQ_YTREE.PAS
+
+####
+
+PQ_VID.PAS:	pq_videlectrix.zx02
+	$(BIN2PAS) -l PQ_VID pq_videlectrix.zx02 > PQ_VID.PAS
+
+pq_videlectrix.zx02:	pq_videlectrix.cga
+	$(ZX02) -f pq_videlectrix.cga pq_videlectrix.zx02
+
+pq_videlectrix.cga:	pq_videlectrix.png
+	$(PNG2CGA) -r ./pq_videlectrix.png > pq_videlectrix.cga
+
+
+####
+
+PQ_TITLE.PAS:	pq_title.zx02
+	$(BIN2PAS) -l PQ_TITLE pq_title.zx02 > PQ_TITLE.PAS
+
+pq_title.zx02:	pq_title.cga
+	$(ZX02) -f pq_title.cga pq_title.zx02
+
+pq_title.cga:	pq_title.png
+	$(PNG2CGA) -r ./pq_title.png > pq_title.cga
 
 ####
 
