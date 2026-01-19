@@ -14,6 +14,15 @@ type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
 
 var 
 	screen:screentype absolute $B800:0000;
+	level_over,frame,flame_count:byte;
+	visited_0,visited_1,visited_2:byte;
+	peasant_x,peasant_y:byte;
+	peasant_xadd,peasant_yadd:byte;
+	peasant_dir,peasant_steps:byte;
+	ch:char;
+	i:word;
+	input_x:byte;
+
 
 CONST cga = $b800;
 
@@ -175,13 +184,151 @@ begin
 	end;
 end;
 
+Procedure reset_prompt;
+
+begin
+	input_x:=0;
+	PrintCharXor('>',input_x,24);	
+	input_x:=2;
+end;
 
 
-
+Procedure check_keyboard;
 
 var
-	ch:char;
-	i:word;
+	ch,ch2:char;
+
+begin
+	{ drain keyboard buffer}
+
+	if keypressed=false then exit;
+
+	ch:=readkey;
+
+	if ch=chr(0) then begin
+		ch2:=readkey;
+
+		case ch2 of
+
+			'M':	begin	{ right }
+
+				{ if already moving right, stop}
+				if peasant_xadd = 1 then begin
+					peasant_xadd:=0;
+					peasant_yadd:=0;		
+				end
+				{ not moving right, start moving right}
+				else begin
+					peasant_xadd:=1;
+					peasant_yadd:=0;
+				end;
+
+				peasant_dir:=1; { PEASANT_DIR_RIGHT}
+
+				end;
+
+		end;
+	end
+
+	{ all other keys }
+	else begin
+		{hgr_input}
+
+		PrintCharXor(ch,input_x,24);
+		input_x:=input_x+1;
+
+	end;                   
+
+end;
+
+Procedure move_peasant;
+
+begin
+	if (peasant_xadd<>0) or (peasant_yadd<>0) then begin
+
+		{ moving }
+
+		peasant_steps:=peasant_steps+1;
+		if (peasant_steps>=0) then peasant_steps:=0;
+
+		peasant_x:=peasant_x+peasant_xadd;
+
+	end;
+
+	
+end;
+
+Procedure draw_peasant;
+
+begin
+	SpriteXY(peasant_x,peasant_y);
+end;
+
+
+Procedure do_knight(mode: byte);
+
+label done_knight;
+
+begin
+	level_over:=0;
+	frame:=0;
+	flame_count:=0;
+
+	{ decompress dialog }
+
+	{ decompress priority }
+
+	{ load bg }
+
+	decompress(@screen,@PQ_KNIGHT);
+	PrintStringXor('Score:0 out of 150',0,0);
+	PrintStringXor('Peasant''s Quest',25,0);
+
+	reset_prompt;
+	
+	{ move knight }
+
+	visited_1:=visited_1 or 16;	{ MAP_MOUNTAIN_PASS}
+
+	while(true) do begin
+
+		{ check_keyboard }
+
+		check_keyboard;
+
+		{ move_peasant }
+
+		move_peasant;
+
+
+		if level_over <> 0 then goto done_knight;
+
+		{ update screen }
+
+		draw_peasant;
+		
+		{ increment frame }
+
+		frame := frame + 1;
+
+		{ increment flame }
+
+		{ wait vblank }
+
+		{ page  flip }		
+
+	end;
+
+done_knight:
+
+	repeat until keypressed;
+	ch:=readkey;
+end;
+
+
+
+
+
 
 begin
 	{Set CGA mode 4}
@@ -202,12 +349,17 @@ begin
 
 	SetPalette(1);
 
-	decompress(@screen,@PQ_KNIGHT);
-	PrintStringXor('Score:0 out of 150',0,0);
-	PrintStringXor('Peasant''s Quest',25,0);
+	{ init }
 
-	repeat until keypressed;
-	ch:=readkey;
+	peasant_x:=100;
+	peasant_y:=100;
+	peasant_xadd:=0;
+	peasant_yadd:=0;
+	peasant_dir:=0;
+	peasant_steps:=0;
+	input_x:=0;
+
+	do_knight(0);
 
 	decompress(@screen,@PQ_YTREE);
 	PrintStringXor('Score:0 out of 150',0,0);
