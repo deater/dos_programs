@@ -4,7 +4,9 @@ BIN2PAS = ../../../utils/pas-utils/bin2pas
 
 
 all:	PQ_VID.PAS PQ_TITLE.PAS \
-	PQ_INN.PAS PQ_KER1.PAS PQ_KNGHT.PAS PQ_YTREE.PAS
+	PQ_WFALL.PAS PQ_KNGHT.PAS PQ_INN.PAS \
+	PQ_YTREE.PAS PQ_ROCK.PAS \
+	PQ_KER1.PAS
 
 ####
 
@@ -55,6 +57,17 @@ pq_ker1.cga:	pq_ker1.png
 
 ####
 
+PQ_WFALL.PAS:	pq_waterfall.zx02
+	$(BIN2PAS) -l PQ_WFALL pq_waterfall.zx02 > PQ_WFALL.PAS
+
+pq_waterfall.zx02:	pq_waterfall.cga
+	$(ZX02) -f pq_waterfall.cga pq_waterfall.zx02
+
+pq_waterfall.cga:	pq_waterfall.png
+	$(PNG2CGA) -r ./pq_waterfall.png > pq_waterfall.cga
+
+####
+
 PQ_KNGHT.PAS:	pq_knight.zx02
 	$(BIN2PAS) -l PQ_KNIGHT pq_knight.zx02 > PQ_KNGHT.PAS
 
@@ -74,6 +87,18 @@ pq_ytree.zx02:	pq_ytree.cga
 
 pq_ytree.cga:	pq_ytree.png
 	$(PNG2CGA) -r ./pq_ytree.png > pq_ytree.cga
+
+####
+
+PQ_ROCK.PAS:	pq_rock.zx02
+	$(BIN2PAS) -l PQ_ROCK pq_rock.zx02 > PQ_ROCK.PAS
+
+pq_rock.zx02:	pq_rock.cga
+	$(ZX02) -f pq_rock.cga pq_rock.zx02
+
+pq_rock.cga:	pq_rock.png
+	$(PNG2CGA) -r ./pq_rock.png > pq_rock.cga
+
 
 ####
 

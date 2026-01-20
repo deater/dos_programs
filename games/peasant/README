@@ -1,0 +1,31 @@
+
+
+FAQ:
+
+	Q. Why is it slow in parts?
+
+	A. Unlike the Apple II version which is written entirely in
+		assembly language, a lot of the DOS version is written
+		in Turbo Pascal (with inline assembly)
+
+
+	Q. Why don't you write it all in assembly?
+
+	A. While I can code x86 assembly I don't really enjoy it.
+		Too much 6502 has spoiled me.
+
+
+	Q. Why Pascal and not C?
+
+	A. Pascal is what I coded all of my DOS games in back in the
+		1990s (well, after I had moved on from GW-BASIC and QBasic)
+
+
+	Q. Why are you compiling with Turbo Pascal and not
+		Lazarus/FreePascal?
+
+	A. Currently I have a Makefile that launches a DOSbox script
+		that runs TPC.EXE and compiles things.  I could probably
+		set up a full Linux toolchain but for now this works.
+
+
