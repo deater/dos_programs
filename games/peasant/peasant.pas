@@ -17,7 +17,7 @@ var
 	level_over,frame,flame_count:byte;
 	visited_0,visited_1,visited_2:byte;
 	peasant_x,peasant_y:byte;
-	peasant_xadd,peasant_yadd:byte;
+	peasant_xadd,peasant_yadd:integer; { signed }
 	peasant_dir,peasant_steps:byte;
 	ch:char;
 	i:word;
@@ -227,6 +227,60 @@ begin
 
 				end;
 
+			'K':	begin	{ left }
+
+				{ if already moving left, stop}
+				if peasant_xadd = -1 then begin
+					peasant_xadd:=0;
+					peasant_yadd:=0;		
+				end
+				{ not moving left, start moving left}
+				else begin
+					peasant_xadd:=-1;
+					peasant_yadd:=0;
+				end;
+
+				peasant_dir:=2; { PEASANT_DIR_LEFT}
+
+				end;
+
+			'H':	begin	{ up }
+
+				{ if already moving up, stop}
+				if peasant_yadd = -1 then begin
+					peasant_xadd:=0;
+					peasant_yadd:=0;		
+				end
+				{ not moving up, start moving up}
+				else begin
+					peasant_xadd:=0;
+					peasant_yadd:=-1;
+				end;
+
+				peasant_dir:=0; { PEASANT_DIR_UP}
+
+				end;
+
+			'P':	begin	{ down }
+
+				{ if already moving down, stop}
+				if peasant_yadd = 1 then begin
+					peasant_xadd:=0;
+					peasant_yadd:=0;		
+				end
+				{ not moving down, start moving down}
+				else begin
+					peasant_xadd:=0;
+					peasant_yadd:=1;
+				end;
+
+				peasant_dir:=3; { PEASANT_DIR_DOWN}
+
+				end;
+
+
+
+
 		end;
 	end
 
@@ -252,11 +306,32 @@ begin
 		if (peasant_steps>=0) then peasant_steps:=0;
 
 		peasant_x:=peasant_x+peasant_xadd;
-
+		peasant_y:=peasant_y+peasant_yadd;
 	end;
 
 	
 end;
+
+Procedure wait_vsync;
+
+label	wait_retrace,wait_next;
+
+begin
+	{ wait for retrace }
+
+	asm
+		mov	dx,3dah
+wait_retrace:
+		in	al,dx
+		test	al,8
+		jz	wait_retrace
+wait_next:
+		in	al,dx
+		test	al,8
+		jnz	wait_next
+	end;
+end;
+
 
 Procedure draw_peasant;
 
@@ -314,6 +389,8 @@ begin
 		{ increment flame }
 
 		{ wait vblank }
+
+		wait_vsync;
 
 		{ page  flip }		
 
