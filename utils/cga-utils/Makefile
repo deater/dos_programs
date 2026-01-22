@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -O2 -Wall -g
 
-all:	png2cga cga2png
+all:	png2cga cga2png cga_make_sprite
 
 ###
 
@@ -10,6 +10,15 @@ png2cga:		png2cga.o
 
 png2cga.o:		png2cga.c
 			$(CC) $(CFLAGS) -c png2cga.c
+
+###
+
+cga_make_sprite:		cga_make_sprite.o
+			$(CC) -o cga_make_sprite cga_make_sprite.o $(LFLAGS) -lpng
+
+cga_make_sprite.o:		cga_make_sprite.c
+			$(CC) $(CFLAGS) -c cga_make_sprite.c
+
 
 ###
 
@@ -25,6 +34,4 @@ cga2png.o:		cga2png.c
 #		cp pcx2cga png2cga cga2png $(INSTALL_LOC)
 
 clean:		
-		rm -f *~ *.o pcx2cga png2cga cga2png
-
-
+		rm -f *~ *.o pcx2cga png2cga cga2png cga_make_sprite
