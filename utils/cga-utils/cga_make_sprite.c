@@ -236,26 +236,6 @@ static void print_help(char *name,int version) {
 	exit(1);
 }
 
-static int hgr_offset_table[48]={
-	0x0000,0x0080,0x0100,0x0180,0x0200,0x0280,0x0300,0x0380,
-	0x0028,0x00A8,0x0128,0x01A8,0x0228,0x02A8,0x0328,0x03A8,
-	0x0050,0x00D0,0x0150,0x01D0,0x0250,0x02D0,0x0350,0x03D0,
-};
-
-static int hgr_offset(int y) {
-
-	int temp,temp2,address;
-	temp=y/8;
-	temp2=y%8;
-
-	temp2=temp2*0x400;
-
-	address=hgr_offset_table[temp]+temp2;
-
-	return address;
-}
-
-
 int main(int argc, char **argv) {
 
 	int xsize=0,ysize=0;
@@ -344,45 +324,91 @@ int main(int argc, char **argv) {
 		xsize,ysize,which_pal);
 
 
+	/* for now have to be on an 4-pixel boundary (?) */
 
 
-
-	if (x1%7) {
-		fprintf(stderr,"Warning!  x1 should be a multiple of 7\n");
+	if (x1%4) {
+		fprintf(stderr,"Warning!  x1 should be a multiple of 4\n");
 	}
 
-	xs=(x2/7-x1/7);
-	if (!((x2%7==0)&&(x1%7==0))) xs++;
+	xs=(x2/4-x1/4);
+	if (!((x2%4==0)&&(x1%4==0))) xs++;
 
 	total_bytes=(xs*(y2-y1));
 //	if (printsize) total_bytes+=2;
 //	if (mask_offset) total_bytes+=2;
 
-	printf("; %d %d %d %d\n",x1,y1,x2,y2);
-	printf("; total bytes: %d\n",total_bytes);
-	printf("%s:\n",label_string);
 
 
-	if (printsize) {
+	int addr;
 
-		printf("\t.byte $%02X,$%02X\n",
-				xs,y2-y1);
+	if (output_type==OUTPUT_ASM) {
+		printf("; %d %d %d %d\n",x1,y1,x2,y2);
+		printf("; total bytes: %d\n",total_bytes);
+		printf("%s:\n",label_string);
+
+
+		if (printsize) {
+
+			printf("\t.byte $%02X,$%02X\n",
+					xs,y2-y1);
+		}
+
+		if (mask_offset) {
+			printf("\t.byte $%02X,$%02X\n",
+					total_bytes&0xff,
+					total_bytes>>8);
+		}
+
+		for(y=y1;y<y2;y++) {
+			printf("\t.byte ");
+			for(x=x1/4;x<=x2/4;x++) {
+				addr=(0x2000*(y&1))+((y/2)*80)+x;
+				printf("$%02X",
+					cga_ram[addr]);
+				if (x!=x2/4) printf(",");
+			}
+			printf("\n");
+		}
 	}
+	else if (output_type==OUTPUT_PASCAL) {
 
-	if (mask_offset) {
-		printf("\t.byte $%02X,$%02X\n",
+		printf("{ %d %d %d %d }\n",x1,y1,x2,y2);
+		printf("{ total bytes: %d }\n",total_bytes);
+
+		printf("const\n");
+		printf("%s : array [0..%d] of Char = (\n",
+			label_string,total_bytes-1);
+
+
+		if (printsize) {
+
+			printf("\t#$%02X,#$%02X\n",xs,y2-y1);
+		}
+
+		if (mask_offset) {
+			printf("\t#$%02X,#$%02X\n",
 				total_bytes&0xff,
 				total_bytes>>8);
-	}
-
-	for(y=y1;y<y2;y++) {
-		printf("\t.byte ");
-		for(x=x1/7;x<=x2/7;x++) {
-			printf("$%02X",cga_ram[hgr_offset(y)+x]);
-			if (x!=x2/7) printf(",");
 		}
-		printf("\n");
+
+		for(y=y1;y<y2;y++) {
+			printf("\t");
+			for(x=x1/4;x<=x2/4;x++) {
+				addr=(0x2000*(y&1))+((y/2)*80)+x;
+				printf("#$%02X",
+					cga_ram[addr]);
+				if ((y==y2-1)&&(x==x2/4)) {
+				}
+				else {
+					printf(",");
+				}
+			}
+			printf("\n");
+		}
+		printf(");\n");
 	}
 
 	return 0;
 }
+

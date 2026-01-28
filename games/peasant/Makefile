@@ -16,7 +16,8 @@ peasant.img:	PEASANT.EXE
 PEASANT.EXE:	peasant.pas zx02.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
 	graphics/PQ_INN.PAS \
-	graphics/PQ_KER1.PAS graphics/PQ_KNGHT.PAS graphics/PQ_YTREE.PAS
+	graphics/PQ_KER1.PAS graphics/PQ_KNGHT.PAS graphics/PQ_YTREE.PAS \
+	sprites/s_walk.pas
 	cp peasant.pas zx02.pas $(TPDIR)
 	cp graphics/PQ_VID.PAS $(TPDIR)
 	cp graphics/PQ_TITLE.PAS $(TPDIR)
@@ -24,6 +25,7 @@ PEASANT.EXE:	peasant.pas zx02.pas \
 	cp graphics/PQ_KER1.PAS $(TPDIR)
 	cp graphics/PQ_KNGHT.PAS $(TPDIR)
 	cp graphics/PQ_YTREE.PAS $(TPDIR)
+	cp sprites/s_walk.pas $(TPDIR)
 	dosbox -conf build.conf
 	cp $(TPDIR)/PEASANT.EXE .
 

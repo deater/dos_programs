@@ -9,6 +9,7 @@ uses crt,zx02;
 {$I pq_knght.pas}
 {$I pq_ytree.pas}
 {$I pq_inn.pas}
+{$I s_walk.pas}
 
 type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
 
