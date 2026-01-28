@@ -32,9 +32,16 @@ CONST cga = $b800;
   DL = col (0 top)
 }
 
+{ ShapeTable = Array [0..16000] of byte; }
+
+Type
+SpriteArray = array[0..119] of char;
+SpritePtr = ^SpriteArray;
+
+
 { assume 8 pixels wide for now }
 
-Procedure SpriteXY(x,y: word);
+Procedure SpriteXY(x,y: word; s_seg,s_off: word);
 
 var boffset,width,height:word;
 label loopy;
@@ -46,15 +53,20 @@ begin
 
 		push	ds
 		push	es
+
 		mov	ax,cga
 		mov	es,ax
-		mov	di,boffset
+		mov	di,boffset	{; es:di = destination}
+
+		mov	ax,[s_seg]
+		mov	ds,ax
+		mov	si,[s_off]	{; ds:si = source}
 
 		mov	dx,20
 loopy:
-		mov	ax,0
 		mov	cx,4
-		rep stosb
+
+		rep	movsb
 		
 		add	di,(80-4)
 
@@ -337,7 +349,8 @@ end;
 Procedure draw_peasant;
 
 begin
-	SpriteXY(peasant_x,peasant_y);
+	SpriteXY(peasant_x,peasant_y,seg(walk_r0_sprite),
+		ofs(walk_r0_sprite));
 end;
 
 
@@ -456,7 +469,7 @@ begin
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',24,0);
 
-	SpriteXY(8,100);
+{	SpriteXY(8,100); }
 
 	for i:=0 to 10 do begin
 		PutPixelXY(0,50+i);
