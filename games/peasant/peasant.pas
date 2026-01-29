@@ -14,6 +14,8 @@ uses crt,zx02;
 type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
 
 var 
+	background,offscreen:buffer_ptr;
+
 	screen:screentype absolute $B800:0000;
 	level_over,frame,flame_count:byte;
 	visited_0,visited_1,visited_2:byte;
@@ -38,6 +40,54 @@ Type
 SpriteArray = array[0..119] of char;
 SpritePtr = ^SpriteArray;
 
+
+
+{***********************************************}
+{ screen_copy                                   }
+{***********************************************}
+
+Procedure screen_copy(dest,src:buffer_ptr);
+
+var
+	dest_seg,dest_off,src_seg,src_off : word;
+
+begin
+	dest_seg:=seg(dest);
+	writeln(dest_seg);
+
+	dest_off:=ofs(dest);
+	src_seg:=seg(src);
+	src_off:=ofs(src);
+
+	asm
+
+		push	ds
+		push	es
+
+		mov	ax,[dest_seg]
+		mov	es,ax
+		mov	di,0		{; es:di = destination}
+
+		mov	ax,[src_seg]
+		mov	ds,ax
+		mov	si,[src_off]	{; ds:si = source}
+
+		mov	cx,8192
+		mov	ax,65535
+		rep	stosw
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
+
+
+{***********************************************}
+{ SpriteXY                                      }
+{***********************************************}
 
 { assume 8 pixels wide for now }
 
@@ -79,8 +129,6 @@ loopy:
 	end;
 
 end;
-
-
 
 
 Procedure PutPixelXY(x,y: word);
@@ -354,6 +402,10 @@ begin
 end;
 
 
+{************************************}
+{ do_knight                          }
+{************************************}
+
 Procedure do_knight(mode: byte);
 
 label done_knight;
@@ -369,7 +421,11 @@ begin
 
 	{ load bg }
 
-	decompress(@screen,@PQ_KNIGHT);
+	decompress(background,@PQ_KNIGHT);
+
+	screen_copy(@screen,background);
+
+	{* decompress(@screen,@PQ_KNIGHT); *}
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',25,0);
 
@@ -432,15 +488,25 @@ begin
 	repeat until keypressed;
 	ch:=readkey;
 
-	SetPalette(0);
+	SetPalette(0);			{ cyan palette }
 
 	decompress(@screen,@PQ_TITLE);
 	repeat until keypressed;
 	ch:=readkey;
 
-	SetPalette(1);
+	SetPalette(1);			{ yellow palette }
 
-	{ init }
+
+	{*****************}
+	{ allocate memory }
+	{*****************}
+
+	GetMem(background,16384);
+	
+
+	{****************}
+	{ init variables }
+	{****************}
 
 	peasant_x:=100;
 	peasant_y:=100;
