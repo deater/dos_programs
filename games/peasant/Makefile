@@ -11,6 +11,14 @@ peasant.img:	PEASANT.EXE
 	cp ../../disk_images/freedos.boot.disk.360K.img peasant.img
 	mcopy -i peasant.img PEASANT.EXE ::PEASANT.EXE
 
+
+###
+
+TEST.EXE:	test.pas
+	cp test.pas $(TPDIR)
+	dosbox -conf test.conf
+
+
 ###
 
 PEASANT.EXE:	peasant.pas zx02.pas \

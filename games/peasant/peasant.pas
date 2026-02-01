@@ -52,12 +52,10 @@ var
 	dest_seg,dest_off,src_seg,src_off : word;
 
 begin
-	dest_seg:=seg(dest);
-	writeln(dest_seg);
-
-	dest_off:=ofs(dest);
-	src_seg:=seg(src);
-	src_off:=ofs(src);
+	dest_seg:=seg(dest^);
+	dest_off:=ofs(dest^);
+	src_seg:=seg(src^);
+	src_off:=ofs(src^);
 
 	asm
 
@@ -73,8 +71,8 @@ begin
 		mov	si,[src_off]	{; ds:si = source}
 
 		mov	cx,8192
-		mov	ax,65535
-		rep	stosw
+		{ mov	ax,65535 }
+		rep	movsw
 
 		pop	es
 		pop	ds
@@ -90,38 +88,81 @@ end;
 {***********************************************}
 
 { assume 8 pixels wide for now }
+{ also assume always writing to even Y }
+
+{
+	x,y,x*y
+	sprite_even:	x*y bytes
+	sprite_odd:	x*y bytes
+	mask_even:
+	mask_odd:
+
+
+	want to load background
+	and with mask
+	or with sprite
+	store back to background
+
+	needs 3 pointers!
+		es:di = destination
+		ds:si = source (sprite)
+		ds:[bx][si] = source (mask)
+
+}
+
 
 Procedure SpriteXY(x,y: word; s_seg,s_off: word);
 
-var boffset,width,height:word;
-label loopy;
+var	even_offset,odd_offset,mask_offset,width,height:word;
+	xsize,ysize:word;
+
+label even_loopy,even_loopx;
 
 begin
-	boffset:=((y div 2)*80)+(x div 4);
+	even_offset:=((y div 2)*80)+(x div 4);
+	odd_offset:=even_offset+$2000;
+
+	xsize:=4;
+	ysize:=20;
+
+	mask_offset:=xsize*ysize;
 
 	asm
+
+		{; even first }
 
 		push	ds
 		push	es
 
 		mov	ax,cga
 		mov	es,ax
-		mov	di,boffset	{; es:di = destination}
+		mov	di,even_offset	{; es:di = destination}
 
 		mov	ax,[s_seg]
 		mov	ds,ax
 		mov	si,[s_off]	{; ds:si = source}
 
-		mov	dx,20
-loopy:
-		mov	cx,4
+		mov	bx,[mask_offset]
 
-		rep	movsb
-		
+		mov	dx,[ysize]
+
+even_loopy:
+		mov	cx,[xsize]
+even_loopx:
+		{ rep	movsb }
+
+		mov	al,es:[di]
+		and	al,ds:[si][bx]
+		or	al,ds:[si]
+		inc	si
+		stosb
+
+		loop	even_loopx
+
 		add	di,(80-4)
 
 		dec	dx
-		jne	loopy
+		jne	even_loopy
 
 		pop	es
 		pop	ds
@@ -423,7 +464,6 @@ begin
 
 	decompress(background,@PQ_KNIGHT);
 
-	screen_copy(@screen,background);
 
 	{* decompress(@screen,@PQ_KNIGHT); *}
 	PrintStringXor('Score:0 out of 150',0,0);
@@ -445,10 +485,11 @@ begin
 
 		move_peasant;
 
-
 		if level_over <> 0 then goto done_knight;
 
 		{ update screen }
+
+		screen_copy(@screen,background);
 
 		draw_peasant;
 		
