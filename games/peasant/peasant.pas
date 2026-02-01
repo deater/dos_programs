@@ -9,9 +9,14 @@ uses crt,zx02;
 {$I pq_knght.pas}
 {$I pq_ytree.pas}
 {$I pq_inn.pas}
-{$I s_walk.pas}
+
 
 type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
+Type
+SpriteArray = array[0..241] of char;
+SpritePtr = ^SpriteArray;
+
+{$I s_walk.pas}
 
 var 
 	background,offscreen:buffer_ptr;
@@ -36,9 +41,7 @@ CONST cga = $b800;
 
 { ShapeTable = Array [0..16000] of byte; }
 
-Type
-SpriteArray = array[0..119] of char;
-SpritePtr = ^SpriteArray;
+
 
 
 
@@ -111,21 +114,25 @@ end;
 }
 
 
-Procedure SpriteXY(x,y: word; s_seg,s_off: word);
+Procedure SpriteXY(x,y: word; sprite: SpritePtr);
 
 var	even_offset,odd_offset,mask_offset,width,height:word;
-	xsize,ysize:word;
+	xsize,ysize,s_seg,s_off:word;
 
 label even_loopy,even_loopx;
+label odd_loopy,odd_loopx;
 
 begin
+	s_seg:=seg(sprite^);
+	s_off:=ofs(sprite^)+2;
+
 	even_offset:=((y div 2)*80)+(x div 4);
 	odd_offset:=even_offset+$2000;
 
-	xsize:=4;
-	ysize:=20;
+	xsize:=Word(sprite^[0]);
+	ysize:=Word(sprite^[1]);
 
-	mask_offset:=xsize*ysize;
+	mask_offset:=xsize*ysize*2;
 
 	asm
 
@@ -149,7 +156,6 @@ begin
 even_loopy:
 		mov	cx,[xsize]
 even_loopx:
-		{ rep	movsb }
 
 		mov	al,es:[di]
 		and	al,ds:[si][bx]
@@ -163,6 +169,33 @@ even_loopx:
 
 		dec	dx
 		jne	even_loopy
+
+
+		{; odd next }
+		{; at this point }
+
+		mov	di,odd_offset	{; es:di = destination}
+
+		{add	si,[mask_offset] }
+
+		mov	dx,[ysize]
+
+odd_loopy:
+		mov	cx,[xsize]
+odd_loopx:
+
+		mov	al,es:[di]
+		and	al,ds:[si][bx]
+		or	al,ds:[si]
+		inc	si
+		stosb
+
+		loop	odd_loopx
+
+		add	di,(80-4)
+
+		dec	dx
+		jne	odd_loopy
 
 		pop	es
 		pop	ds
@@ -438,8 +471,7 @@ end;
 Procedure draw_peasant;
 
 begin
-	SpriteXY(peasant_x,peasant_y,seg(walk_r0_sprite),
-		ofs(walk_r0_sprite));
+	SpriteXY(peasant_x,peasant_y,@walk_r0_sprite);
 end;
 
 

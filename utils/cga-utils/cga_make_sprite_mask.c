@@ -1,5 +1,5 @@
 /* Grabs part of 320x200 8-bit PNG file with correct palette */
-/* Makes "sprites" suitable for CGA */
+/* Makes "sprites"+masks suitable for CGA */
 
 #define VERSION "0.0.1"
 
@@ -245,6 +245,7 @@ int main(int argc, char **argv) {
 	char label_string[BUFSIZ];
 
 	int x1,y1,x2,y2;
+	int x3,y3,x4,y4;
 
 	int xs;
 
@@ -282,7 +283,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	if (argc-optind<5) {
+	if (argc-optind<9) {
 		printf("ERROR: Was expecting filename and co-ords!\n");
 		//printf("\targc=%d optind=%d\n",argc,optind);
 		exit(1);
@@ -294,6 +295,12 @@ int main(int argc, char **argv) {
 	y1=atoi(argv[optind+2]);
 	x2=atoi(argv[optind+3]);
 	y2=atoi(argv[optind+4]);
+
+	x3=atoi(argv[optind+5]);
+	y3=atoi(argv[optind+6]);
+	x4=atoi(argv[optind+7]);
+	y4=atoi(argv[optind+8]);
+
 
 	memset(cga_ram,0,16384);
 
@@ -340,7 +347,7 @@ int main(int argc, char **argv) {
 
 
 
-	int addr,total_size;
+	int addr,output_size;
 
 	if (output_type==OUTPUT_ASM) {
 		printf("; %d %d %d %d\n",x1,y1,x2,y2);
@@ -373,14 +380,15 @@ int main(int argc, char **argv) {
 	}
 	else if (output_type==OUTPUT_PASCAL) {
 
-		if (printsize) total_bytes+=2;
+		output_size=total_bytes*2;
+		if (printsize) output_size+=2;
 
 		printf("{ %d %d %d %d }\n",x1,y1,x2,y2);
 		printf("{ total bytes: %d }\n",total_bytes);
 
 		printf("const\n");
 		printf("%s : array [0..%d] of Char = (\n",
-			label_string,total_bytes-1);
+			label_string,output_size-1);
 
 
 		if (printsize) {
@@ -394,31 +402,47 @@ int main(int argc, char **argv) {
 				total_bytes>>8);
 		}
 
-		/* print even */
+		/* print even sprite */
 		for(y=y1;y<y2;y+=2) {
 			printf("\t");
 			for(x=x1/4;x<=x2/4;x++) {
 				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X",
+				printf("#$%02X,",
 					cga_ram[addr]);
-//				if ((y==y2-1)&&(x==x2/4)) {
-//				}
-//				else {
-					printf(",");
-//				}
 			}
 			printf("\n");
 		}
-//		printf(");\n");
 
-		/* print odd */
+		/* print odd sprite */
 		for(y=y1+1;y<y2;y+=2) {
 			printf("\t");
 			for(x=x1/4;x<=x2/4;x++) {
 				addr=(0x2000*(y&1))+((y/2)*80)+x;
+				printf("#$%02X,",
+					cga_ram[addr]);
+			}
+			printf("\n");
+		}
+
+		/* print even mask */
+		for(y=y3;y<y4;y+=2) {
+			printf("\t");
+			for(x=x3/4;x<=x4/4;x++) {
+				addr=(0x2000*(y&1))+((y/2)*80)+x;
+				printf("#$%02X,",
+					cga_ram[addr]);
+			}
+			printf("\n");
+		}
+
+		/* print odd mask */
+		for(y=y3+1;y<y4;y+=2) {
+			printf("\t");
+			for(x=x3/4;x<=x4/4;x++) {
+				addr=(0x2000*(y&1))+((y/2)*80)+x;
 				printf("#$%02X",
 					cga_ram[addr]);
-				if ((y==y2-1)&&(x==x2/4)) {
+				if ((y==y4-1)&&(x==x4/4)) {
 				}
 				else {
 					printf(",");
@@ -427,6 +451,7 @@ int main(int argc, char **argv) {
 			printf("\n");
 		}
 		printf(");\n");
+
 
 	}
 

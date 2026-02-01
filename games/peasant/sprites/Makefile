@@ -1,4 +1,5 @@
 CGA_SPRITE = ../../../utils/cga-utils/cga_make_sprite
+CGA_SPRITE_MASK = ../../../utils/cga-utils/cga_make_sprite_mask
 ZX02 = ~/research/6502_compression/zx02.git/build/zx02
 LINKER_SCRIPTS = ../../../linker_scripts
 
@@ -6,7 +7,9 @@ all:	s_walk.pas
 
 
 s_walk.pas:     walk_sprites.png
-	$(CGA_SPRITE) -l walk_r0_sprite walk_sprites.png   8   1  23  31 > s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_r0_sprite walk_sprites.png \
+			8  32  23  62 \
+			8  63  23  93 > s_walk.pas
 
 #	$(CGA_SPRITE) -l walk_r0_sprite walk_sprites.png  14  32  27  62 > walk_sprites.inc
 #	$(CGA_SPRITE) -l walk_r0_mask   walk_sprites.png  14  63  27  93 >> walk_sprites.inc
