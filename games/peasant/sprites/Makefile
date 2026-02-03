@@ -32,44 +32,31 @@ s_walk.pas:     walk_sprites.png
 	$(CGA_SPRITE_MASK) -s -l walk_l5_sprite walk_sprites.png \
 			128 128  143  158     128  159  143  189 >> s_walk.pas
 
+	$(CGA_SPRITE_MASK) -s -l walk_u0_sprite walk_sprites.png \
+			160 32 175 62     160 63 175 93 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_u1_sprite walk_sprites.png \
+			184 32 199 62     184 63 199 93 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_u2_sprite walk_sprites.png \
+			208 32 223 62     208 63 223 93 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_u3_sprite walk_sprites.png \
+			232 32 247 62     232 63 247 93 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_u4_sprite walk_sprites.png \
+			256 32 271 62     256 63 271 93 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_u5_sprite walk_sprites.png \
+			280 32 295 62     280 63 295 93 >> s_walk.pas
 
-
-#	$(CGA_SPRITE) -l walk_l0_sprite walk_sprites.png  14 128  27 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l0_mask   walk_sprites.png  14 159  27 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l1_sprite walk_sprites.png  42 128  53 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l1_mask   walk_sprites.png  42 159  53 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l2_sprite walk_sprites.png  70 128  83 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l2_mask   walk_sprites.png  70 159  83 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l3_sprite walk_sprites.png  98 128 111 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l3_mask   walk_sprites.png  98 159 111 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l4_sprite walk_sprites.png 126 128 139 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l4_mask   walk_sprites.png 126 159 139 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l5_sprite walk_sprites.png 154 128 167 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_l5_mask   walk_sprites.png 154 159 167 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u0_sprite walk_sprites.png 182   1 195  31 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u0_mask   walk_sprites.png 183  32 195  62 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u1_sprite walk_sprites.png 210   1 221  31 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u1_mask   walk_sprites.png 210  32 223  62 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u2_sprite walk_sprites.png 238   1 251  31 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u2_mask   walk_sprites.png 238  32 251  62 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u3_sprite walk_sprites.png 266   1 279  31 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u3_mask   walk_sprites.png 266  32 279  62 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u4_sprite walk_sprites.png 182  63 195  93 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u4_mask   walk_sprites.png 182  94 195 124 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u5_sprite walk_sprites.png 210  63 223  93 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_u5_mask   walk_sprites.png 210  94 223 124 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d0_sprite walk_sprites.png 238  63 251  93 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d0_mask   walk_sprites.png 238  94 251 124 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d1_sprite walk_sprites.png 266  63 279  93 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d1_mask   walk_sprites.png 266  94 279 124 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d2_sprite walk_sprites.png 182 128 195 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d2_mask   walk_sprites.png 182 159 195 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d3_sprite walk_sprites.png 210 128 223 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d3_mask   walk_sprites.png 210 159 223 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d4_sprite walk_sprites.png 238 128 251 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d4_mask   walk_sprites.png 238 159 251 189 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d5_sprite walk_sprites.png 266 128 279 158 >> walk_sprites.inc
-#	$(CGA_SPRITE) -l walk_d5_mask   walk_sprites.png 266 159 279 189 >> walk_sprites.inc
+	$(CGA_SPRITE_MASK) -s -l walk_d0_sprite walk_sprites.png \
+			160 128 175 158     160 159 175 189 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_d1_sprite walk_sprites.png \
+			184 128 199 158     184 159 199 189 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_d2_sprite walk_sprites.png \
+			208 128 223 158     208 159 223 189 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_d3_sprite walk_sprites.png \
+			232 128 247 158     232 159 247 189 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_d4_sprite walk_sprites.png \
+			256 128 271 158     256 159 271 189 >> s_walk.pas
+	$(CGA_SPRITE_MASK) -s -l walk_d5_sprite walk_sprites.png \
+			280 128 295 158     280 159 295 189 >> s_walk.pas
 
 clean:	
 	rm -f *~ *.zx02 \
