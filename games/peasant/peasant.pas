@@ -18,6 +18,32 @@ SpritePtr = ^SpriteArray;
 
 {$I s_walk.pas}
 
+
+const WalkingSprites : array[0..23] of SpritePtr =
+(
+	{0 = up}
+
+	@walk_u0_sprite,@walk_u1_sprite,@walk_u2_sprite,
+	@walk_u3_sprite,@walk_u4_sprite,@walk_u5_sprite,
+
+	{1 = right}
+
+	@walk_r0_sprite,@walk_r1_sprite,@walk_r2_sprite,
+	@walk_r3_sprite,@walk_r4_sprite,@walk_r5_sprite,
+
+	{2 = left}
+
+	@walk_l0_sprite,@walk_l1_sprite,@walk_l2_sprite,
+	@walk_l3_sprite,@walk_l4_sprite,@walk_l5_sprite,
+
+	{3 = down}
+
+	@walk_d0_sprite,@walk_d1_sprite,@walk_d2_sprite,
+	@walk_d3_sprite,@walk_d4_sprite,@walk_d5_sprite
+
+);
+
+
 var 
 	background,offscreen:buffer_ptr;
 
@@ -438,7 +464,7 @@ begin
 		{ moving }
 
 		peasant_steps:=peasant_steps+1;
-		if (peasant_steps>=0) then peasant_steps:=0;
+		if (peasant_steps>=6) then peasant_steps:=0;
 
 		peasant_x:=peasant_x+peasant_xadd;
 		peasant_y:=peasant_y+peasant_yadd;
@@ -470,8 +496,13 @@ end;
 
 Procedure draw_peasant;
 
+var which : byte;
+
 begin
-	SpriteXY(peasant_x,peasant_y,@walk_r0_sprite);
+
+	which := (peasant_dir*6)+peasant_steps;
+
+	SpriteXY(peasant_x,peasant_y,WalkingSprites[which]);
 end;
 
 
