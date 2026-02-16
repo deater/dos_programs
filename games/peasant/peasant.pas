@@ -5,11 +5,14 @@ uses crt,zx02,cga;
 
 {$I pq_vid.pas}
 {$I pq_title.pas}
-{$I pq_ker1.pas}
+
 {$I pq_knght.pas}
+
+(*
+{$I pq_ker1.pas}
 {$I pq_ytree.pas}
 {$I pq_inn.pas}
-
+*)
 
 {$I s_walk.pas}
 
@@ -40,7 +43,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 
 var 
-	background,offscreen:buffer_ptr;
+	background,framebuffer:buffer_ptr;
 
 	screen:screentype absolute $B800:0000;
 	level_over,frame,flame_count:byte;
@@ -190,7 +193,8 @@ begin
 
 	which := (peasant_dir*6)+peasant_steps;
 
-	SpriteXY(peasant_x,peasant_y,WalkingSprites[which]);
+	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],screen_ptr(framebuffer));
+{	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],@screen);}
 end;
 
 
@@ -215,7 +219,10 @@ begin
 
 	decompress(background,@PQ_KNIGHT);
 
-	{* decompress(@screen,@PQ_KNIGHT); *}
+	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
+
+	screen_copy(@screen,screen_ptr(framebuffer));
+
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',25,0);
 
@@ -231,6 +238,10 @@ begin
 
 		check_keyboard;
 
+		{ erase peasant }
+		RestoreBG(peasant_x,peasant_y,4,15,
+			screen_ptr(background),screen_ptr(framebuffer));
+
 		{ move_peasant }
 
 		move_peasant;
@@ -239,10 +250,10 @@ begin
 
 		{ update screen }
 
-		screen_copy(@screen,screen_ptr(background));
-
 		draw_peasant;
-		
+
+		screen_update(@screen,screen_ptr(framebuffer));
+
 		{ increment frame }
 
 		frame := frame + 1;
@@ -293,6 +304,7 @@ begin
 	{*****************}
 
 	GetMem(background,16384);
+	GetMem(framebuffer,16384);
 	
 
 	{****************}
@@ -309,6 +321,7 @@ begin
 
 	do_knight(0);
 
+(*
 	decompress(@screen,@PQ_YTREE);
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',25,0);
@@ -326,15 +339,13 @@ begin
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',24,0);
 
-{	SpriteXY(8,100); }
-
 	for i:=0 to 10 do begin
 		PutPixelXY(0,50+i);
 	end;
 
 	repeat until keypressed;
 	ch:=readkey;
-
+*)
 	{ Restore Text Mode}
 	SetCGAMode(3);
 

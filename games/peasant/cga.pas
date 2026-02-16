@@ -14,36 +14,24 @@ type
 
 Procedure PrintChar(which: char);
 Procedure PrintCharXor(which: char;x,y:word);
-Procedure SpriteXY(x,y: word; sprite: SpritePtr);
+Procedure SpriteXY(x,y: word; sprite: SpritePtr; framebuffer: screen_ptr);
 Procedure PrintStringXor(st:string;x,y:word);
 Procedure screen_copy(dest,src:screen_ptr);
+Procedure screen_update(dest,src:screen_ptr);
 Procedure wait_vsync;
 Procedure SetCGAMode(Mode: byte);
 Procedure SetPalette(which: byte);
 Procedure PutPixelXY(x,y: word);
+Procedure RestoreBG(x,y,xsize,ysize: word; bg, fb: screen_ptr);
 
 IMPLEMENTATION
 
 
 var 
-	background,offscreen:screen_ptr;
 
 	screen:screentype absolute $B800:0000;
-	level_over,frame,flame_count:byte;
-	visited_0,visited_1,visited_2:byte;
-	peasant_x,peasant_y:byte;
-	peasant_xadd,peasant_yadd:integer; { signed }
-	peasant_dir,peasant_steps:byte;
-	ch:char;
-	i:word;
-	input_x:byte;
 
 CONST cga_addr = $b800;
-
-{ BH = page number,
-  DH = row (0 top)
-  DL = col (0 top)
-}
 
 
 {***********************************************}
@@ -68,14 +56,13 @@ begin
 
 		mov	ax,[dest_seg]
 		mov	es,ax
-		mov	di,0		{; es:di = destination}
+		mov	di,[dest_off]	{; es:di = destination}
 
 		mov	ax,[src_seg]
 		mov	ds,ax
 		mov	si,[src_off]	{; ds:si = source}
 
 		mov	cx,8192
-		{ mov	ax,65535 }
 		rep	movsw
 
 		pop	es
@@ -84,6 +71,80 @@ begin
 	end;
 
 end;
+
+
+{***********************************************}
+{ screen_update                                 }
+{***********************************************}
+{ Only update middle (graphics) part of screen) }
+{  skipping title and text entry area           }
+
+{ From line 10 to line 190                      }
+{ so offset 400 to 7600  (190*80)/2             }
+{ 7200 bytes, /2 = 3600                         }
+
+Procedure screen_update(dest,src:screen_ptr);
+
+var
+	dest_seg,dest_off,src_seg,src_off : word;
+
+begin
+	dest_seg:=seg(dest^);
+	dest_off:=ofs(dest^);
+	src_seg:=seg(src^);
+	src_off:=ofs(src^);
+
+	src_off:=src_off+400;
+
+	asm
+
+		push	ds
+		push	es
+
+		mov	ax,[dest_seg]
+		mov	es,ax
+		mov	di,400		{; es:di = destination}
+
+		mov	ax,[src_seg]
+		mov	ds,ax
+		mov	si,[src_off]	{; ds:si = source}
+
+		mov	cx,3600
+
+		rep	movsw
+
+		pop	es
+		pop	ds
+
+	end;
+
+	src_off:=src_off+8192;
+
+	asm
+
+		push	ds
+		push	es
+
+		mov	ax,[dest_seg]
+		mov	es,ax
+		mov	di,8592		{; es:di = destination}
+
+		mov	ax,[src_seg]
+		mov	ds,ax
+		mov	si,[src_off]	{; ds:si = source}
+
+		mov	cx,3600
+
+		rep	movsw
+
+		pop	es
+		pop	ds
+
+	end;
+
+
+end;
+
 
 
 
@@ -115,19 +176,23 @@ end;
 }
 
 
-Procedure SpriteXY(x,y: word; sprite: SpritePtr);
+Procedure SpriteXY(x,y: word; sprite: SpritePtr; framebuffer: screen_ptr);
 
 var	even_offset,odd_offset,mask_offset,width,height:word;
-	xsize,ysize,s_seg,s_off:word;
+	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
 
 label even_loopy,even_loopx;
 label odd_loopy,odd_loopx;
 
 begin
+	f_seg:=seg(framebuffer^);
+	f_off:=ofs(framebuffer^);
+
 	s_seg:=seg(sprite^);
 	s_off:=ofs(sprite^)+2;
 
 	even_offset:=((y div 2)*80)+(x div 4);
+	even_offset:=even_offset+f_off;
 	odd_offset:=even_offset+$2000;
 
 	xsize:=Word(sprite^[0]);
@@ -142,9 +207,9 @@ begin
 		push	ds
 		push	es
 
-		mov	ax,cga_addr
+		mov	ax,[f_seg]
 		mov	es,ax
-		mov	di,even_offset	{; es:di = destination}
+		mov	di,[even_offset]	{; es:di = destination}
 
 		mov	ax,[s_seg]
 		mov	ds,ax
@@ -175,9 +240,7 @@ even_loopx:
 		{; odd next }
 		{; at this point }
 
-		mov	di,odd_offset	{; es:di = destination}
-
-		{add	si,[mask_offset] }
+		mov	di,[odd_offset]	{; es:di = destination}
 
 		mov	dx,[ysize]
 
@@ -205,6 +268,88 @@ odd_loopx:
 
 end;
 
+{==================================}
+{ RestoreBG                        }
+{==================================}
+
+
+Procedure RestoreBG(x,y,xsize,ysize: word; bg, fb: screen_ptr);
+
+var
+	b_seg,b_off,f_seg,f_off,src_off,dest_off,dest_odd_off,src_odd_off:word;
+
+label even_loopy;
+label odd_loopy,odd_loopx;
+
+begin
+	f_seg:=seg(fb^);
+	f_off:=ofs(fb^);
+
+	b_seg:=seg(bg^);
+	b_off:=ofs(bg^);
+
+	src_off:=((y div 2)*80)+(x div 4);
+	dest_off:=src_off;
+
+	src_off:=src_off+b_off;
+	dest_off:=dest_off+f_off;
+	dest_odd_off:=dest_off+$2000;
+	src_odd_off:=src_off+$2000;
+
+	asm
+		{; even first }
+
+		push	ds
+		push	es
+
+		mov	ax,[f_seg]	{; destination is framebuffer }
+		mov	es,ax
+		mov	di,[dest_off]	{; es:di = destination}
+
+		mov	ax,[b_seg]	{; source is background}
+		mov	ds,ax
+		mov	si,[src_off]	{; ds:si = source}
+
+		mov	dx,[ysize]
+even_loopy:
+		mov	cx,[xsize]
+		rep	movsb
+
+		add	di,(80-4)	{FIXME: hardcoded}
+		add	si,(80-4)
+
+		dec	dx
+		jne	even_loopy
+
+
+		{; odd next }
+		{; at this point }
+
+		mov	di,[dest_odd_off]	{; es:di = destination}
+		mov	si,[src_odd_off]
+
+		mov	dx,[ysize]
+odd_loopy:
+		mov	cx,[xsize]
+		rep	movsb
+
+		add	di,(80-4)
+		add	si,(80-4)
+
+		dec	dx
+		jne	odd_loopy
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
+
+{==================================}
+{ PutPixelXY                       }
+{==================================}
 
 Procedure PutPixelXY(x,y: word);
 
