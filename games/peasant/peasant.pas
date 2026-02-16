@@ -1,7 +1,7 @@
 program peasants_quest;
 {by Vince 'Deater' Weaver}
 
-uses crt,zx02;
+uses crt,zx02,cga;
 
 {$I pq_vid.pas}
 {$I pq_title.pas}
@@ -11,10 +11,12 @@ uses crt,zx02;
 {$I pq_inn.pas}
 
 
-type ScreenType = array [0..16384] of byte;  {For Graphics Loading}
-Type
+(* type ScreenType = array [0..16384] of byte;  {For Graphics Loading} *)
+
+(* Type
 SpriteArray = array[0..241] of char;
 SpritePtr = ^SpriteArray;
+*)
 
 {$I s_walk.pas}
 
@@ -57,7 +59,7 @@ var
 	i:word;
 	input_x:byte;
 
-
+(*
 CONST cga = $b800;
 
 { BH = page number,
@@ -345,6 +347,8 @@ begin
 	end;
 end;
 
+*)
+
 Procedure reset_prompt;
 
 begin
@@ -473,6 +477,7 @@ begin
 	
 end;
 
+(*
 Procedure wait_vsync;
 
 label	wait_retrace,wait_next;
@@ -492,7 +497,7 @@ wait_next:
 		jnz	wait_next
 	end;
 end;
-
+*)
 
 Procedure draw_peasant;
 
@@ -527,7 +532,6 @@ begin
 
 	decompress(background,@PQ_KNIGHT);
 
-
 	{* decompress(@screen,@PQ_KNIGHT); *}
 	PrintStringXor('Score:0 out of 150',0,0);
 	PrintStringXor('Peasant''s Quest',25,0);
@@ -552,7 +556,7 @@ begin
 
 		{ update screen }
 
-		screen_copy(@screen,background);
+		screen_copy(@screen,screen_ptr(background));
 
 		draw_peasant;
 		
