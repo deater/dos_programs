@@ -64,7 +64,10 @@ Procedure reset_prompt;
 
 begin
 	Delete(input_buffer,1,Length(input_buffer));
-	{ FIXME!  draw black rectangle to erase }
+
+	{ erase bottom of screen }
+	Rectangle(0,190,80,10,0,@screen);
+
 	input_x:=0;
 	PrintCharXor('>',input_x,24);	
 	input_x:=2;

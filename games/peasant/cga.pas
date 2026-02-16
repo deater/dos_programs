@@ -23,6 +23,7 @@ Procedure SetCGAMode(Mode: byte);
 Procedure SetPalette(which: byte);
 Procedure PutPixelXY(x,y: word);
 Procedure RestoreBG(x,y,xsize,ysize: word; bg, fb: screen_ptr);
+Procedure Rectangle(x,y,xsize,ysize: word; color: byte; fb: screen_ptr);
 
 IMPLEMENTATION
 
@@ -269,6 +270,76 @@ odd_loopx:
 end;
 
 {==================================}
+{ Rectangle                        }
+{==================================}
+
+Procedure Rectangle(x,y,xsize,ysize: word; color: byte; fb: screen_ptr);
+
+var
+	f_seg,f_off,dest_off,dest_odd_off,nextline:word;
+
+label even_loopy;
+label odd_loopy,odd_loopx;
+
+begin
+	ysize:=ysize div 2; {FIXME: only works if Y is even }
+
+
+	f_seg:=seg(fb^);
+	f_off:=ofs(fb^);
+
+	dest_off:=((y div 2)*80)+(x div 4);
+	dest_off:=dest_off+f_off;
+
+	dest_odd_off:=dest_off+$2000;
+
+	nextline:=80-xsize;
+
+	asm
+		{; even first }
+
+		push	ds
+		push	es
+
+		mov	ax,[f_seg]	{; destination is framebuffer }
+		mov	es,ax
+		mov	di,[dest_off]	{; es:di = destination}
+
+		mov	al,[color]
+		mov	dx,[ysize]
+even_loopy:
+		mov	cx,[xsize]
+		rep	stosb
+
+		add	di,[nextline]
+
+		dec	dx
+		jne	even_loopy
+
+
+		{; odd next }
+		{; at this point }
+
+		mov	di,[dest_odd_off]	{; es:di = destination}
+
+		mov	dx,[ysize]
+odd_loopy:
+		mov	cx,[xsize]
+		rep	stosb
+
+		add	di,[nextline]
+
+		dec	dx
+		jne	odd_loopy
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
+{==================================}
 { RestoreBG                        }
 {==================================}
 
@@ -279,7 +350,7 @@ var
 	b_seg,b_off,f_seg,f_off,src_off,dest_off,dest_odd_off,src_odd_off:word;
 
 label even_loopy;
-label odd_loopy,odd_loopx;
+label odd_loopy;
 
 begin
 	f_seg:=seg(fb^);
