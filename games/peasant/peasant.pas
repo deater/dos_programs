@@ -54,16 +54,64 @@ var
 	ch:char;
 	i:word;
 	input_x:byte;
+	input_buffer : string;
 
+{=====================================}
+{ Reset Prompt                        }
+{=====================================}
 
 Procedure reset_prompt;
 
 begin
+	Delete(input_buffer,1,Length(input_buffer));
+	{ FIXME!  draw black rectangle to erase }
 	input_x:=0;
 	PrintCharXor('>',input_x,24);	
 	input_x:=2;
 end;
 
+{=====================================}
+{ graphics input                      }
+{=====================================}
+
+Procedure graphics_input(ch: char);
+
+begin
+
+	{ backspace }
+	if (ch=chr(8)) then begin
+
+		{ erase last character }
+
+		if (length(input_buffer)>0) then begin
+			input_x:=input_x-1;
+			PrintCharXor(input_buffer[length(input_buffer)],
+				input_x,24);
+			Delete(input_buffer,Length(input_buffer),1);
+		end
+	end
+
+	{ enter }
+	else if (ch=chr(13)) then begin
+		
+		reset_prompt;
+
+	end
+
+	{ anything else }
+	else begin
+		if (Length(input_buffer)<40) then begin
+			input_buffer:=input_buffer+ch;
+			PrintCharXor(ch,input_x,24);
+			input_x:=input_x+1;
+		end
+	end;
+	
+end;
+
+{=====================================}
+{ Check keyboard                      }
+{=====================================}
 
 Procedure check_keyboard;
 
@@ -150,22 +198,21 @@ begin
 
 				end;
 
-
-
-
 		end;
 	end
 
 	{ all other keys }
 	else begin
-		{hgr_input}
 
-		PrintCharXor(ch,input_x,24);
-		input_x:=input_x+1;
+		graphics_input(ch);
 
 	end;                   
 
 end;
+
+{=============================}
+{ Move peasant                }
+{=============================}
 
 Procedure move_peasant;
 
@@ -184,6 +231,10 @@ begin
 	
 end;
 
+
+{=============================}
+{ Draw Peasant                }
+{=============================}
 
 Procedure draw_peasant;
 
@@ -276,8 +327,9 @@ end;
 
 
 
-
-
+{====================================}
+{ Main                               }
+{====================================}
 
 begin
 	{Set CGA mode 4}

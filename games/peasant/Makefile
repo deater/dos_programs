@@ -27,6 +27,7 @@ PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	graphics/PQ_KER1.PAS graphics/PQ_KNGHT.PAS graphics/PQ_YTREE.PAS \
 	sprites/s_walk.pas
 	cp peasant.pas zx02.pas cga.pas $(TPDIR)
+	cp test2.pas $(TPDIR)
 	cp graphics/PQ_VID.PAS $(TPDIR)
 	cp graphics/PQ_TITLE.PAS $(TPDIR)
 	cp graphics/PQ_INN.PAS $(TPDIR)
