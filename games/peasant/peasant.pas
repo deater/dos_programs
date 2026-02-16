@@ -16,6 +16,8 @@ uses crt,zx02,cga;
 
 {$I s_walk.pas}
 
+{$I dialog_t.pas}
+
 
 const WalkingSprites : array[0..23] of SpritePtr =
 (
@@ -66,11 +68,73 @@ begin
 	Delete(input_buffer,1,Length(input_buffer));
 
 	{ erase bottom of screen }
-	Rectangle(0,190,80,10,0,@screen);
+	Rectangle(0,190,320,200,0,@screen);
 
 	input_x:=0;
 	PrintCharXor('>',input_x,24);	
 	input_x:=2;
+end;
+
+
+{=====================================}
+{ print_text_message                  }
+{=====================================}
+
+Procedure print_text_message( offset: word);
+
+var
+	message_lines: word;
+
+begin
+	{ count_message_lines }
+	message_lines:=5;
+
+	{ draw box }
+	{ Apple II starts at 35,24 }
+	{ Adjust for fact screen is 320, 5 columns in = 40 }
+	{	40 to 280 }
+
+	Rectangle(40,24,280,70,255,@screen);	
+	Hline(44,276,28,$AA,@screen);
+	Hline(44,276,66,$AA,@screen);
+	Vline(28,68,44,$EB,@screen);
+	Vline(28,68,272,$EB,@screen);
+
+	{ print text }
+
+	PrintStringXor('test test',6,4);
+
+end;
+
+
+{=====================================}
+{ parse input                         }
+{=====================================}
+
+Procedure parse_input;
+
+label finish_parse_message;
+
+begin
+
+
+finish_parse_message:
+
+	print_text_message(0);
+
+	repeat until keypressed;
+end;
+
+
+{=====================================}
+{ stop peasant                        }
+{=====================================}
+
+Procedure stop_peasant;
+
+begin
+	peasant_xadd:=0;
+	peasant_yadd:=0;
 end;
 
 {=====================================}
@@ -97,6 +161,10 @@ begin
 	{ enter }
 	else if (ch=chr(13)) then begin
 		
+		stop_peasant;
+		
+		parse_input;
+
 		reset_prompt;
 
 	end

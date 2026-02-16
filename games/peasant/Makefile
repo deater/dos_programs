@@ -35,6 +35,7 @@ PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	cp graphics/PQ_KNGHT.PAS $(TPDIR)
 	cp graphics/PQ_YTREE.PAS $(TPDIR)
 	cp sprites/s_walk.pas $(TPDIR)
+	cp text/dialog_t.pas $(TPDIR)
 	dosbox -conf build.conf
 	cp $(TPDIR)/PEASANT.EXE .
 

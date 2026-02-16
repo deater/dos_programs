@@ -23,7 +23,9 @@ Procedure SetCGAMode(Mode: byte);
 Procedure SetPalette(which: byte);
 Procedure PutPixelXY(x,y: word);
 Procedure RestoreBG(x,y,xsize,ysize: word; bg, fb: screen_ptr);
-Procedure Rectangle(x,y,xsize,ysize: word; color: byte; fb: screen_ptr);
+Procedure Rectangle(x1,y1,x2,y2: word; color: byte; fb: screen_ptr);
+Procedure Hline(x1,x2,y: word; color: byte; fb: screen_ptr);
+Procedure Vline(y1,y2,x: word; color: byte; fb: screen_ptr);
 
 IMPLEMENTATION
 
@@ -270,25 +272,150 @@ odd_loopx:
 end;
 
 {==================================}
-{ Rectangle                        }
+{ Hline                            }
 {==================================}
+{ x1,y to x2,y }
+{ actually x1,y1,x2,y2 all in 320x200 co-ords }
 
-Procedure Rectangle(x,y,xsize,ysize: word; color: byte; fb: screen_ptr);
+Procedure Hline(x1,x2,y: word; color: byte; fb: screen_ptr);
 
 var
-	f_seg,f_off,dest_off,dest_odd_off,nextline:word;
+	f_seg,f_off,dest_off,dest_odd_off,nextline,xsize,ysize : word;
+
+begin
+	xsize:=(x2-x1) div 4;
+
+	f_seg:=seg(fb^);
+	f_off:=ofs(fb^);
+
+	dest_off:=((y div 2)*80)+(x1 div 4);
+	dest_off:=dest_off+f_off;
+
+	dest_odd_off:=dest_off+$2000;
+
+	asm
+		{; even first }
+
+		push	ds
+		push	es
+
+		mov	ax,[f_seg]	{; destination is framebuffer }
+		mov	es,ax
+		mov	di,[dest_off]	{; es:di = destination}
+
+		mov	al,[color]
+
+		mov	cx,[xsize]
+		rep	stosb
+
+
+		{; odd next }
+		{; at this point }
+
+		mov	di,[dest_odd_off]	{; es:di = destination}
+
+		mov	cx,[xsize]
+		rep	stosb
+
+		pop	es
+		pop	ds
+
+	end;
+end;
+
+
+{==================================}
+{ Vline                            }
+{==================================}
+{ x,y1 to x,y2 }
+{ actually x1,y1,x2,y2 all in 320x200 co-ords }
+
+Procedure Vline(y1,y2,x: word; color: byte; fb: screen_ptr);
+
+
+var
+	f_seg,f_off,dest_off,dest_odd_off,nextline,xsize,ysize : word;
 
 label even_loopy;
 label odd_loopy,odd_loopx;
 
 begin
-	ysize:=ysize div 2; {FIXME: only works if Y is even }
-
+	ysize:=(y2-y1) div 2; {FIXME: only works if Y is even }
 
 	f_seg:=seg(fb^);
 	f_off:=ofs(fb^);
 
-	dest_off:=((y div 2)*80)+(x div 4);
+	dest_off:=((y1 div 2)*80)+(x div 4);
+	dest_off:=dest_off+f_off;
+
+	dest_odd_off:=dest_off+$2000;
+
+	nextline:=79;
+
+	asm
+		{; even first }
+
+		push	ds
+		push	es
+
+		mov	ax,[f_seg]	{; destination is framebuffer }
+		mov	es,ax
+		mov	di,[dest_off]	{; es:di = destination}
+
+		mov	al,[color]
+		mov	dx,[ysize]
+even_loopy:
+		stosb
+
+		add	di,[nextline]
+
+		dec	dx
+		jne	even_loopy
+
+
+		{; odd next }
+		{; at this point }
+
+		mov	di,[dest_odd_off]	{; es:di = destination}
+
+		mov	dx,[ysize]
+odd_loopy:
+		stosb
+
+		add	di,[nextline]
+
+		dec	dx
+		jne	odd_loopy
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
+{==================================}
+{ Rectangle                        }
+{==================================}
+{ actually x1,y1,x2,y3 all in 320x200 co-ords }
+{    but we div x by 4 before using }
+
+Procedure Rectangle(x1,y1,x2,y2: word; color: byte; fb: screen_ptr);
+
+var
+	f_seg,f_off,dest_off,dest_odd_off,nextline,xsize,ysize : word;
+
+label even_loopy;
+label odd_loopy,odd_loopx;
+
+begin
+	ysize:=(y2-y1) div 2; {FIXME: only works if Y is even }
+	xsize:=(x2-x1) div 4;
+
+	f_seg:=seg(fb^);
+	f_off:=ofs(fb^);
+
+	dest_off:=((y1 div 2)*80)+(x1 div 4);
 	dest_off:=dest_off+f_off;
 
 	dest_odd_off:=dest_off+$2000;
