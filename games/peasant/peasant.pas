@@ -7,6 +7,7 @@ uses crt,zx02,cga;
 {$I pq_title.pas}
 
 {$I pq_knght.pas}
+{$I d_knight.pas}
 
 (*
 {$I pq_ker1.pas}
@@ -45,7 +46,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 
 var 
-	background,framebuffer:buffer_ptr;
+	dialog,background,framebuffer:buffer_ptr;
 
 	screen:screentype absolute $B800:0000;
 	level_over,frame,flame_count:byte;
@@ -75,6 +76,34 @@ begin
 	input_x:=2;
 end;
 
+{=====================================}
+{ disp_put_string                     }
+{=====================================}
+
+Procedure disp_put_string( x,y: word);
+
+var
+	newx,offset: word;
+
+begin
+	offset:=0;
+	newx:=x;
+
+	while(dialog^[offset]<>0) do begin
+		if (dialog^[offset]=13) then begin
+			y:=y+1;
+			newx:=x;
+		end
+		else if (dialog^[offset]>=128) then begin
+			newx:=newx+1;
+		end
+		else begin
+			PrintCharXor(char(dialog^[offset]),newx,y);
+			newx:=newx+1;
+		end;
+		offset:=offset+1;
+	end;
+end;
 
 {=====================================}
 { print_text_message                  }
@@ -83,26 +112,45 @@ end;
 Procedure print_text_message( offset: word);
 
 var
-	message_lines: word;
+	y2,dialog_offset,message_lines: word;
 
 begin
 	{ count_message_lines }
-	message_lines:=5;
+
+	message_lines:=0;
+	dialog_offset:=0;
+
+	while (dialog^[dialog_offset]<>0) do begin
+
+		if (dialog^[dialog_offset]=13) then begin
+			message_lines:=message_lines+1;
+		end;
+
+		dialog_offset:=dialog_offset+1;
+	end;
+
+	message_lines:=message_lines+1; { for end }
+
 
 	{ draw box }
 	{ Apple II starts at 35,24 }
 	{ Adjust for fact screen is 320, 5 columns in = 40 }
 	{	40 to 280 }
 
-	Rectangle(40,24,280,70,255,@screen);	
+	{ Y2 = 24+ 10*message_lines, originally 70? }
+	y2:=24+16+8*message_lines;
+
+	Rectangle(40,24,280,y2,255,@screen);	
 	Hline(44,276,28,$AA,@screen);
-	Hline(44,276,66,$AA,@screen);
-	Vline(28,68,44,$EB,@screen);
-	Vline(28,68,272,$EB,@screen);
+	Hline(44,276,y2-4,$AA,@screen);
+	Vline(28,y2-2,44,$EB,@screen);
+	Vline(28,y2-2,272,$EB,@screen);
 
 	{ print text }
 
-	PrintStringXor('test test',6,4);
+{	PrintStringXor('test test',6,4); }
+
+	disp_put_string(6,4);
 
 end;
 
@@ -335,6 +383,8 @@ begin
 
 	{ decompress dialog }
 
+	decompress(dialog,@D_KNIGHT);
+
 	{ decompress priority }
 
 	{ load bg }
@@ -428,7 +478,7 @@ begin
 
 	GetMem(background,16384);
 	GetMem(framebuffer,16384);
-	
+	GetMem(dialog,4096);	
 
 	{****************}
 	{ init variables }
