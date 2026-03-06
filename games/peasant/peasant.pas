@@ -84,21 +84,30 @@ Procedure disp_put_string( x,y: word);
 
 var
 	newx,offset: word;
+	which: byte;
 
 begin
 	offset:=0;
 	newx:=x;
 
 	while(dialog^[offset]<>0) do begin
-		if (dialog^[offset]=13) then begin
+
+		which:=dialog^[offset];
+
+		if (which=13) then begin
 			y:=y+1;
 			newx:=x;
 		end
-		else if (dialog^[offset]>=128) then begin
-			newx:=newx+1;
+		else if (which>=128) then begin
+			which:=which and $7F;
+			for i:=1 to Length(dialog_lookup[which]) do begin
+				PrintCharXor(char(dialog_lookup[which][i]),
+						newx,y);
+				newx:=newx+1;
+			end;
 		end
 		else begin
-			PrintCharXor(char(dialog^[offset]),newx,y);
+			PrintCharXor(char(which),newx,y);
 			newx:=newx+1;
 		end;
 		offset:=offset+1;

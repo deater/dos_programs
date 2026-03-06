@@ -81,12 +81,25 @@ type dialog_types = (
 	DIALOG_UP		{ = $CA }
 );
 
-{ ;.byte "already","cottage","peasant","There's","Trogdor" }
-{ ;.byte "little","you're","You're" }
-{ ;.byte "about","can't","don't","there","There" }
-{ ;.byte "baby","dead","from","have","here","into","it's","It's" }
-{ ;.byte "just","like","says","some","that","That","this","with","your", }
-{ ;.byte "all","and","are","but","for","get","got","him","his","not" }
-{ ;.byte "now","old","one","out","see","the","The","was","you","You" }
-{ ;.byte "an","at","be","do","go","he","He","in","is","it","It" }
-{ ;.byte "my","no","No","of","on","or","so","to","up" }
+
+const dialog_lookup : array [0..74] of string[10] =
+	('already','cottage','peasant','There''s','Trogdor',
+	'little','you''re','You''re','about','can''t',
+	'don''t','looks','there','There','those',
+        'baby','dead','from','game','good',
+	'have','here','into','it''s','It''s',
+	'just','like','over','says','some',
+	'that','That','this','with','your',
+        'all','and','are','but','for',
+	'get','got','him','his','not',
+	'now','old','one','out','see',
+	'the','The','was','you','You',
+        'an','at','be','do','go',
+	'he','He','in','is','it',
+	'It','my','no','No','of',
+	'on','or','so','to','up'
+);
+
+
+
+

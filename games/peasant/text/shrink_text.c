@@ -160,6 +160,7 @@ void parse_line(char *string) {
 				printf("%c",0x80+j);
 				char_count+=1;
 				i+=strlen(word_list[j]);
+				i--;
 				word_found=1;
 				break;
 			}
