@@ -6,7 +6,7 @@ BIN2PAS = ../../../utils/pas-utils/bin2pas
 all:	PQ_VID.PAS PQ_TITLE.PAS \
 	PQ_WFALL.PAS PQ_KNGHT.PAS PQ_INN.PAS \
 	PQ_YTREE.PAS PQ_ROCK.PAS \
-	PQ_KER1.PAS
+	PQ_KER1.PAS PQ_TIPS.PAS
 
 ####
 
@@ -30,6 +30,18 @@ pq_title.zx02:	pq_title.cga
 
 pq_title.cga:	pq_title.png
 	$(PNG2CGA) -r ./pq_title.png > pq_title.cga
+
+####
+
+PQ_TIPS.PAS:	pq_tips.zx02
+	$(BIN2PAS) -l PQ_TIPS pq_tips.zx02 > PQ_TIPS.PAS
+
+pq_tips.zx02:	pq_tips.cga
+	$(ZX02) -f pq_tips.cga pq_tips.zx02
+
+pq_tips.cga:	pq_tips.png
+	$(PNG2CGA) -r ./pq_tips.png > pq_tips.cga
+
 
 ####
 
