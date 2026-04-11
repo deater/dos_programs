@@ -5,6 +5,7 @@ uses crt,zx02,cga;
 
 {$I pq_vid.pas}
 {$I pq_title.pas}
+{$I pq_tips.pas}
 
 {$I pq_knght.pas}
 {$I d_knight.pas}
@@ -456,6 +457,51 @@ done_knight:
 end;
 
 
+{************************************}
+{ tips_screen                        }
+{************************************}
+
+{         1         2         3
+0123456789012345678901234567890123456789
+   Here's how things work round here:           8
+-Look around by typing stuff like 'look         10
+ tree' or just plain 'look'                     11
+-Talk to folks by typing stuff like             12
+ 'talk man'                                     13
+-Take items by typing 'get (item)'              14
+-Use items by typing 'use (item)' You can       15
+ also 'give (item)' 'throw(item)' or some       16
+ other action words                             17
+-Type 'inv' to see your INVENTORY               18
+-Type 'save' to save your game and 'load'       19
+ to load one. To save games, your browser       20
+ must have cookies enabled                      21
+-press + and - to speed up or slow down your    22
+ character                                      23
+}
+
+
+Procedure tips_screen;
+
+begin
+
+	decompress(@screen,@PQ_TIPS);
+	PrintStringXor('Here''s how things work round here:',3,8);
+	PrintStringXor('-Look around by typing stuff like ''look',0,10);
+	PrintStringXor(' tree'' or just plain ''look''',0,11);
+	PrintStringXor('-Talk to folks by typing stuff like',0,12);
+	PrintStringXor(' ''talk man''',0,13);
+	PrintStringXor('-Take items by typing ''get (item)''',0,14);
+	PrintStringXor('-Use items by typing ''use (item)'' You',0,15);
+	PrintStringXor(' can also ''give (item)'' ''throw(item)''',0,16);
+	PrintStringXor(' or some other action words',0,17);
+	PrintStringXor('-Type ''inv'' to see your INVENTORY',0,18);
+	PrintStringXor('-Type ''save'' to save your game and',0,19);
+	PrintStringXor(' ''load'' to load one.',0,20);
+	PrintStringXor('-press + and - to speed up or slow down',0,22);
+	PrintStringXor(' your character',0,23);
+end;
+
 
 {====================================}
 { Main                               }
@@ -466,20 +512,37 @@ begin
 
 	SetCGAMode(4);
 
+	{**************************************************}
+	{ Videlectrix Logo }
+	{**************************************************}
+
 	SetPalette(1);
 
 	decompress(@screen,@PQ_VID);
 	repeat until keypressed;
 	ch:=readkey;
 
-	SetPalette(0);			{ cyan palette }
+	{**************************************************}
+	{ Title Screen }
+	{**************************************************}
+
+	SetPalette(0);			{ yellow palette }
 
 	decompress(@screen,@PQ_TITLE);
 	repeat until keypressed;
 	ch:=readkey;
 
-	SetPalette(1);			{ yellow palette }
+	{**************************************************}
+	{ Tips Screen }
+	{**************************************************}
 
+	SetPalette(1);			{ cyan palette }
+
+	tips_screen;
+
+
+	repeat until keypressed;
+	ch:=readkey;
 
 	{*****************}
 	{ allocate memory }
