@@ -46,6 +46,63 @@ const WalkingSprites : array[0..23] of SpritePtr =
 );
 
 
+	type verb_type = (
+		VERB_UNKNOWN, VERB_ASK, VERB_BOO, VERB_BREAK,
+		VERB_BUY, VERB_CHEAT, VERB_CLIMB, VERB_CLOSE,
+		VERB_COPY, VERB_DANCE, VERB_DEPLOY, VERB_DIE,
+		VERB_DITCH, VERB_DRINK, VERB_DROP, VERB_ENTER,
+		VERB_FEED, VERB_GET, VERB_GIVE, VERB_GO,
+		VERB_HALDO, VERB_INVENTORY, VERB_JUMP, VERB_KICK,
+		VERB_KILL, VERB_KNOCK, VERB_LIGHT, VERB_LOAD,
+		VERB_LOOK, VERB_MAKE, VERB_MAP, VERB_NO,
+		VERB_OPEN, VERB_PARTY, VERB_PET, VERB_PLAY,
+		VERB_PULL, VERB_PUNCH, VERB_PUSH, VERB_PUT,
+		VERB_PWD, VERB_QUIT, VERB_READ, VERB_RIDE,
+		VERB_RING, VERB_SAVE, VERB_SCARE, VERB_SEARCH,
+		VERB_SHOOT, VERB_SHOW, VERB_SIT, VERB_SKIP,
+		VERB_SLEEP, VERB_SMELL, VERB_SNIFF, VERB_STEAL,
+		VERB_SWIM, VERB_TAKE, VERB_TALK, VERB_THIS,
+		VERB_THROW, VERB_TRY, VERB_TURN, VERB_USE,
+		VERB_VERSION, VERB_WAKE, VERB_WEAR, VERB_WHAT,
+		VERB_WHERE, VERB_WHY, VERB_YES, VERB_HELP,
+		VERB_ATTACK, VERB_HUG, VERB_HIDE, VERB_MOVE,
+		VERB_CUT, VERB_SAY, VERB_SLAY,
+		VERB_ALL_DONE );
+
+	type noun_type = (
+		NOUN_NONE, NOUN_ARCHER, NOUN_ARROW, NOUN_BABY,
+		NOUN_BEADS, NOUN_BELL, NOUN_BELT, NOUN_BERRIES,
+		NOUN_BOAT, NOUN_BONE, NOUN_BOW, NOUN_BROOM,
+		NOUN_BUSH, NOUN_CANDLE, NOUN_CAVE, NOUN_CHAIR,
+		NOUN_CLIFF, NOUN_CLUB, NOUN_COLD, NOUN_COTTAGE,
+		NOUN_CRANK, NOUN_CURTAIN, NOUN_DAN, NOUN_DESK,
+		NOUN_DINGHY, NOUN_DOING_SPROINGS, NOUN_DOOR, NOUN_DRAWER,
+		NOUN_DRESSER, NOUN_DUDE, NOUN_FEED, NOUN_FENCE,
+		NOUN_FIRE, NOUN_FLIES, NOUN_FOOD, NOUN_FOOTPRINTS,
+		NOUN_GAME, NOUN_GARY, NOUN_GREASE, NOUN_GREEN,
+		NOUN_GROUND, NOUN_GUY, NOUN_HAY, NOUN_HOLE,
+		NOUN_HORSE, NOUN_INN, NOUN_JHONKA, NOUN_KERREK,
+		NOUN_KNIGHT, NOUN_LADY, NOUN_LAKE, NOUN_LANTERN,
+		NOUN_LEG, NOUN_LIGHTNING, NOUN_MAN, NOUN_MAP,
+		NOUN_MASK, NOUN_MUD, NOUN_NED, NOUN_NOTE,
+		NOUN_OPENINGS, NOUN_PAINTING, NOUN_PAPER, NOUN_PEASANT,
+		NOUN_PEBBLES, NOUN_PILLOW, NOUN_PILLS, NOUN_PLAGUE,
+		NOUN_PLAQUE, NOUN_POT, NOUN_RICHES, NOUN_ROBE,
+		NOUN_ROCKS, NOUN_ROOM, NOUN_RUB, NOUN_RUG,
+		NOUN_SAND, NOUN_SANDWICH, NOUN_SHELF, NOUN_SIGN,
+		NOUN_SKELETON, NOUN_SKULL, NOUN_SMELL, NOUN_SODA,
+		NOUN_STUFF, NOUN_STUMP, NOUN_SUB, NOUN_TARGET,
+		NOUN_TRACKS, NOUN_TREE, NOUN_TRINKET, NOUN_TROGDOR,
+		NOUN_WATER, NOUN_WATERFALL, NOUN_WELL, NOUN_WINDOW,
+		NOUN_WOMAN, NOUN_RIVER, NOUN_STONES, NOUN_IN_HAY,
+		NOUN_PUDDLE, NOUN_MENDELEV, NOUN_BLEED, NOUN_IN_WELL,
+		NOUN_BUCKET, NOUN_WISH, NOUN_ARMS, NOUN_GOLD,
+		NOUN_MONEY, NOUN_CARPET, NOUN_BED, NOUN_MATTRESS,
+		NOUN_PARCHMENT, NOUN_DONGOLEV, NOUN_HALDO, NOUN_SHIRT,
+		NOUN_SHIELD, NOUN_SWORD, NOUN_HELM, NOUN_DRAGON,
+		NOUN_QUIZ, NOUN_ROCK, NOUN_STONE, NOUN_UNKNOWN
+		);
+
 var 
 	dialog,background,framebuffer:buffer_ptr;
 
@@ -59,6 +116,12 @@ var
 	i:word;
 	input_x:byte;
 	input_buffer : string;
+
+	current_verb: verb_type;
+	current_noun: noun_type;
+
+	
+
 
 {=====================================}
 { Reset Prompt                        }
@@ -165,6 +228,52 @@ begin
 end;
 
 
+
+	{===========================    }
+	{ get verb                      }
+	{===========================    }
+	{ verb has to be the first word }
+
+Procedure get_verb;
+
+begin
+	current_verb := VERB_UNKNOWN;
+{
+
+        lda     #<verb_lookup           ; reset verb pointer
+        sta     get_verb_loop+1
+        lda     #>verb_lookup
+        sta     get_verb_loop+2
+
+next_verb_loop:
+        ldx     #0                      ; set input pointer to zero
+        stx     WORD_MATCH              ; set match count to zero
+}
+
+end;
+
+
+	{=========================== }
+	{=========================== }
+	{ get noun                   }
+	{=========================== }
+	{=========================== }
+
+	{ assume command is "VERB SOMETHING SOMETHING SOMETHING" }
+	{ skip to first space, return NONE if nothing else       }
+	{               parse for first matching noun            }
+	{               return UNKNOWN if no matches             }
+
+Procedure get_noun;
+
+begin
+	current_noun := NOUN_NONE;
+
+end;
+
+
+
+
 {=====================================}
 { parse input                         }
 {=====================================}
@@ -174,6 +283,37 @@ Procedure parse_input;
 label finish_parse_message;
 
 begin
+
+	{===========================}
+	{special case: pot on head}
+
+	{lda     GAME_STATE_1}
+	{and     #POT_ON_HEAD}
+	{beq     no_pot_on_head}
+
+	{ldx     #<inside_inn_pot_on_head_message}
+	{ldy     #>inside_inn_pot_on_head_message}
+	{jmp     finish_parse_message}
+
+{no_pot_on_head:}
+
+	{======================}
+	{ uppercase the buffer }
+
+	for i:=1 to Length(input_buffer) do begin
+		input_buffer[i]:=upCase(input_buffer[i]);
+	end;
+
+	{=====================}
+	{get the verb }
+
+	get_verb;
+
+	{=====================}
+	{get the noun }
+
+	get_noun;
+
 
 
 finish_parse_message:
@@ -237,6 +377,7 @@ begin
 	end;
 	
 end;
+
 
 {=====================================}
 { Check keyboard                      }
@@ -330,13 +471,14 @@ begin
 		end;
 	end
 
-	{ all other keys }
 	else begin
+		{ all other keys }
+
+		{  Note, it handles enter }
 
 		graphics_input(ch);
 
-	end;                   
-
+	end;
 end;
 
 {=============================}
