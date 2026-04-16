@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
+static FILE *offsets,*words;
+
+
 #define NUM_WORDS 75
 
 static char word_list[NUM_WORDS][20]={
@@ -99,17 +102,32 @@ static char replacement_list[NUM_WORDS][32]={
 
 static int char_count=0;
 
+static int lookup_offsets[1024];
+static int num_offsets=0;
+
 void parse_line(char *string) {
 	int len;
 	int i,j;
 	int in_quote=0;
+	static int first_entry=1;
 
 	len=strlen(string);
 
 	/* if line ends in : then label */
 	/* want to grab it and offset */
 	if ( (strstr(string,":")) && (!strstr(string,"\""))) {
-		fprintf(stderr,"%d %s",char_count,string);
+		if (first_entry) {
+			first_entry=0;
+		}
+		else {
+			fprintf(offsets,",\n");
+		}
+//		fprintf(offsets,"%d %s",char_count,string);
+		string[strlen(string)-2]=0;
+//		fprintf(offsets,"\t%s = %d,\n",string,char_count);
+		fprintf(offsets,"\t%s",string);
+		lookup_offsets[num_offsets]=char_count;
+		num_offsets++;
 	}
 
 	if (string[0]==';') return;
@@ -132,7 +150,7 @@ void parse_line(char *string) {
 
 		/* handle carriage return */
 		if (!strncmp(&string[i],",13",3)) {
-			printf("%c",13);
+			fprintf(words,"%c",13);
 			i+=3;
 			char_count++;
 			continue;
@@ -140,7 +158,7 @@ void parse_line(char *string) {
 
 		/* handle end of string */
 		if (!strncmp(&string[i],",0",2)) {
-			printf("%c",0);
+			fprintf(words,"%c",0);
 			i+=2;
 			char_count++;
 			continue;
@@ -157,7 +175,7 @@ void parse_line(char *string) {
 //					printf("MATCH %s%d %s%d\n",
 //						&string[i],i,word_list[j],j);
 
-				printf("%c",0x80+j);
+				fprintf(words,"%c",0x80+j);
 				char_count+=1;
 				i+=strlen(word_list[j]);
 				i--;
@@ -167,7 +185,7 @@ void parse_line(char *string) {
 		}
 
 		if ((!word_found) && (in_quote)) {
-			printf("%c",string[i]);
+			fprintf(words,"%c",string[i]);
 			char_count++;
 		}
 	}
@@ -180,14 +198,36 @@ void parse_line(char *string) {
 
 int main(int argc, char **argv) {
 
+
 	char string[BUFSIZ];
 	char *result;
 	int length_of_table=0;
 	int i;
 
+	if (argc<3) {
+		fprintf(stderr,"Usage: shrink_text words usage\n");
+		return -1;
+	}
+
+	words=fopen(argv[1],"w");
+	if (words==NULL) {
+		fprintf(stderr,"Error opening %s\n",argv[1]);
+		return -1;
+	}
+
+	offsets=fopen(argv[2],"w");
+	if (offsets==NULL) {
+		fprintf(stderr,"Error opening %s\n",argv[2]);
+		return -1;
+	}
+
+
 	for(i=0;i<NUM_WORDS;i++) {
 		length_of_table+=strlen(word_list[i]);
 	}
+
+
+	fprintf(offsets,"type common_offsets = (\n");
 
 	while(1) {
 
@@ -198,8 +238,24 @@ int main(int argc, char **argv) {
 
 	}
 
+	fprintf(offsets,");\n\n");
+
+	fprintf(offsets,"const common_lookup : array [0..%d] of word = (\n",
+		num_offsets-1);
+
+	for(i=0;i<num_offsets;i++) {
+		fprintf(offsets,"\t%d",lookup_offsets[i]);
+		if (i!=num_offsets-1) {
+			fprintf(offsets,",\n");
+		}
+
+	}
+	fprintf(offsets,");\n");
+
 	fprintf(stderr,"; Done!  rough char count = %d, "
 		"length_of_table = %d\n",
 		char_count, length_of_table);
 
+	fclose(words);
+	fclose(offsets);
 }

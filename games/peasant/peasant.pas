@@ -19,7 +19,7 @@ uses crt,zx02,cga;
 {$I s_walk.pas}
 
 {$I dialog_t.pas}
-
+{$I o_common.pas}
 
 const WalkingSprites : array[0..23] of SpritePtr =
 (
@@ -314,11 +314,17 @@ begin
 
 	get_noun;
 
+	case current_verb of
+		VERB_UNKNOWN:
+			begin
+			print_text_message(common_lookup[ord(unknown_message)]);
+			end;
+	end;
 
 
 finish_parse_message:
 
-	print_text_message(0);
+
 
 	repeat until keypressed;
 end;
