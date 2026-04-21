@@ -7,7 +7,8 @@ CFLAGS = -O2 -Wall -g
 
 all:	shrink_text \
 	D_KNIGHT.PAS \
-	D_COMMON.PAS
+	D_COMMON.PAS \
+	O_COMMON.PAS
 
 
 #	DIALOG_NED_COTTAGE.ZX02 dialog_ned_cottage.inc \
@@ -60,6 +61,8 @@ dialog_knight.raw:	knight.inc
 	./shrink_text dialog_knight.raw offset_knight.pas < knight.inc
 
 ####
+
+O_COMMON.PAS:	dialog_common.raw
 
 D_COMMON.PAS:	D_COMMON.ZX2
 	$(BIN2PAS) -l D_COMMON D_COMMON.ZX2 > D_COMMON.PAS

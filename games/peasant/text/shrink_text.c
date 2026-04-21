@@ -123,11 +123,15 @@ void parse_line(char *string) {
 			fprintf(offsets,",\n");
 		}
 //		fprintf(offsets,"%d %s",char_count,string);
+
+		/* strip off : from end */
 		string[strlen(string)-2]=0;
+
 //		fprintf(offsets,"\t%s = %d,\n",string,char_count);
 		fprintf(offsets,"\t%s",string);
 		lookup_offsets[num_offsets]=char_count;
 		num_offsets++;
+		return;
 	}
 
 	if (string[0]==';') return;
