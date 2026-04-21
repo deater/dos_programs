@@ -70,6 +70,30 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		VERB_CUT, VERB_SAY, VERB_SLAY,
 		VERB_ALL_DONE );
 
+	const verb_lookup : array [0..78] of string[10] =
+		('UNKNOWN', 'ASK', 'BOO', 'BREAK',
+		'BUY', 'CHEAT', 'CLIMB', 'CLOSE',
+		'COPY', 'DANCE', 'DEPLOY', 'DIE',
+		'DITCH', 'DRINK', 'DROP', 'ENTER',
+		'FEED', 'GET', 'GIVE', 'GO',
+		'HALDO', 'INVENTORY', 'JUMP', 'KICK',
+		'KILL', 'KNOCK', 'LIGHT', 'LOAD',
+		'LOOK', 'MAKE', 'MAP', 'NO',
+		'OPEN', 'PARTY', 'PET', 'PLAY',
+		'PULL', 'PUNCH', 'PUSH', 'PUT',
+		'PWD', 'QUIT', 'READ', 'RIDE',
+		'RING', 'SAVE', 'SCARE', 'SEARCH',
+		'SHOOT', 'SHOW', 'SIT', 'SKIP',
+		'SLEEP', 'SMELL', 'SNIFF', 'STEAL',
+		'SWIM', 'TAKE', 'TALK', 'THIS',
+		'THROW', 'TRY', 'TURN', 'USE',
+		'VERSION', 'WAKE', 'WEAR', 'WHAT',
+		'WHERE', 'WHY', 'YES', 'HELP',
+		'ATTACK', 'HUG', 'HIDE', 'MOVE',
+		'CUT', 'SAY', 'SLAY'
+	);
+	
+
 	type noun_type = (
 		NOUN_NONE, NOUN_ARCHER, NOUN_ARROW, NOUN_BABY,
 		NOUN_BEADS, NOUN_BELL, NOUN_BELT, NOUN_BERRIES,
@@ -238,19 +262,23 @@ end;
 
 Procedure get_verb;
 
+var
+	i: verb_type;
+
 begin
 	current_verb := VERB_UNKNOWN;
-{
 
-        lda     #<verb_lookup           ; reset verb pointer
-        sta     get_verb_loop+1
-        lda     #>verb_lookup
-        sta     get_verb_loop+2
+{	PrintStringXor(chr(length(verb_lookup[ord(VERB_PARTY)])+48),6,14);}
 
-next_verb_loop:
-        ldx     #0                      ; set input pointer to zero
-        stx     WORD_MATCH              ; set match count to zero
-}
+	for i:=VERB_ASK to VERB_SLAY do begin
+
+		if (verb_lookup[ord(i)]=
+			Copy(input_buffer,1,length(verb_lookup[ord(i)]) ))
+
+		then begin
+			current_verb:=i;
+		end;
+	end;
 
 end;
 
@@ -317,6 +345,39 @@ begin
 	get_noun;
 
 	case current_verb of
+
+		VERB_PARTY:
+			begin
+			print_text_message(
+				common_lookup[ord(party_message)],common);
+			end;
+
+		{VERB_PWD:}
+
+		{VERB_QUIT:}
+
+		{VERB_SAVE:}
+
+		{VERB_SHOW:}
+
+		VERB_SNIFF:
+			begin
+			print_text_message(
+				common_lookup[ord(smell_message)],common);
+			end;
+
+		VERB_SMELL:
+			begin
+			print_text_message(
+				common_lookup[ord(smell_message)],common);
+			end;
+
+		VERB_TALK:
+			begin
+			print_text_message(
+				common_lookup[ord(talk_noone_message)],common);
+			end;
+
 		VERB_UNKNOWN:
 			begin
 			print_text_message(
