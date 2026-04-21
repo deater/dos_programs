@@ -20,6 +20,7 @@ uses crt,zx02,cga;
 
 {$I dialog_t.pas}
 {$I o_common.pas}
+{$I d_common.pas}
 
 const WalkingSprites : array[0..23] of SpritePtr =
 (
@@ -104,7 +105,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		);
 
 var 
-	dialog,background,framebuffer:buffer_ptr;
+	dialog,common,background,framebuffer:buffer_ptr;
 
 	screen:screentype absolute $B800:0000;
 	level_over,frame,flame_count:byte;
@@ -144,19 +145,20 @@ end;
 { disp_put_string                     }
 {=====================================}
 
-Procedure disp_put_string( x,y: word);
+Procedure disp_put_string( x,y,offset: word; whichd: buffer_ptr);
 
 var
-	newx,offset: word;
+	newx,dialog_offset: word;
 	which: byte;
 
 begin
-	offset:=0;
+
+	dialog_offset:=offset;
 	newx:=x;
 
-	while(dialog^[offset]<>0) do begin
+	while(whichd^[dialog_offset]<>0) do begin
 
-		which:=dialog^[offset];
+		which:=whichd^[dialog_offset];
 
 		if (which=13) then begin
 			y:=y+1;
@@ -174,7 +176,7 @@ begin
 			PrintCharXor(char(which),newx,y);
 			newx:=newx+1;
 		end;
-		offset:=offset+1;
+		dialog_offset:=dialog_offset+1;
 	end;
 end;
 
@@ -182,7 +184,7 @@ end;
 { print_text_message                  }
 {=====================================}
 
-Procedure print_text_message( offset: word);
+Procedure print_text_message( offset: word; whichd: buffer_ptr);
 
 var
 	y2,dialog_offset,message_lines: word;
@@ -191,11 +193,11 @@ begin
 	{ count_message_lines }
 
 	message_lines:=0;
-	dialog_offset:=0;
+	dialog_offset:=offset;
 
-	while (dialog^[dialog_offset]<>0) do begin
+	while (whichd^[dialog_offset]<>0) do begin
 
-		if (dialog^[dialog_offset]=13) then begin
+		if (whichd^[dialog_offset]=13) then begin
 			message_lines:=message_lines+1;
 		end;
 
@@ -223,7 +225,7 @@ begin
 
 {	PrintStringXor('test test',6,4); }
 
-	disp_put_string(6,4);
+	disp_put_string(6,4,offset,whichd);
 
 end;
 
@@ -317,7 +319,8 @@ begin
 	case current_verb of
 		VERB_UNKNOWN:
 			begin
-			print_text_message(common_lookup[ord(unknown_message)]);
+			print_text_message(
+				common_lookup[ord(unknown_message)],common);
 			end;
 	end;
 
@@ -698,7 +701,10 @@ begin
 
 	GetMem(background,16384);
 	GetMem(framebuffer,16384);
-	GetMem(dialog,4096);	
+	GetMem(dialog,4096);
+	GetMem(common,4096);
+
+	decompress(common,@D_COMMON);
 
 	{****************}
 	{ init variables }
