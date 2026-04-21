@@ -128,7 +128,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		NOUN_QUIZ, NOUN_ROCK, NOUN_STONE, NOUN_UNKNOWN
 		);
 
-	type game_state = record 
+	type game_state_type = record 
 		{ game state 0}
 		BABY_IN_WELL,
 		BUCKET_DOWN_WELL,
@@ -179,6 +179,8 @@ var
 	i:word;
 	input_x:byte;
 	input_buffer : string;
+
+	game_state: game_state_type;
 
 	current_verb: verb_type;
 	current_noun: noun_type;
@@ -842,6 +844,45 @@ begin
 	PrintStringXor(' your character',0,23);
 end;
 
+Procedure init_game_state;
+
+begin
+	with game_state do begin
+		BABY_IN_WELL := false;
+		BUCKET_DOWN_WELL := false;
+		TALKED_TO_MENDELEV := false;
+		HALDO_TO_DONGOLEV := false;
+		ARROW_BEATEN := false;
+		GARY_SCARED := false;
+		LADY_GONE := false;
+		TRINKET_GIVEN := false;
+
+		FISH_FED := false;
+		PUDDLE_WET := false;
+		IN_HAY_BALE := false;
+		ALREADY_GOT_ROOM := false;
+		RAINING := false;
+		NIGHT := false;
+		POT_ON_HEAD := false;
+		WEARING_ROBE := false;
+
+		ON_FIRE := false;
+		COTTAGE_ROCK_MOVED := false;
+		KNUCKLES_BLEED := false;
+		DRESSER_OPEN := false;
+		TALKED_TO_KNIGHT := false;
+		COVERED_IN_MUD := false;
+		GOT_MUDDY_ALREADY := false;
+		GREASE_ON_HEAD := false;
+
+		SWORD_THROWN := false;
+		CLIFF_CLIMBED := false;
+		KNIGHT_MOVED := false;
+		ASLEEP := false;
+		KERREK_DEAD := false;
+		GOT_RICHES := false;
+	end;
+end;
 
 {====================================}
 { Main                               }
@@ -906,6 +947,8 @@ begin
 	peasant_dir:=0;
 	peasant_steps:=0;
 	input_x:=0;
+
+	init_game_state;
 
 	do_knight(0);
 
