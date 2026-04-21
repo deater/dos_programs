@@ -128,6 +128,44 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		NOUN_QUIZ, NOUN_ROCK, NOUN_STONE, NOUN_UNKNOWN
 		);
 
+	type game_state = record 
+		{ game state 0}
+		BABY_IN_WELL,
+		BUCKET_DOWN_WELL,
+		TALKED_TO_MENDELEV,
+		HALDO_TO_DONGOLEV,
+		ARROW_BEATEN,
+		GARY_SCARED,
+		LADY_GONE,
+		TRINKET_GIVEN : boolean;
+		{ game state 1}
+		FISH_FED,		{ also implies man gone and inn open }
+		PUDDLE_WET,
+		IN_HAY_BALE,
+		ALREADY_GOT_ROOM,
+		RAINING,
+		NIGHT,
+		POT_ON_HEAD,
+		WEARING_ROBE : boolean;
+		{game state 2}
+		ON_FIRE,
+		COTTAGE_ROCK_MOVED,
+		KNUCKLES_BLEED,
+		DRESSER_OPEN,
+		TALKED_TO_KNIGHT,
+		COVERED_IN_MUD,
+		GOT_MUDDY_ALREADY,
+		GREASE_ON_HEAD : boolean;
+		{game state 3}
+		SWORD_THROWN,
+		CLIFF_CLIMBED,
+		KNIGHT_MOVED,
+		ASLEEP,
+		KERREK_DEAD,
+		GOT_RICHES : boolean;
+
+	end;
+
 var 
 	dialog,common,background,framebuffer:buffer_ptr;
 
