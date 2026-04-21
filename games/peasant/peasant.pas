@@ -128,6 +128,41 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		NOUN_QUIZ, NOUN_ROCK, NOUN_STONE, NOUN_UNKNOWN
 		);
 
+	const noun_lookup : array [0..123] of string[10] = (
+		'NONE', 'ARCHER', 'ARROW', 'BABY',
+		'BEADS', 'BELL', 'BELT', 'BERRIES',
+		'BOAT', 'BONE', 'BOW', 'BROOM',
+		'BUSH', 'CANDLE', 'CAVE', 'CHAIR',
+		'CLIFF', 'CLUB', 'COLD', 'COTTAGE',
+		'CRANK', 'CURTAIN', 'DAN', 'DESK',
+		'DINGHY', 'DOING_SPROINGS', 'DOOR', 'DRAWER',
+		'DRESSER', 'DUDE', 'FEED', 'FENCE',
+		'FIRE', 'FLIES', 'FOOD', 'FOOTPRINTS',
+		'GAME', 'GARY', 'GREASE', 'GREEN',
+		'GROUND', 'GUY', 'HAY', 'HOLE',
+		'HORSE', 'INN', 'JHONKA', 'KERREK',
+		'KNIGHT', 'LADY', 'LAKE', 'LANTERN',
+		'LEG', 'LIGHTNING', 'MAN', 'MAP',
+		'MASK', 'MUD', 'NED', 'NOTE',
+		'OPENINGS', 'PAINTING', 'PAPER', 'PEASANT',
+		'PEBBLES', 'PILLOW', 'PILLS', 'PLAGUE',
+		'PLAQUE', 'POT', 'RICHES', 'ROBE',
+		'ROCKS', 'ROOM', 'RUB', 'RUG',
+		'SAND', 'SANDWICH', 'SHELF', 'SIGN',
+		'SKELETON', 'SKULL', 'SMELL', 'SODA',
+		'STUFF', 'STUMP', 'SUB', 'TARGET',
+		'TRACKS', 'TREE', 'TRINKET', 'TROGDOR',
+		'WATER', 'WATERFALL', 'WELL', 'WINDOW',
+		'WOMAN', 'RIVER', 'STONES', 'IN_HAY',
+		'PUDDLE', 'MENDELEV', 'BLEED', 'IN_WELL',
+		'BUCKET', 'WISH', 'ARMS', 'GOLD',
+		'MONEY', 'CARPET', 'BED', 'MATTRESS',
+		'PARCHMENT', 'DONGOLEV', 'HALDO', 'SHIRT',
+		'SHIELD', 'SWORD', 'HELM', 'DRAGON',
+		'QUIZ', 'ROCK', 'STONE', 'UNKNOWN'
+		);
+
+
 	type game_state_type = record 
 		{ game state 0}
 		BABY_IN_WELL,
@@ -176,7 +211,7 @@ var
 	peasant_xadd,peasant_yadd:integer; { signed }
 	peasant_dir,peasant_steps:byte;
 	ch:char;
-	i:word;
+	i,next_space:word;
 	input_x:byte;
 	input_buffer : string;
 
@@ -323,6 +358,33 @@ begin
 end;
 
 
+{=====================================}
+{ Noun Next Space                     }
+{=====================================}
+{ point to just after next space in parse input }
+
+Procedure noun_next_space;
+
+var x: word;
+
+label done_noun_next_space;
+
+begin
+
+	for x:=next_space to Length(input_buffer) do begin
+		if input_buffer[x]=' ' then begin
+			next_space:=x+1;
+			goto done_noun_next_space;
+		end;
+	end;
+	next_space:=$FFFF;
+
+done_noun_next_space:
+
+end;
+
+
+
 	{=========================== }
 	{=========================== }
 	{ get noun                   }
@@ -336,11 +398,38 @@ end;
 
 Procedure get_noun;
 
+var
+	i: noun_type;
+	next : word;
+	label done_get_noun,get_noun_loop;
+
 begin
 	current_noun := NOUN_NONE;
 
-end;
+	next_space:=1;
 
+get_noun_loop:
+
+	noun_next_space;
+
+	if (next_space=$ffff) then goto done_get_noun;
+
+	for i:=NOUN_ARCHER to NOUN_STONE do begin
+
+		if (noun_lookup[ord(i)]=
+			Copy(input_buffer,next_space,length(noun_lookup[ord(i)]) ))
+
+		then begin
+			current_noun:=i;
+			goto done_get_noun;
+		end;
+
+	end;
+	goto get_noun_loop;
+
+done_get_noun:
+
+end;
 
 
 
@@ -360,15 +449,13 @@ begin
 	{===========================}
 	{special case: pot on head}
 
-	{lda     GAME_STATE_1}
-	{and     #POT_ON_HEAD}
-	{beq     no_pot_on_head}
+	if (game_state.POT_ON_HEAD) then begin
 
-	{ldx     #<inside_inn_pot_on_head_message}
-	{ldy     #>inside_inn_pot_on_head_message}
-	{jmp     finish_parse_message}
+		print_offset:=inside_inn_pot_on_head_message;
+		goto finish_parse_message;
 
-{no_pot_on_head:}
+	end;
+
 
 	{======================}
 	{ uppercase the buffer }
@@ -388,6 +475,23 @@ begin
 	get_noun;
 
 
+	{=====================}
+	{check for dan }
+
+	if (current_noun=NOUN_DAN) then begin
+		print_offset:=dan_message;
+		goto finish_parse_message;
+	end;
+
+	{=================================}
+	{ check if LOOKing at something in inventory}
+
+	if (current_verb=VERB_LOOK) then begin
+		{TODO}
+		{look_check_if_in_inventory;}
+		{if was, exit early}
+	end;
+
 	{=====================================}
 	{ COMMON ROUTINES
 	{=====================================}
@@ -404,7 +508,15 @@ begin
 		VERB_CHEAT:	print_offset:=cheat_message;
 
 		VERB_CLIMB:	begin
-				{ TODO }
+				
+				if (current_noun=NOUN_TREE) then begin
+					if (game_state.night) then begin
+						print_offset:=climb_tree_night_message;
+					end
+					else begin
+						print_offset:=climb_tree_message;
+					end;
+				end;
 				end;
 
 		VERB_COPY:	begin
