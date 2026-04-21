@@ -312,6 +312,9 @@ Procedure parse_input;
 
 label finish_parse_message;
 
+var
+	print_offset : common_offsets;
+
 begin
 
 	{===========================}
@@ -344,53 +347,140 @@ begin
 
 	get_noun;
 
+
+	{=====================================}
+	{ COMMON ROUTINES
+	{=====================================}
+	{ here if no custom dialog from level }
+
+	print_offset:=unknown_message;
+
 	case current_verb of
 
-		VERB_PARTY:
-			begin
-			print_text_message(
-				common_lookup[ord(party_message)],common);
-			end;
+		VERB_ASK:	print_offset:=unknown_ask_message;
 
-		{VERB_PWD:}
+		VERB_BOO:	print_offset:=boo_message;
 
-		{VERB_QUIT:}
+		VERB_CHEAT:	print_offset:=cheat_message;
 
-		{VERB_SAVE:}
+		VERB_CLIMB:	begin
+				{ TODO }
+				end;
 
-		{VERB_SHOW:}
+		VERB_COPY:	begin
+				{ TODO }
+				end;
 
-		VERB_SNIFF:
-			begin
-			print_text_message(
-				common_lookup[ord(smell_message)],common);
-			end;
+		VERB_DANCE:	print_offset:=dance_message;
+		
+		VERB_DIE:	begin
+				{ TODO }
+				end;
 
-		VERB_SMELL:
-			begin
-			print_text_message(
-				common_lookup[ord(smell_message)],common);
-			end;
+		VERB_DITCH:	begin
+				{ TODO }
+				end;
 
-		VERB_TALK:
-			begin
-			print_text_message(
-				common_lookup[ord(talk_noone_message)],common);
-			end;
+		VERB_DROP:	begin
+				{ TODO }
+				end;
 
-		VERB_UNKNOWN:
-			begin
-			print_text_message(
-				common_lookup[ord(unknown_message)],common);
-			end;
+		VERB_DRINK:	begin
+				{ TODO }
+				end;
+
+		VERB_THROW:	begin
+				{ TODO }
+				end;
+
+		VERB_GET:	begin
+				{ TODO }
+				end;
+		VERB_TAKE:	begin
+				{ TODO }
+				end;
+		VERB_STEAL:	begin
+				{ TODO }
+				end;
+
+		VERB_GIVE:	print_offset:=give_message;
+
+		VERB_GO:	print_offset:=go_message;
+
+		VERB_HALDO:	print_offset:=haldo_message;
+
+		VERB_HELP:	print_offset:=help_message;
+
+		VERB_INVENTORY:	begin
+				{ TODO }
+				end;
+
+		VERB_LOAD:	begin
+				{ TODO }
+				end;
+
+		VERB_LOOK:	begin
+				{ TODO }
+				end;
+
+		VERB_MAP:	begin
+				{ TODO }
+				end;
+
+		VERB_PARTY:	print_offset:=party_message;
+
+		VERB_PWD:	begin
+				{ TODO }
+				end;
+
+		VERB_QUIT:	begin
+				{ TODO }
+				end;
+
+		VERB_SAVE:	begin
+				{ TODO }
+				end;
+
+		VERB_SHOW:	begin
+				{ TODO }
+				end;
+
+		VERB_SNIFF:	print_offset:=smell_message;
+
+		VERB_SMELL:	print_offset:=smell_message;
+
+		VERB_TALK:	print_offset:=talk_noone_message;
+
+		VERB_UNKNOWN:	print_offset:=unknown_message;
+
+		VERB_VERSION:	print_offset:=version_message;
+
+		VERB_WEAR:	begin
+				{ TODO }
+				end;
+
+		VERB_THIS:	print_offset:=what_message;
+
+		VERB_WHAT:	print_offset:=what_message;
+
+		VERB_WHERE:	begin
+				{ TODO }
+				end;
+
+		VERB_WHY:	print_offset:=why_message;
+
 	end;
 
 
 finish_parse_message:
 
-
+	print_text_message(
+			common_lookup[ord(print_offset)],common);
 
 	repeat until keypressed;
+
+	{ throw away keypress }
+	ch:=readkey;
 end;
 
 
