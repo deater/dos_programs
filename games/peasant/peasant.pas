@@ -242,6 +242,8 @@ var
 
 	inventory,inventory_gone: inventory_type;
 
+	print_offset : common_offsets;
+
 	current_verb: verb_type;
 	current_noun: noun_type;
 
@@ -457,6 +459,23 @@ done_get_noun:
 end;
 
 
+{=====================================}
+{ partial message step                }
+{=====================================}
+
+Procedure partial_message_step;
+
+begin
+	print_text_message(
+			common_lookup[ord(print_offset)],common);
+
+	repeat until keypressed;
+
+	{ throw away keypress }
+	ch:=readkey;
+
+end;
+
 
 {=====================================}
 { parse input                         }
@@ -466,8 +485,6 @@ Procedure parse_input;
 
 label finish_parse_message;
 
-var
-	print_offset : common_offsets;
 
 begin
 
@@ -527,6 +544,8 @@ begin
 	{ Handle aliases here as Pascal has no fallthrough?}
 
 	if (current_verb=VERB_DITCH) then current_verb:=VERB_DROP;
+	if (current_verb=VERB_TAKE) then current_verb:=VERB_GET;
+	if (current_verb=VERB_STEAL) then current_verb:=VERB_GET;
 
 	case current_verb of
 
@@ -579,21 +598,48 @@ begin
 				end;
 
 		VERB_DRINK:	begin
-				{ TODO }
+
+				print_offset:=drink_message;
+
+				partial_message_step;
+
+				print_offset:=drink_message2;
+
 				end;
 
 		VERB_THROW:	begin
-				{ TODO }
+
+				if (current_noun = NOUN_BABY) then begin
+
+					if (inventory.baby = true) and
+						(inventory_gone.baby = false)
+						then begin
+						
+						print_offset:=throw_baby_yes_message;
+					end
+					else begin
+						print_offset:=no_baby_message;
+					end;
+
+
 				end;
 
+				end;
+
+		{VERB_STEAL}
+		{VERB_TAKE}
 		VERB_GET:	begin
-				{ TODO }
-				end;
-		VERB_TAKE:	begin
-				{ TODO }
-				end;
-		VERB_STEAL:	begin
-				{ TODO }
+
+				if (current_noun = NOUN_PEBBLES) and
+					(inventory.pebbles)
+								then begin
+
+					print_offset:=get_pebbles_message;
+
+				end
+
+				else print_offset:=get_message;
+
 				end;
 
 		VERB_GIVE:	print_offset:=give_message;
@@ -613,7 +659,11 @@ begin
 				end;
 
 		VERB_LOOK:	begin
-				{ TODO }
+				if (current_noun=NOUN_TREE) then
+					print_offset:=look_trees_message
+				else
+					print_offset:=look_irrelevant_message;
+
 				end;
 
 		VERB_MAP:	begin
@@ -667,13 +717,8 @@ begin
 
 finish_parse_message:
 
-	print_text_message(
-			common_lookup[ord(print_offset)],common);
+	partial_message_step;
 
-	repeat until keypressed;
-
-	{ throw away keypress }
-	ch:=readkey;
 end;
 
 
