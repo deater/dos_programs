@@ -667,7 +667,13 @@ begin
 				end;
 
 		VERB_MAP:	begin
-				{ TODO }
+				if (inventory.map) then begin
+
+				{TODO}
+
+				end
+				else print_offset:=map_message;
+
 				end;
 
 		VERB_PARTY:	print_offset:=party_message;
@@ -676,9 +682,7 @@ begin
 				{ TODO }
 				end;
 
-		VERB_QUIT:	begin
-				{ TODO }
-				end;
+		VERB_QUIT:	print_offset:=quit_message;
 
 		VERB_SAVE:	begin
 				{ TODO }
@@ -699,7 +703,24 @@ begin
 		VERB_VERSION:	print_offset:=version_message;
 
 		VERB_WEAR:	begin
-				{ TODO }
+
+				if (current_noun = NOUN_ROBE) then begin
+					if (inventory.ROBE) then begin
+						{ TODO }
+					end;
+
+				end
+				else if (current_noun = NOUN_BELT) then begin
+					if (inventory.KERREK_BELT) then begin
+						print_offset:=wear_belt_message;
+					end;
+				end
+				else if (current_noun = NOUN_MASK) then begin
+					if (inventory.MONSTER_MASK) then begin
+						print_offset:=wear_mask_message;
+					end;
+				end
+
 				end;
 
 		VERB_THIS:	print_offset:=what_message;
