@@ -9,6 +9,7 @@ uses crt,zx02,cga;
 
 {$I pq_knght.pas}
 {$I d_knight.pas}
+{$I o_knight.pas}
 
 (*
 {$I pq_ker1.pas}
@@ -532,6 +533,36 @@ begin
 		{TODO}
 		{look_check_if_in_inventory;}
 		{if was, exit early}
+	end;
+
+	{=====================================}
+	{ KNIGHT ROUTINES
+	{=====================================}
+	{ here if no custom dialog from level }
+
+	print_offset:=unknown_message;
+
+	case current_verb of
+
+		VERB_ASK:	begin
+			if (current_noun=NOUN_FIRE) then begin
+			end
+			else if (current_noun=NOUN_JHONKA) then begin
+			end
+			else if (current_noun=NOUN_KERREK) then begin
+			end
+			else if (current_noun=NOUN_NED) then begin
+			end
+			else if (current_noun=NOUN_ROBE) then begin
+			end
+			else if (current_noun=NOUN_SMELL) then begin
+			end
+			else if (current_noun=NOUN_TROGDOR) then begin
+			end
+			else print_offset:=common_offsets(knight_ask_unknown_message);
+			goto finish_parse_message;
+				end;
+
 	end;
 
 	{=====================================}

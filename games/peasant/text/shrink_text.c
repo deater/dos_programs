@@ -204,12 +204,12 @@ int main(int argc, char **argv) {
 
 
 	char string[BUFSIZ];
-	char *result;
+	char *result,*name;
 	int length_of_table=0;
 	int i;
 
-	if (argc<3) {
-		fprintf(stderr,"Usage: shrink_text words usage\n");
+	if (argc<4) {
+		fprintf(stderr,"Usage: shrink_text words usage name\n");
 		return -1;
 	}
 
@@ -225,13 +225,14 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+	name=strdup(argv[3]);
 
 	for(i=0;i<NUM_WORDS;i++) {
 		length_of_table+=strlen(word_list[i]);
 	}
 
 
-	fprintf(offsets,"type common_offsets = (\n");
+	fprintf(offsets,"type %s_offsets = (\n",name);
 
 	while(1) {
 
@@ -244,8 +245,8 @@ int main(int argc, char **argv) {
 
 	fprintf(offsets,");\n\n");
 
-	fprintf(offsets,"const common_lookup : array [0..%d] of word = (\n",
-		num_offsets-1);
+	fprintf(offsets,"const %s_lookup : array [0..%d] of word = (\n",
+		name,num_offsets-1);
 
 	for(i=0;i<num_offsets;i++) {
 		fprintf(offsets,"\t%d",lookup_offsets[i]);
