@@ -46,7 +46,6 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 );
 
-
 	type verb_type = (
 		VERB_UNKNOWN, VERB_ASK, VERB_BOO, VERB_BREAK,
 		VERB_BUY, VERB_CHEAT, VERB_CLIMB, VERB_CLOSE,
@@ -162,7 +161,6 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		'QUIZ', 'ROCK', 'STONE', 'UNKNOWN'
 		);
 
-
 	type game_state_type = record 
 		{ game state 0}
 		BABY_IN_WELL,
@@ -198,8 +196,33 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		ASLEEP,
 		KERREK_DEAD,
 		GOT_RICHES : boolean;
-
 	end;
+
+	type inventory_type = record 
+		{ Inventory 1}
+		ARROW,
+		BABY,
+		KERREK_BELT,
+		CHICKEN_FEED,
+		BOW,
+		MONSTER_MASK,
+		PEBBLES,
+		PILLS : boolean;
+		{ Inventory 2}
+		RICHES,
+		ROBE,
+		SODA,
+		MEATBALL_SUB,
+		TRINKET,
+		TROGHELM,
+		TROGSHIELD,
+		TROGSWORD : boolean;
+		{ Inventory 3}
+		IMPOSSIBLE,
+		SHIRT,
+		MAP : boolean;
+	end;
+
 
 var 
 	dialog,common,background,framebuffer:buffer_ptr;
@@ -216,6 +239,8 @@ var
 	input_buffer : string;
 
 	game_state: game_state_type;
+
+	inventory,inventory_gone: inventory_type;
 
 	current_verb: verb_type;
 	current_noun: noun_type;
@@ -499,6 +524,10 @@ begin
 
 	print_offset:=unknown_message;
 
+	{ Handle aliases here as Pascal has no fallthrough?}
+
+	if (current_verb=VERB_DITCH) then current_verb:=VERB_DROP;
+
 	case current_verb of
 
 		VERB_ASK:	print_offset:=unknown_ask_message;
@@ -529,12 +558,24 @@ begin
 				{ TODO }
 				end;
 
-		VERB_DITCH:	begin
-				{ TODO }
-				end;
-
+		{also VERB_DITCH}
 		VERB_DROP:	begin
-				{ TODO }
+
+				if (current_noun = NOUN_BABY) then begin
+
+					if (inventory.baby = true) and
+						(inventory_gone.baby = false)
+						then begin
+						
+						print_offset:=ditch_baby_message;
+					end
+					else begin
+						print_offset:=no_baby_message;
+					end;
+
+
+				end;
+			
 				end;
 
 		VERB_DRINK:	begin
@@ -996,6 +1037,55 @@ begin
 	end;
 end;
 
+Procedure init_inventory;
+
+begin
+	with inventory do begin
+		ARROW := false;
+		BABY := false;
+		KERREK_BELT := false;
+		CHICKEN_FEED := false;
+		BOW := false;
+		MONSTER_MASK := false;
+		PEBBLES := false;
+		PILLS := false;
+		RICHES := false;
+		ROBE := false;
+		SODA := false;
+		MEATBALL_SUB := false;
+		TRINKET := false;
+		TROGHELM := false;
+		TROGSHIELD := false;
+		TROGSWORD := false;
+		IMPOSSIBLE := false;
+		SHIRT := false;
+		MAP := false;
+	end;
+	with inventory_gone do begin
+		ARROW := false;
+		BABY := false;
+		KERREK_BELT := false;
+		CHICKEN_FEED := false;
+		BOW := false;
+		MONSTER_MASK := false;
+		PEBBLES := false;
+		PILLS := false;
+		RICHES := false;
+		ROBE := false;
+		SODA := false;
+		MEATBALL_SUB := false;
+		TRINKET := false;
+		TROGHELM := false;
+		TROGSHIELD := false;
+		TROGSWORD := false;
+		IMPOSSIBLE := false;
+		SHIRT := false;
+		MAP := false;
+	end;
+
+end;
+
+
 {====================================}
 { Main                               }
 {====================================}
@@ -1061,6 +1151,7 @@ begin
 	input_x:=0;
 
 	init_game_state;
+	init_inventory;
 
 	do_knight(0);
 
