@@ -571,7 +571,7 @@ begin
 		end; {case noun}
 
 		end; {verb_ask}
-		{ goto finish_parse_message; }
+
 
 	end; {case verb}
 

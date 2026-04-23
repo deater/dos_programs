@@ -249,13 +249,26 @@ int main(int argc, char **argv) {
 		name,num_offsets-1);
 
 	for(i=0;i<num_offsets;i++) {
-		fprintf(offsets,"\t%d",lookup_offsets[i]);
+		/* huge hack */
+		if (!strncmp(name,"common",6)) {
+			fprintf(offsets,"\t%d",lookup_offsets[i]);
+		}
+		else {
+			fprintf(offsets,"\t%d",lookup_offsets[i]+4096);
+		}
 		if (i!=num_offsets-1) {
 			fprintf(offsets,",\n");
 		}
 
 	}
-	fprintf(offsets,");\n");
+	fprintf(offsets,");\n\n");
+
+
+	fprintf(offsets,"function %s_dialog( offset: %s_offsets) : word;\n",
+		name,name);
+	fprintf(offsets,"begin\n");
+	fprintf(offsets,"\t%s_dialog:=%s_lookup[ord(offset)];\n",name,name);
+	fprintf(offsets,"end;\n");
 
 	fprintf(stderr,"; Done!  rough char count = %d, "
 		"length_of_table = %d\n",
