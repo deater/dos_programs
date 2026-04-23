@@ -1,7 +1,7 @@
 ## Syntax Highlighting for Turbo Pascal files.
 ## by Vince Weaver
 
-syntax "turbo_pascal" "\.pas$"
+syntax "turbo_pascal" "\.(pas|PAS)$"
 
 # keywords not filed yet:
 # constructor destructor in inherited inline nil
