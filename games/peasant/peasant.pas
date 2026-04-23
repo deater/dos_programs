@@ -572,6 +572,77 @@ begin
 
 		end; {verb_ask}
 
+	VERB_ATTACK:
+		if (current_noun=NOUN_SIGN) then
+			print_offset:=
+				knight_dialog(attack_sign_message);
+
+	VERB_BREAK:
+		if (current_noun=NOUN_SIGN) then
+			print_offset:=
+				knight_dialog(attack_sign_message);
+
+	VERB_LOOK:	begin
+		if (current_noun=NOUN_KNIGHT) or
+			(current_noun=NOUN_MAN) or
+			(current_noun=NOUN_DUDE) or
+			(current_noun=NOUN_GUY) then
+
+				print_offset:=knight_dialog(knight_look_message);
+
+		if (current_noun=NOUN_SIGN) then
+			print_offset:=knight_dialog(sign_look_message);
+		if (current_noun=NOUN_TROGDOR) then
+			print_offset:=knight_dialog(trogdor_look_message);
+		if (current_noun=NOUN_NONE) then
+			print_offset:=knight_dialog(pass_look_message);
+
+		end; {verb_look}
+
+	VERB_TALK:	begin
+		if (current_noun=NOUN_KNIGHT) or
+			(current_noun=NOUN_MAN) or
+			(current_noun=NOUN_DUDE) or
+			(current_noun=NOUN_GUY) then begin
+
+			{ extra text first time talking }
+			if (game_state.TALKED_TO_KNIGHT=false) then begin
+				print_offset:=knight_dialog(talk_knight_first_message);
+				partial_message_step;
+				print_offset:=knight_dialog(talk_knight_second_message);
+				partial_message_step;
+
+			end;
+			{ see if have belt }
+			if (inventory.KERREK_BELT) then begin
+				{TODO}
+			end;
+			{ see if wearing robe }
+			if (game_state.WEARING_ROBE) then begin
+				{TODO}
+			end;
+			{ if have nothing }
+			print_offset:=knight_dialog(talk_knight_third_message);
+			partial_message_step;
+			print_offset:=knight_dialog(talk_knight_stink_message);
+			partial_message_step;
+			print_offset:=knight_dialog(talk_knight_dress_message);
+			partial_message_step;
+			print_offset:=knight_dialog(talk_knight_fire_message);
+			partial_message_step;
+
+			print_offset:=knight_dialog(talk_knight_fourth_message);
+			{ extra text first time talking }
+			if (game_state.TALKED_TO_KNIGHT=false) then begin
+				partial_message_step;
+				print_offset:=knight_dialog(talk_knight_fifth_message);
+				game_state.TALKED_TO_KNIGHT:=true;
+			end;
+
+		end; {talking to knight}
+
+
+		end; {verb_talk}
 
 	end; {case verb}
 
