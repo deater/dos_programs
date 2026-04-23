@@ -1,0 +1,57 @@
+## Syntax Highlighting for Turbo Pascal files.
+## by Vince Weaver
+
+syntax "turbo_pascal" "\.pas$"
+
+# keywords not filed yet:
+# constructor destructor in inherited inline nil
+# of operator reintroduce self
+
+# Types (case insensitive)
+icolor green "\<(absolute|const|label|type|var|packed)\>"
+icolor green "\<(array|set|file|record|object|packed)\>"
+icolor green "\<(shortint|intger|longint|byte|word)\>"
+icolor green "\<(boolean|char|string)\>"
+icolor green "\<(procedure|function)\>"
+icolor green "\<(real|single|double|extended|comp)\>"
+
+# Interfaces
+icolor cyan "\<(program|uses|interface|implementation|unit)\>"
+
+# Constants.
+color brightred "\<[[:upper:]_][[:upper:][:digit:]_]*\>"
+icolor brightred "\<(true|false)\>"
+
+# Strings
+color brightyellow "'([^']|\\')*"
+
+# Flow control.
+color brightyellow "\<(if|then|else)\>"
+color brightyellow "\<(for|to|downto|repeat|until|while|do|case|with)\>"
+color brightyellow "\<(begin|end|asm)\>"
+color magenta "\<(goto)\>"
+
+# Operators
+color brightred "\<(and|or|xor|not)\>"
+color brightred "\<(div|shl|shr|mod)\>"
+
+# Labels
+color brightmagenta "^[[:blank:]]*[[:alpha:]_][[:alnum:]_]*:[[:blank:]]*$"
+color normal ":[[:blank:]]*$"
+
+# Comments
+color brightblue start="\{" end="\}"
+
+# Reminders
+color brightwhite,yellow "\<(FIXME|TODO|XXX)\>"
+
+# Directives
+#color brightyellow "'([^']|\\')*"
+color brightcyan "\{\$([^']|\})*"
+
+# More Comments
+color brightblue start="\(\*" end="\*\)"
+
+# Trailing whitespace
+color ,green "[[:space:]]+$"
+
