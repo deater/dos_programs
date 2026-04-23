@@ -225,7 +225,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 
 var
-	dialog,common,background,framebuffer:buffer_ptr;
+	dialog,background,framebuffer:buffer_ptr;
 
 	screen:screentype absolute $B800:0000;
 	level_over,frame,flame_count:byte;
@@ -242,7 +242,7 @@ var
 
 	inventory,inventory_gone: inventory_type;
 
-	print_offset : common_offsets;
+	print_offset : word;
 
 	current_verb: verb_type;
 	current_noun: noun_type;
@@ -270,7 +270,7 @@ end;
 { disp_put_string                     }
 {=====================================}
 
-Procedure disp_put_string( x,y,offset: word; whichd: buffer_ptr);
+Procedure disp_put_string( x,y,offset: word);
 
 var
 	newx,dialog_offset: word;
@@ -281,9 +281,9 @@ begin
 	dialog_offset:=offset;
 	newx:=x;
 
-	while(whichd^[dialog_offset]<>0) do begin
+	while(dialog^[dialog_offset]<>0) do begin
 
-		which:=whichd^[dialog_offset];
+		which:=dialog^[dialog_offset];
 
 		if (which=13) then begin
 			y:=y+1;
@@ -309,7 +309,7 @@ end;
 { print_text_message                  }
 {=====================================}
 
-Procedure print_text_message( offset: word; whichd: buffer_ptr);
+Procedure print_text_message( offset: word);
 
 var
 	y2,dialog_offset,message_lines: word;
@@ -320,9 +320,9 @@ begin
 	message_lines:=0;
 	dialog_offset:=offset;
 
-	while (whichd^[dialog_offset]<>0) do begin
+	while (dialog^[dialog_offset]<>0) do begin
 
-		if (whichd^[dialog_offset]=13) then begin
+		if (dialog^[dialog_offset]=13) then begin
 			message_lines:=message_lines+1;
 		end;
 
@@ -350,7 +350,7 @@ begin
 
 {	PrintStringXor('test test',6,4); }
 
-	disp_put_string(6,4,offset,whichd);
+	disp_put_string(6,4,offset);
 
 end;
 
@@ -465,8 +465,7 @@ end;
 Procedure partial_message_step;
 
 begin
-	print_text_message(
-			common_lookup[ord(print_offset)],common);
+	print_text_message(print_offset);
 
 	repeat until keypressed;
 
@@ -492,7 +491,7 @@ begin
 
 	if (game_state.POT_ON_HEAD) then begin
 
-		print_offset:=inside_inn_pot_on_head_message;
+		print_offset:=common_dialog(inside_inn_pot_on_head_message);
 		goto finish_parse_message;
 
 	end;
@@ -520,7 +519,7 @@ begin
 	{check for dan }
 
 	if (current_noun=NOUN_DAN) then begin
-		print_offset:=dan_message;
+		print_offset:=common_dialog(dan_message);
 		goto finish_parse_message;
 	end;
 
@@ -538,60 +537,77 @@ begin
 	{=====================================}
 	{ here if no custom dialog from level }
 
-	print_offset:=unknown_message;
+	print_offset:=common_dialog(unknown_message);
 
 	case current_verb of
 
-		VERB_ASK:	begin
-			if (current_noun=NOUN_FIRE) then begin
-			end
-			else if (current_noun=NOUN_JHONKA) then begin
-			end
-			else if (current_noun=NOUN_KERREK) then begin
-			end
-			else if (current_noun=NOUN_NED) then begin
-			end
-			else if (current_noun=NOUN_ROBE) then begin
-			end
-			else if (current_noun=NOUN_SMELL) then begin
-			end
-			else if (current_noun=NOUN_TROGDOR) then begin
-			end
-			else print_offset:=common_offsets(knight_ask_unknown_message);
-			goto finish_parse_message;
-				end;
+	VERB_ASK:	begin
+		{ default }
+		print_offset:=knight_dialog(knight_ask_unknown_message);
 
-	end;
+		case current_noun of
+
+			NOUN_FIRE:
+				print_offset:=
+					knight_dialog(knight_ask_fire_message);
+			NOUN_JHONKA:
+				print_offset:=
+					knight_dialog(knight_ask_jhonka_message);
+			NOUN_KERREK:
+				print_offset:=
+					knight_dialog(knight_ask_kerrek_message);
+			NOUN_NED:
+				print_offset:=
+					knight_dialog(knight_ask_ned_message);
+			NOUN_ROBE:
+				print_offset:=
+					knight_dialog(knight_ask_robe_message);
+			NOUN_SMELL:
+				print_offset:=
+					knight_dialog(knight_ask_smell_message);
+			NOUN_TROGDOR:
+				print_offset:=
+					knight_dialog(knight_ask_trogdor_message);
+		end; {case noun}
+
+		end; {verb_ask}
+		{ goto finish_parse_message; }
+
+	end; {case verb}
+
+	if (print_offset<>common_dialog(unknown_message)) then
+		goto finish_parse_message;
 
 	{=====================================}
 	{ COMMON ROUTINES
 	{=====================================}
 	{ here if no custom dialog from level }
 
-	print_offset:=unknown_message;
+	print_offset:=common_dialog(unknown_message);
 
 	{ Handle aliases here as Pascal has no fallthrough?}
 
 	if (current_verb=VERB_DITCH) then current_verb:=VERB_DROP;
+	if (current_verb=VERB_SNIFF) then current_verb:=VERB_SMELL;
 	if (current_verb=VERB_TAKE) then current_verb:=VERB_GET;
 	if (current_verb=VERB_STEAL) then current_verb:=VERB_GET;
 
 	case current_verb of
 
-		VERB_ASK:	print_offset:=unknown_ask_message;
+		VERB_ASK:	print_offset:=common_dialog(unknown_ask_message);
 
-		VERB_BOO:	print_offset:=boo_message;
+		VERB_BOO:	print_offset:=common_dialog(boo_message);
 
-		VERB_CHEAT:	print_offset:=cheat_message;
+		VERB_CHEAT:	print_offset:=common_dialog(cheat_message);
 
 		VERB_CLIMB:	begin
 
 				if (current_noun=NOUN_TREE) then begin
 					if (game_state.night) then begin
-						print_offset:=climb_tree_night_message;
+						print_offset:=common_dialog(climb_tree_night_message);
 					end
 					else begin
-						print_offset:=climb_tree_message;
+						print_offset:=common_dialog(climb_tree_message);
 					end;
 				end;
 				end;
@@ -600,7 +616,7 @@ begin
 				{ TODO }
 				end;
 
-		VERB_DANCE:	print_offset:=dance_message;
+		VERB_DANCE:	print_offset:=common_dialog(dance_message);
 
 		VERB_DIE:	begin
 				{ TODO }
@@ -615,10 +631,10 @@ begin
 						(inventory_gone.baby = false)
 						then begin
 
-						print_offset:=ditch_baby_message;
+						print_offset:=common_dialog(ditch_baby_message);
 					end
 					else begin
-						print_offset:=no_baby_message;
+						print_offset:=common_dialog(no_baby_message);
 					end;
 
 
@@ -628,11 +644,11 @@ begin
 
 		VERB_DRINK:	begin
 
-				print_offset:=drink_message;
+				print_offset:=common_dialog(drink_message);
 
 				partial_message_step;
 
-				print_offset:=drink_message2;
+				print_offset:=common_dialog(drink_message2);
 
 				end;
 
@@ -644,10 +660,10 @@ begin
 						(inventory_gone.baby = false)
 						then begin
 
-						print_offset:=throw_baby_yes_message;
+						print_offset:=common_dialog(throw_baby_yes_message);
 					end
 					else begin
-						print_offset:=no_baby_message;
+						print_offset:=common_dialog(no_baby_message);
 					end;
 
 
@@ -663,21 +679,21 @@ begin
 					(inventory.pebbles)
 								then begin
 
-					print_offset:=get_pebbles_message;
+					print_offset:=common_dialog(get_pebbles_message);
 
 				end
 
-				else print_offset:=get_message;
+				else print_offset:=common_dialog(get_message);
 
 				end;
 
-		VERB_GIVE:	print_offset:=give_message;
+		VERB_GIVE:	print_offset:=common_dialog(give_message);
 
-		VERB_GO:	print_offset:=go_message;
+		VERB_GO:	print_offset:=common_dialog(go_message);
 
-		VERB_HALDO:	print_offset:=haldo_message;
+		VERB_HALDO:	print_offset:=common_dialog(haldo_message);
 
-		VERB_HELP:	print_offset:=help_message;
+		VERB_HELP:	print_offset:=common_dialog(help_message);
 
 		VERB_INVENTORY:	begin
 				{ TODO }
@@ -689,10 +705,11 @@ begin
 
 		VERB_LOOK:	begin
 				if (current_noun=NOUN_TREE) then
-					print_offset:=look_trees_message
+					print_offset:=
+						common_dialog(look_trees_message)
 				else
-					print_offset:=look_irrelevant_message;
-
+					print_offset:=
+						common_dialog(look_irrelevant_message);
 				end;
 
 		VERB_MAP:	begin
@@ -701,17 +718,17 @@ begin
 				{TODO}
 
 				end
-				else print_offset:=map_message;
+				else print_offset:=common_dialog(map_message);
 
 				end;
 
-		VERB_PARTY:	print_offset:=party_message;
+		VERB_PARTY:	print_offset:=common_dialog(party_message);
 
 		VERB_PWD:	begin
 				{ TODO }
 				end;
 
-		VERB_QUIT:	print_offset:=quit_message;
+		VERB_QUIT:	print_offset:=common_dialog(quit_message);
 
 		VERB_SAVE:	begin
 				{ TODO }
@@ -721,15 +738,14 @@ begin
 				{ TODO }
 				end;
 
-		VERB_SNIFF:	print_offset:=smell_message;
+		{VERB_SNIFF:}
+		VERB_SMELL:	print_offset:=common_dialog(smell_message);
 
-		VERB_SMELL:	print_offset:=smell_message;
+		VERB_TALK:	print_offset:=common_dialog(talk_noone_message);
 
-		VERB_TALK:	print_offset:=talk_noone_message;
+		VERB_UNKNOWN:	print_offset:=common_dialog(unknown_message);
 
-		VERB_UNKNOWN:	print_offset:=unknown_message;
-
-		VERB_VERSION:	print_offset:=version_message;
+		VERB_VERSION:	print_offset:=common_dialog(version_message);
 
 		VERB_WEAR:	begin
 
@@ -741,26 +757,26 @@ begin
 				end
 				else if (current_noun = NOUN_BELT) then begin
 					if (inventory.KERREK_BELT) then begin
-						print_offset:=wear_belt_message;
+						print_offset:=common_dialog(wear_belt_message);
 					end;
 				end
 				else if (current_noun = NOUN_MASK) then begin
 					if (inventory.MONSTER_MASK) then begin
-						print_offset:=wear_mask_message;
+						print_offset:=common_dialog(wear_mask_message);
 					end;
 				end
 
 				end;
 
-		VERB_THIS:	print_offset:=what_message;
+		VERB_THIS:	print_offset:=common_dialog(what_message);
 
-		VERB_WHAT:	print_offset:=what_message;
+		VERB_WHAT:	print_offset:=common_dialog(what_message);
 
 		VERB_WHERE:	begin
 				{ TODO }
 				end;
 
-		VERB_WHY:	print_offset:=why_message;
+		VERB_WHY:	print_offset:=common_dialog(why_message);
 
 	end;
 
@@ -981,7 +997,7 @@ begin
 
 	{ decompress dialog }
 
-	decompress(dialog,@D_KNIGHT);
+	decompress(buffer_ptr(@dialog^[4096]),@D_KNIGHT);
 
 	{ decompress priority }
 
@@ -1226,10 +1242,9 @@ begin
 
 	GetMem(background,16384);
 	GetMem(framebuffer,16384);
-	GetMem(dialog,4096);
-	GetMem(common,4096);
+	GetMem(dialog,8192);		{ probably could be smaller }
 
-	decompress(common,@D_COMMON);
+	decompress(dialog,@D_COMMON);
 
 	{****************}
 	{ init variables }
