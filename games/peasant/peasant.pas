@@ -92,7 +92,6 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		'ATTACK', 'HUG', 'HIDE', 'MOVE',
 		'CUT', 'SAY', 'SLAY'
 	);
-	
 
 	type noun_type = (
 		NOUN_NONE, NOUN_ARCHER, NOUN_ARROW, NOUN_BABY,
@@ -162,7 +161,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		'QUIZ', 'ROCK', 'STONE', 'UNKNOWN'
 		);
 
-	type game_state_type = record 
+	type game_state_type = record
 		{ game state 0}
 		BABY_IN_WELL,
 		BUCKET_DOWN_WELL,
@@ -199,7 +198,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		GOT_RICHES : boolean;
 	end;
 
-	type inventory_type = record 
+	type inventory_type = record
 		{ Inventory 1}
 		ARROW,
 		BABY,
@@ -225,7 +224,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 	end;
 
 
-var 
+var
 	dialog,common,background,framebuffer:buffer_ptr;
 
 	screen:screentype absolute $B800:0000;
@@ -248,7 +247,6 @@ var
 	current_verb: verb_type;
 	current_noun: noun_type;
 
-	
 
 
 {=====================================}
@@ -264,7 +262,7 @@ begin
 	Rectangle(0,190,320,200,0,@screen);
 
 	input_x:=0;
-	PrintCharXor('>',input_x,24);	
+	PrintCharXor('>',input_x,24);
 	input_x:=2;
 end;
 
@@ -342,7 +340,7 @@ begin
 	{ Y2 = 24+ 10*message_lines, originally 70? }
 	y2:=24+16+8*message_lines;
 
-	Rectangle(40,24,280,y2,255,@screen);	
+	Rectangle(40,24,280,y2,255,@screen);
 	Hline(44,276,28,$AA,@screen);
 	Hline(44,276,y2-4,$AA,@screen);
 	Vline(28,y2-2,44,$EB,@screen);
@@ -587,7 +585,7 @@ begin
 		VERB_CHEAT:	print_offset:=cheat_message;
 
 		VERB_CLIMB:	begin
-				
+
 				if (current_noun=NOUN_TREE) then begin
 					if (game_state.night) then begin
 						print_offset:=climb_tree_night_message;
@@ -603,7 +601,7 @@ begin
 				end;
 
 		VERB_DANCE:	print_offset:=dance_message;
-		
+
 		VERB_DIE:	begin
 				{ TODO }
 				end;
@@ -616,7 +614,7 @@ begin
 					if (inventory.baby = true) and
 						(inventory_gone.baby = false)
 						then begin
-						
+
 						print_offset:=ditch_baby_message;
 					end
 					else begin
@@ -625,7 +623,7 @@ begin
 
 
 				end;
-			
+
 				end;
 
 		VERB_DRINK:	begin
@@ -645,7 +643,7 @@ begin
 					if (inventory.baby = true) and
 						(inventory_gone.baby = false)
 						then begin
-						
+
 						print_offset:=throw_baby_yes_message;
 					end
 					else begin
@@ -808,9 +806,9 @@ begin
 
 	{ enter }
 	else if (ch=chr(13)) then begin
-		
+
 		stop_peasant;
-		
+
 		parse_input;
 
 		reset_prompt;
@@ -825,7 +823,7 @@ begin
 			input_x:=input_x+1;
 		end
 	end;
-	
+
 end;
 
 
@@ -855,7 +853,7 @@ begin
 				{ if already moving right, stop}
 				if peasant_xadd = 1 then begin
 					peasant_xadd:=0;
-					peasant_yadd:=0;		
+					peasant_yadd:=0;
 				end
 				{ not moving right, start moving right}
 				else begin
@@ -872,7 +870,7 @@ begin
 				{ if already moving left, stop}
 				if peasant_xadd = -1 then begin
 					peasant_xadd:=0;
-					peasant_yadd:=0;		
+					peasant_yadd:=0;
 				end
 				{ not moving left, start moving left}
 				else begin
@@ -889,7 +887,7 @@ begin
 				{ if already moving up, stop}
 				if peasant_yadd = -1 then begin
 					peasant_xadd:=0;
-					peasant_yadd:=0;		
+					peasant_yadd:=0;
 				end
 				{ not moving up, start moving up}
 				else begin
@@ -906,7 +904,7 @@ begin
 				{ if already moving down, stop}
 				if peasant_yadd = 1 then begin
 					peasant_xadd:=0;
-					peasant_yadd:=0;		
+					peasant_yadd:=0;
 				end
 				{ not moving down, start moving down}
 				else begin
@@ -948,8 +946,6 @@ begin
 		peasant_x:=peasant_x+peasant_xadd;
 		peasant_y:=peasant_y+peasant_yadd;
 	end;
-
-	
 end;
 
 
@@ -1001,7 +997,7 @@ begin
 	PrintStringXor('Peasant''s Quest',25,0);
 
 	reset_prompt;
-	
+
 	{ move knight }
 
 	visited_1:=visited_1 or 16;	{ MAP_MOUNTAIN_PASS}
@@ -1038,7 +1034,7 @@ begin
 
 		wait_vsync;
 
-		{ page  flip }		
+		{ page  flip }
 
 	end;
 
