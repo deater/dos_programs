@@ -86,6 +86,9 @@ int main(int argc, char **argv) {
 	int directory_offset=12;
 	int offset;
 
+	char **filenames;
+	char **names;
+
 	unsigned char header[12];
 
 	while ( (c=getopt(argc, argv, "hvo:") ) != -1) {
@@ -115,6 +118,9 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+	/* get number of lumps */
+	lumps=argc-optind;
+
 	/* setup header */
 	header[0]='P';
 	header[1]='W';
@@ -135,12 +141,6 @@ int main(int argc, char **argv) {
 
 	/* write header */
 	write(fd_out,header,12);
-
-	/* get number of lumps */
-	lumps=argc-optind;
-
-	char **filenames;
-	char **names;
 
 	/* allocate memory for filenames list */
 	filenames=calloc(lumps,sizeof(char *));

@@ -24,18 +24,14 @@ TEST.EXE:	test.pas
 
 PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
-	graphics/PQ_INN.PAS \
-	graphics/PQ_KER1.PAS graphics/PQ_KNGHT.PAS graphics/PQ_YTREE.PAS \
 	sprites/s_walk.pas
 	cp peasant.pas zx02.pas cga.pas $(TPDIR)
 	cp wad_load.pas $(TPDIR)
+	cp lknight.pas $(TPDIR)
 	cp test2.pas $(TPDIR)
 	cp graphics/PQ_VID.PAS $(TPDIR)
 	cp graphics/PQ_TITLE.PAS $(TPDIR)
 	cp graphics/PQ_TIPS.PAS $(TPDIR)
-	cp graphics/PQ_INN.PAS $(TPDIR)
-	cp graphics/PQ_KER1.PAS $(TPDIR)
-	cp graphics/PQ_YTREE.PAS $(TPDIR)
 	cp graphics/PEASANT.WAD $(TPDIR)
 	cp sprites/s_walk.pas $(TPDIR)
 	cp text/dialog_t.pas $(TPDIR)
@@ -45,6 +41,11 @@ PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	cp text/O_COMMON.PAS $(TPDIR)
 	dosbox -conf build.conf
 	cp $(TPDIR)/PEASANT.EXE .
+
+#	cp graphics/PQ_INN.PAS $(TPDIR)
+#	cp graphics/PQ_KER1.PAS $(TPDIR)
+#	cp graphics/PQ_YTREE.PAS $(TPDIR)
+
 
 ###
 

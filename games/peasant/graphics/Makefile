@@ -12,9 +12,11 @@ all:	PEASANT.WAD \
 
 ####
 
-PEASANT.WAD:	pq_knight.zx02
+PEASANT.WAD:	\
+	pq_knight.zx02 ../text/D_KNIGHT.ZX2
 	$(MKWAD) -o PEASANT.WAD \
-		pq_knight.zx02,GKNIGHT
+		pq_knight.zx02,GKNIGHT \
+		../text/D_KNIGHT.ZX2,DKNIGHT
 
 ####
 
@@ -125,4 +127,4 @@ pq_rock.cga:	pq_rock.png
 
 
 clean:	
-	rm -f *.PAS
+	rm -f *.PAS *.WAD

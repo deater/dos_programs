@@ -31,6 +31,8 @@ begin
 
 	writeln;
 
+	wad_load(file_buffer,'DKNIGHT');
+
 (*
 	while(true) do begin
 
