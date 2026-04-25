@@ -47,6 +47,45 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 );
 
+	type map_locations = (
+		LOCATION_POOR_GARY,		{ 0 }
+		LOCATION_KERREK_1,		{ 1 }
+		LOCATION_OLD_WELL,		{ 2 }
+		LOCATION_YELLOW_TREE,		{ 3 }
+		LOCATION_WATERFALL,		{ 4 }
+		LOCATION_HAY_BALE,		{ 5 }
+		LOCATION_MUD_PUDDLE,		{ 6 }
+		LOCATION_ARCHERY,		{ 7 }
+		LOCATION_RIVER_STONE,		{ 8 }
+		LOCATION_MOUNTAIN_PASS,		{ 9 }
+		LOCATION_JHONKA_CAVE,		{ 10 }
+		LOCATION_YOUR_COTTAGE,		{ 11 }
+		LOCATION_LAKE_WEST,		{ 12 }
+		LOCATION_LAKE_EAST,		{ 13 }
+		LOCATION_OUTSIDE_INN,		{ 14 }
+		LOCATION_OUTSIDE_NN,		{ 15 }
+		LOCATION_WAVY_TREE,		{ 16 }
+		LOCATION_KERREK_2,		{ 17 }
+		LOCATION_OUTSIDE_LADY,		{ 18 }
+		LOCATION_BURN_TREES,		{ 19 }
+		LOCATION_CLIFF_BASE,		{ 20 }
+		LOCATION_CLIFF_HEIGHTS,		{ 21 }
+		LOCATION_TROGDOR_OUTER,		{ 22 }
+		LOCATION_TROGDOR_LAIR,		{ 23 }
+		LOCATION_HIDDEN_GLEN,		{ 24 }
+		LOCATION_INSIDE_LADY,		{ 25 }
+		LOCATION_INSIDE_NN,		{ 26 }
+		LOCATION_INSIDE_INN,		{ 27 }
+		LOCATION_ARCHERY_GAME,		{ 28 }
+		LOCATION_MAP,			{ 29 }
+		LOCATION_CLIMB,			{ 30 }
+		LOCATION_TROGDOR_OUTER2,	{ 31 }
+		LOCATION_TROGDOR_OUTER3,	{ 32 }
+		LOCATION_INSIDE_INN_NIGHT,	{ 33 }
+		LOCATION_EMPTY			{ 34 }
+	);
+
+
 	type verb_type = (
 		VERB_UNKNOWN, VERB_ASK, VERB_BOO, VERB_BREAK,
 		VERB_BUY, VERB_CHEAT, VERB_CLIMB, VERB_CLOSE,
@@ -241,6 +280,8 @@ var
 	game_state: game_state_type;
 
 	inventory,inventory_gone: inventory_type;
+
+	map_location : map_locations;
 
 	print_offset : word;
 
@@ -1331,6 +1372,8 @@ begin
 
 	init_game_state;
 	init_inventory;
+
+	map_location:=LOCATION_MOUNTAIN_PASS;
 
 	do_knight(0);
 
