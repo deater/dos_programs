@@ -3,6 +3,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 /* usage: mkwad -o output_file filename,WADNAME */
 
@@ -52,6 +53,9 @@ static int write_directory(int fd, int *out_offset,char *filename, char *name) {
 	write(fd,buffer,16);
 
 	*out_offset+=our_stat.st_size;
+
+	fprintf(stderr,"Adding %s as %s, size: %ld\n",
+			filename,name,our_stat.st_size);
 
 	return 0;
 }
@@ -132,17 +136,45 @@ int main(int argc, char **argv) {
 	/* write header */
 	write(fd_out,header,12);
 
+	/* get number of lumps */
+	lumps=argc-optind;
+
+	char **filenames;
+	char **names;
+
+	/* allocate memory for filenames list */
+	filenames=calloc(lumps,sizeof(char *));
+	if (filenames==NULL) {
+		fprintf(stderr,"Memory error!\n");
+		return -1;
+	}
+
+	/* allocate memory for names list */
+	names=calloc(lumps,sizeof(char *));
+	if (names==NULL) {
+		fprintf(stderr,"Memory error!\n");
+		return -1;
+	}
+
+	int j=0;
+	for(i=optind;i<argc;i++) {
+		filenames[j]=strdup(strtok(argv[i],","));
+		names[j]=strdup(strtok(NULL,""));
+//		fprintf(stderr,"%d: %s %s\n",j,filenames[j],names[j]);
+		j++;
+	}
+
 	/* point past directory */
 	offset=12+(lumps*16);
 
 	/* write directory */
 	for(i=0;i<lumps;i++) {
-		write_directory(fd_out,&offset,"Makefile","MAKE");
+		write_directory(fd_out,&offset,filenames[i],names[i]);
 	}
 
 	/* write file */
 	for(i=0;i<lumps;i++) {
-		write_file(fd_out,"Makefile");
+		write_file(fd_out,filenames[i]);
 	}
 
 	close(fd_out);
