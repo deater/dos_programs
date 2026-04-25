@@ -2,14 +2,36 @@ program test2;
 
 uses crt;
 
-var 
+type
+        buffer = Array [0..16383] of byte;
+        buffer_ptr = ^buffer;
+
+var
 	input_buffer  : string;
 	ch,ch2 : char;
 
+	i : integer;
+
+	file_buffer : buffer_ptr;
+
+{$I wad_load.pas}
+
 begin
+	GetMem(file_buffer,4096);
 
+	writeln('Testing loading GNKIGHT from WAD');
 
+	wad_load(file_buffer,'GKNIGHT');
 
+	writeln('after load');
+
+	for i:=0 to 128 do begin
+		write(file_buffer^[i],',');
+	end;
+
+	writeln;
+
+(*
 	while(true) do begin
 
 		repeat until keypressed;
@@ -29,8 +51,8 @@ begin
 		end;
 
 		writeln('buffer: ',Length(input_buffer),' ',input_buffer);
-		
 
 	end;
+*)
 
 end.

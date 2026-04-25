@@ -10,7 +10,7 @@ syntax "turbo_pascal" "\.(pas|PAS)$"
 # Types (case insensitive)
 icolor green "\<(absolute|const|label|type|var|packed)\>"
 icolor green "\<(array|set|file|record|object|packed)\>"
-icolor green "\<(shortint|intger|longint|byte|word)\>"
+icolor green "\<(shortint|integer|longint|byte|word)\>"
 icolor green "\<(boolean|char|string)\>"
 icolor green "\<(procedure|function)\>"
 icolor green "\<(real|single|double|extended|comp)\>"

@@ -7,7 +7,6 @@ uses crt,zx02,cga;
 {$I pq_title.pas}
 {$I pq_tips.pas}
 
-{$I pq_knght.pas}
 {$I d_knight.pas}
 {$I o_knight.pas}
 
@@ -15,6 +14,7 @@ uses crt,zx02,cga;
 {$I pq_ker1.pas}
 {$I pq_ytree.pas}
 {$I pq_inn.pas}
+{$I pq_knght.pas}
 *)
 
 {$I s_walk.pas}
@@ -264,7 +264,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 
 var
-	dialog,background,framebuffer:buffer_ptr;
+	file_buffer,dialog,background,framebuffer:buffer_ptr;
 
 	screen:screentype absolute $B800:0000;
 	level_over,frame,flame_count:byte;
@@ -1093,6 +1093,7 @@ begin
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],@screen);}
 end;
 
+{$I wad_load.pas}
 
 {************************************}
 { do_knight                          }
@@ -1115,7 +1116,8 @@ begin
 
 	{ load bg }
 
-	decompress(background,@PQ_KNIGHT);
+	wad_load(file_buffer,'GKNIGHT');
+	decompress(background,file_buffer);
 
 	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
 
@@ -1355,6 +1357,7 @@ begin
 	GetMem(background,16384);
 	GetMem(framebuffer,16384);
 	GetMem(dialog,8192);		{ probably could be smaller }
+	GetMem(file_buffer,4096);
 
 	decompress(dialog,@D_COMMON);
 

@@ -10,6 +10,7 @@ all:	peasant.img
 peasant.img:	PEASANT.EXE
 	cp ../../disk_images/freedos.boot.disk.360K.img peasant.img
 	mcopy -i peasant.img PEASANT.EXE ::PEASANT.EXE
+	mcopy -i peasant.img graphics/PEASANT.WAD ::PEASANT.WAD
 
 
 ###
@@ -27,14 +28,15 @@ PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	graphics/PQ_KER1.PAS graphics/PQ_KNGHT.PAS graphics/PQ_YTREE.PAS \
 	sprites/s_walk.pas
 	cp peasant.pas zx02.pas cga.pas $(TPDIR)
+	cp wad_load.pas $(TPDIR)
 	cp test2.pas $(TPDIR)
 	cp graphics/PQ_VID.PAS $(TPDIR)
 	cp graphics/PQ_TITLE.PAS $(TPDIR)
 	cp graphics/PQ_TIPS.PAS $(TPDIR)
 	cp graphics/PQ_INN.PAS $(TPDIR)
 	cp graphics/PQ_KER1.PAS $(TPDIR)
-	cp graphics/PQ_KNGHT.PAS $(TPDIR)
 	cp graphics/PQ_YTREE.PAS $(TPDIR)
+	cp graphics/PEASANT.WAD $(TPDIR)
 	cp sprites/s_walk.pas $(TPDIR)
 	cp text/dialog_t.pas $(TPDIR)
 	cp text/D_KNIGHT.PAS $(TPDIR)

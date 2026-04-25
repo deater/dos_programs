@@ -1,12 +1,20 @@
 PNG2CGA = ../../../utils/cga-utils/png2cga
 ZX02 = ~/research/6502_compression/zx02.git/build/zx02
 BIN2PAS = ../../../utils/pas-utils/bin2pas
+MKWAD = ../../../utils/disk-utils/mkwad
 
+all:	PEASANT.WAD \
+	PQ_VID.PAS PQ_TITLE.PAS PQ_TIPS.PAS
+\
+#	PQ_WFALL.PAS PQ_KNGHT.PAS PQ_INN.PAS \
+#	PQ_YTREE.PAS PQ_ROCK.PAS \
+#	PQ_KER1.PAS PQ_TIPS.PAS
 
-all:	PQ_VID.PAS PQ_TITLE.PAS \
-	PQ_WFALL.PAS PQ_KNGHT.PAS PQ_INN.PAS \
-	PQ_YTREE.PAS PQ_ROCK.PAS \
-	PQ_KER1.PAS PQ_TIPS.PAS
+####
+
+PEASANT.WAD:	pq_knight.zx02
+	$(MKWAD) -o PEASANT.WAD \
+		pq_knight.zx02,GKNIGHT
 
 ####
 
