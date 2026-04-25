@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 /* usage: mkwad -o output_file filename,WADNAME */
 
@@ -14,12 +15,72 @@ static void print_help(char *exe_name,int print_version) {
 	printf("usage: %s -o output_file filename,WADNAME ...\n",exe_name);
 }
 
+/* directory format: 4 byte offset, 4-byte length, 8-byte name */
+static int write_directory(int fd, int *out_offset,char *filename, char *name) {
+
+	unsigned char buffer[16];
+
+	int i;
+	int offset=*out_offset;
+	int size=0;
+	int len=strlen(name);
+	struct stat our_stat;
+
+	if (stat(filename,&our_stat)<0) {
+		fprintf(stderr,"Error statting %s\n",filename);
+		return -1;
+	}
+
+	size=our_stat.st_size;
+
+	if (len>8) len=8;
+
+	buffer[0]=(offset&0xff);
+	buffer[1]=((offset>>8)&0xff);
+	buffer[2]=((offset>>16)&0xff);
+	buffer[3]=((offset>>24)&0xff);
+
+	buffer[4]=(size&0xff);
+	buffer[5]=((size>>8)&0xff);
+	buffer[6]=((size>>16)&0xff);
+	buffer[7]=((size>>24)&0xff);
+
+	for(i=0;i<8;i++) buffer[8+i]=0;
+
+	for(i=0;i<len;i++) buffer[8+i]=name[i];
+
+	write(fd,buffer,16);
+
+	*out_offset+=our_stat.st_size;
+
+	return 0;
+}
+
+static int write_file(int fd, char *filename) {
+
+	int fd_in,result;
+	char buffer[1024];
+
+	fd_in=open(filename,O_RDONLY);
+	if (fd_in<0) {
+		fprintf(stderr,"Error reading file %s\n",filename);
+		return -1;
+	}
+
+	while((result=read(fd_in,buffer,1024))) {
+		write(fd,buffer,result);
+	}
+	return 0;
+}
+
 int main(int argc, char **argv) {
 
-	int fd_in,fd_out;
+	int i;
+	int fd_out;
 	char *out_name=NULL;
 	int c,lumps=1;
 	int directory_offset=12;
+	int offset;
 
 	unsigned char header[12];
 
@@ -71,7 +132,22 @@ int main(int argc, char **argv) {
 	/* write header */
 	write(fd_out,header,12);
 
+	/* point past directory */
+	offset=12+(lumps*16);
+
+	/* write directory */
+	for(i=0;i<lumps;i++) {
+		write_directory(fd_out,&offset,"Makefile","MAKE");
+	}
+
+	/* write file */
+	for(i=0;i<lumps;i++) {
+		write_file(fd_out,"Makefile");
+	}
+
 	close(fd_out);
+
+
 
 	return 0;
 

@@ -16,5 +16,5 @@ mkwad.o:		mkwad.c
 #	cp pcx2cga mkwad cga2png $(INSTALL_LOC)
 
 clean:		
-	rm -f *~ *.o pcx2cga mkwad
+	rm -f *~ *.o mkwad
 
