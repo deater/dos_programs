@@ -125,7 +125,7 @@ Procedure do_knight(mode: byte);
 label done_knight;
 
 begin
-	level_over:=0;
+	level_over:=LEVEL_NOT_OVER;
 	frame:=0;
 	flame_count:=0;
 
@@ -154,7 +154,7 @@ begin
 
 	visited_1:=visited_1 or 16;	{ MAP_MOUNTAIN_PASS}
 
-	while(true) do begin
+	while(level_over=LEVEL_NOT_OVER) do begin
 
 		{ check_keyboard }
 
@@ -168,7 +168,7 @@ begin
 
 		move_peasant;
 
-		if level_over <> 0 then goto done_knight;
+		if level_over <> LEVEL_NOT_OVER then goto done_knight;
 
 		{ update screen }
 
