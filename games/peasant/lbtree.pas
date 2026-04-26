@@ -11,25 +11,91 @@ begin
 	VERB_CLIMB:
 		if current_noun=NOUN_CLIFF then
 			print_offset:=
-				waterfall_dialog(waterfall_climb_cliff_message);
+				burninated_tree_dialog(crooked_tree_climb_cliff_message);
+
+
+	VERB_GET: begin
+		if (current_noun=NOUN_FIRE) and (game_state.NIGHT) then begin
+			{ only at night }
+			if (game_state.ON_FIRE) then begin
+				{ already on fire }
+				print_offset:=
+					burninated_tree_dialog(
+					crooked_tree_get_fire_already_message);
+			end
+			else begin
+				{ not on fire yet }
+				if (game_state.GREASE_ON_HEAD) then
+				print_offset:=
+					burninated_tree_dialog(
+					crooked_tree_get_fire_greased_message)
+				else
+				print_offset:=
+					burninated_tree_dialog(
+					crooked_tree_get_fire_not_greased_message);
+
+			end;
+
+
+		end; { VERB_GET NOUN_FIRE }
+
+		if (current_noun=NOUN_LANTERN) then
+			print_offset:=
+				burninated_tree_dialog(
+					crooked_tree_get_lantern_message);
+
+		if (current_noun=NOUN_PLAGUE) then
+			print_offset:=
+				burninated_tree_dialog(
+					crooked_tree_get_plague_message);
+
+		if (current_noun=NOUN_PLAQUE) then
+			print_offset:=
+				burninated_tree_dialog(
+					crooked_tree_get_plaque_message);
+
+		end; {VERB GET}
+
+	VERB_LIGHT: begin
+		if (current_noun=NOUN_LANTERN) then begin
+
+			if (game_state.NIGHT) then
+				print_offset:=
+					burninated_tree_dialog(
+					crooked_tree_light_lantern_night_message)
+			else
+				print_offset:=
+					burninated_tree_dialog(
+					crooked_tree_light_lantern_day_message);
+		end;
+
+		end; { VERB_LIGHT }
 
 	VERB_LOOK:	begin
 
+		if (current_noun=NOUN_LANTERN) then
+			if (game_state.NIGHT) then
+				print_offset:=burninated_tree_dialog(
+					crooked_look_lantern_night_message)
+			else
+				print_offset:=burninated_tree_dialog(
+					crooked_look_lantern_day_message);
+
+		if (current_noun=NOUN_STUMP) then
+			print_offset:=burninated_tree_dialog(
+				crooked_look_stump_message);
 		if (current_noun=NOUN_TREE) then
-			print_offset:=waterfall_dialog(waterfall_look_tree_message);
-		if (current_noun=NOUN_WATERFALL) then
-			print_offset:=waterfall_dialog(waterfall_look_waterfall_message);
+			print_offset:=burninated_tree_dialog(
+				crooked_look_tree_message);
 		if (current_noun=NOUN_NONE) then
-			print_offset:=waterfall_dialog(waterfall_look_at_message);
+			if (game_state.NIGHT) then
+				print_offset:=burninated_tree_dialog(
+					crooked_look_night_message)
+			else
+				print_offset:=burninated_tree_dialog(
+					crooked_look_day_message);
 
 		end; {verb_look}
-
-	VERB_SWIM:
-		if (current_noun=NOUN_WATER) or
-			(current_noun=NOUN_WATERFALL) or
-			(current_noun=NOUN_NONE) then
-			print_offset:=
-				waterfall_dialog(waterfall_swim_message);
 
 	end; {case verb}
 
@@ -51,7 +117,7 @@ begin
 
 	{ decompress dialog }
 
-	wad_load(file_buffer,'DWFALL');
+	wad_load(file_buffer,'DBTREE');
 	decompress(buffer_ptr(@dialog^[4096]),file_buffer);
 
 	{ decompress priority }

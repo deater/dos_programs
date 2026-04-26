@@ -43,6 +43,7 @@ PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	cp text/O_ROCK.PAS $(TPDIR)
 	cp text/O_KNIGHT.PAS $(TPDIR)
 	cp text/O_INN.PAS $(TPDIR)
+	cp text/O_BTREE.PAS $(TPDIR)
 	cp text/D_COMMON.PAS $(TPDIR)
 	cp text/O_COMMON.PAS $(TPDIR)
 	dosbox -conf build.conf

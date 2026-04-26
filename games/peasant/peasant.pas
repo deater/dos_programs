@@ -23,6 +23,7 @@ Procedure burn_tree_actions; forward;
 {$I o_rock.pas}
 {$I o_knight.pas}
 {$I o_inn.pas}
+{$I o_btree.pas}
 
 {$I s_walk.pas}
 
@@ -631,7 +632,7 @@ begin
 		LOCATION_WAVY_TREE:		knight_actions;
 		LOCATION_KERREK_2:		knight_actions;
 		LOCATION_OUTSIDE_LADY:		knight_actions;
-		LOCATION_BURN_TREES:		knight_actions;
+		LOCATION_BURN_TREES:		burn_tree_actions;
 		LOCATION_CLIFF_BASE:		knight_actions;
 		LOCATION_CLIFF_HEIGHTS:		knight_actions;
 		LOCATION_TROGDOR_OUTER:		knight_actions;
