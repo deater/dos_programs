@@ -14,6 +14,7 @@ Procedure east_lake_actions; forward;
 Procedure river_actions; forward;
 Procedure knight_actions; forward;
 Procedure outside_inn_actions; forward;
+Procedure outside_lady_actions; forward;
 Procedure burn_tree_actions; forward;
 
 
@@ -1364,6 +1365,7 @@ end;
 {$I lknight.pas}
 {$I lelake.pas}
 {$I linn.pas}
+{$I lolady.pas}
 {$I lbtree.pas}
 
 
@@ -1598,7 +1600,7 @@ begin
 		LOCATION_OUTSIDE_NN:		do_knight;
 		LOCATION_WAVY_TREE:		do_knight;
 		LOCATION_KERREK_2:		do_knight;
-		LOCATION_OUTSIDE_LADY:		do_knight;
+		LOCATION_OUTSIDE_LADY:		do_outside_lady;
 		LOCATION_BURN_TREES:		do_burn_tree;
 		LOCATION_CLIFF_BASE:		do_knight;
 		LOCATION_CLIFF_HEIGHTS:		do_knight;
