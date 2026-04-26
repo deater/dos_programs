@@ -17,9 +17,9 @@ Procedure outside_inn_actions; forward;
 Procedure burn_tree_actions; forward;
 
 
-{$I o_knight.pas}
 {$I o_wfall.pas}
-
+{$I o_knight.pas}
+{$I o_inn.pas}
 
 {$I s_walk.pas}
 
@@ -623,7 +623,7 @@ begin
 		LOCATION_YOUR_COTTAGE:		knight_actions;
 		LOCATION_LAKE_WEST:		knight_actions;
 		LOCATION_LAKE_EAST:		knight_actions;
-		LOCATION_OUTSIDE_INN:		knight_actions;
+		LOCATION_OUTSIDE_INN:		outside_inn_actions;
 		LOCATION_OUTSIDE_NN:		knight_actions;
 		LOCATION_WAVY_TREE:		knight_actions;
 		LOCATION_KERREK_2:		knight_actions;

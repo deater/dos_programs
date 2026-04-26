@@ -113,6 +113,8 @@ void parse_line(char *string) {
 
 	len=strlen(string);
 
+	if (string[0]==';') return;
+
 	/* if line ends in : then label */
 	/* want to grab it and offset */
 	if ( (strstr(string,":")) && (!strstr(string,"\""))) {
@@ -133,8 +135,6 @@ void parse_line(char *string) {
 		num_offsets++;
 		return;
 	}
-
-	if (string[0]==';') return;
 
 	for(i=0;i<len;i++) {
 

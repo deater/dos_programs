@@ -38,8 +38,9 @@ PEASANT.EXE:	peasant.pas zx02.pas cga.pas \
 	cp graphics/PEASANT.WAD $(TPDIR)
 	cp sprites/s_walk.pas $(TPDIR)
 	cp text/dialog_t.pas $(TPDIR)
-	cp text/O_KNIGHT.PAS $(TPDIR)
 	cp text/O_WFALL.PAS $(TPDIR)
+	cp text/O_KNIGHT.PAS $(TPDIR)
+	cp text/O_INN.PAS $(TPDIR)
 	cp text/D_COMMON.PAS $(TPDIR)
 	cp text/O_COMMON.PAS $(TPDIR)
 	dosbox -conf build.conf

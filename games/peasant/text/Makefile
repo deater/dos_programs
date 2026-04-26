@@ -6,8 +6,9 @@ CC = gcc
 CFLAGS = -O2 -Wall -g
 
 all:	shrink_text \
-	D_KNIGHT.PAS O_KNIGHT.PAS \
 	D_WFALL.PAS  O_WFALL.PAS \
+	D_KNIGHT.PAS O_KNIGHT.PAS \
+	D_INN.PAS O_INN.PAS \
 	D_COMMON.PAS O_COMMON.PAS
 
 
@@ -49,6 +50,20 @@ all:	shrink_text \
 
 ####
 
+O_WFALL.PAS:	dialog_waterfall.raw
+
+D_WFALL.PAS:	D_WFALL.ZX2
+	$(BIN2PAS) -l D_WFALL D_WFALL.ZX2 > D_WFALL.PAS
+
+D_WFALL.ZX2:	dialog_waterfall.raw
+	$(ZX02) -f  dialog_waterfall.raw D_WFALL.ZX2
+
+dialog_waterfall.raw:	falls.inc
+	./shrink_text dialog_waterfall.raw O_WFALL.PAS waterfall < falls.inc
+
+
+####
+
 O_KNIGHT.PAS:	dialog_knight.raw
 
 D_KNIGHT.PAS:	D_KNIGHT.ZX2
@@ -62,16 +77,18 @@ dialog_knight.raw:	knight.inc
 
 ####
 
-O_WFALL.PAS:	dialog_waterfall.raw
+O_INN.PAS:	dialog_inn.raw
 
-D_WFALL.PAS:	D_WFALL.ZX2
-	$(BIN2PAS) -l D_WFALL D_WFALL.ZX2 > D_WFALL.PAS
+D_INN.PAS:	D_INN.ZX2
+	$(BIN2PAS) -l D_INN D_INN.ZX2 > D_INN.PAS
 
-D_WFALL.ZX2:	dialog_waterfall.raw
-	$(ZX02) -f  dialog_waterfall.raw D_WFALL.ZX2
+D_INN.ZX2:	dialog_inn.raw
+	$(ZX02) -f  dialog_inn.raw D_INN.ZX2
 
-dialog_waterfall.raw:	falls.inc
-	./shrink_text dialog_waterfall.raw O_WFALL.PAS waterfall < falls.inc
+dialog_inn.raw:	outside_inn.inc
+	./shrink_text dialog_inn.raw O_INN.PAS outside_inn < outside_inn.inc
+
+
 
 
 ####

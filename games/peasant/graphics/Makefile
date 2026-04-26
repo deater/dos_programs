@@ -18,7 +18,7 @@ PEASANT.WAD:	\
 	pq_rock.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 \
 	pq_e_lake.zx02 \
-	pq_inn.zx02 \
+	pq_inn.zx02 ../text/D_INN.ZX2 \
 	pq_btree.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE \
@@ -26,7 +26,7 @@ PEASANT.WAD:	\
 		pq_rock.zx02,GROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		pq_e_lake.zx02,GELAKE \
-		pq_inn.zx02,GINN \
+		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
 		pq_btree.zx02,GBTREE
 
 
