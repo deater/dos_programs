@@ -14,6 +14,7 @@ Procedure east_lake_actions; forward;
 Procedure river_actions; forward;
 Procedure knight_actions; forward;
 Procedure outside_inn_actions; forward;
+Procedure burn_tree_actions; forward;
 
 
 {$I o_knight.pas}
@@ -1363,6 +1364,7 @@ end;
 {$I lknight.pas}
 {$I lelake.pas}
 {$I linn.pas}
+{$I lbtree.pas}
 
 
 {************************************}
@@ -1547,7 +1549,7 @@ begin
 	GetMem(background,16384);
 	GetMem(framebuffer,16384);
 	GetMem(dialog,8192);		{ probably could be smaller }
-	GetMem(file_buffer,4096);
+	GetMem(file_buffer,5*1024);	{ 4k is slightly to small }
 
 	decompress(dialog,@D_COMMON);
 
@@ -1597,7 +1599,7 @@ begin
 		LOCATION_WAVY_TREE:		do_knight;
 		LOCATION_KERREK_2:		do_knight;
 		LOCATION_OUTSIDE_LADY:		do_knight;
-		LOCATION_BURN_TREES:		do_knight;
+		LOCATION_BURN_TREES:		do_burn_tree;
 		LOCATION_CLIFF_BASE:		do_knight;
 		LOCATION_CLIFF_HEIGHTS:		do_knight;
 		LOCATION_TROGDOR_OUTER:		do_knight;

@@ -18,14 +18,16 @@ PEASANT.WAD:	\
 	pq_rock.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 \
 	pq_e_lake.zx02 \
-	pq_inn.zx02
+	pq_inn.zx02 \
+	pq_btree.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		pq_rock.zx02,GROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		pq_e_lake.zx02,GELAKE \
-		pq_inn.zx02,GINN
+		pq_inn.zx02,GINN \
+		pq_btree.zx02,GBTREE
 
 
 
@@ -136,6 +138,20 @@ pq_inn.cga:	pq_inn.png
 
 #################################################
 #################################################
+
+
+PQ_BTREE.PAS:	pq_btree.zx02
+	$(BIN2PAS) -l PQ_BTREE pq_btree.zx02 > PQ_BTREE.PAS
+
+pq_btree.zx02:	pq_btree.cga
+	$(ZX02) -f pq_btree.cga pq_btree.zx02
+
+pq_btree.cga:	pq_burntree.png
+	$(PNG2CGA) -r ./pq_burntree.png > pq_btree.cga
+
+
+
+#####
 
 PQ_KER1.PAS:	pq_ker1.zx02
 	$(BIN2PAS) -l PQ_KERREK1 pq_ker1.zx02 > PQ_KER1.PAS
