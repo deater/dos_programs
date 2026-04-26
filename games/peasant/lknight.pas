@@ -1,5 +1,5 @@
 	{=====================================}
-	{ KNIGHT ACTIONS
+	{ KNIGHT ACTIONS                      }
 	{=====================================}
 
 Procedure knight_actions;

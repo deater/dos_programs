@@ -17,13 +17,15 @@ PEASANT.WAD:	\
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2 \
 	pq_rock.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 \
+	pq_e_lake.zx02 \
 	pq_inn.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		pq_rock.zx02,GROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
-		pq_inn.zx02,GKNIGHT
+		pq_e_lake.zx02,GELAKE \
+		pq_inn.zx02,GINN
 
 
 
@@ -61,8 +63,66 @@ pq_tips.zx02:	pq_tips.cga
 pq_tips.cga:	pq_tips.png
 	$(PNG2CGA) -r ./pq_tips.png > pq_tips.cga
 
+#################################################
+#################################################
+
+PQ_YTREE.PAS:	pq_ytree.zx02
+	$(BIN2PAS) -l PQ_YTREE pq_ytree.zx02 > PQ_YTREE.PAS
+
+pq_ytree.zx02:	pq_ytree.cga
+	$(ZX02) -f pq_ytree.cga pq_ytree.zx02
+
+pq_ytree.cga:	pq_ytree.png
+	$(PNG2CGA) -r ./pq_ytree.png > pq_ytree.cga
 
 ####
+
+PQ_WFALL.PAS:	pq_waterfall.zx02
+	$(BIN2PAS) -l PQ_WFALL pq_waterfall.zx02 > PQ_WFALL.PAS
+
+pq_waterfall.zx02:	pq_waterfall.cga
+	$(ZX02) -f pq_waterfall.cga pq_waterfall.zx02
+
+pq_waterfall.cga:	pq_waterfall.png
+	$(PNG2CGA) -r ./pq_waterfall.png > pq_waterfall.cga
+
+
+#################################################
+#################################################
+
+PQ_ROCK.PAS:	pq_rock.zx02
+	$(BIN2PAS) -l PQ_ROCK pq_rock.zx02 > PQ_ROCK.PAS
+
+pq_rock.zx02:	pq_rock.cga
+	$(ZX02) -f pq_rock.cga pq_rock.zx02
+
+pq_rock.cga:	pq_rock.png
+	$(PNG2CGA) -r ./pq_rock.png > pq_rock.cga
+
+###
+
+PQ_KNGHT.PAS:	pq_knight.zx02
+	$(BIN2PAS) -l PQ_KNIGHT pq_knight.zx02 > PQ_KNGHT.PAS
+
+pq_knight.zx02:	pq_knight.cga
+	$(ZX02) -f pq_knight.cga pq_knight.zx02
+
+pq_knight.cga:	pq_knight.png
+	$(PNG2CGA) -r ./pq_knight.png > pq_knight.cga
+
+#################################################
+#################################################
+
+PQ_ELAKE.PAS:	pq_e_lake.zx02
+	$(BIN2PAS) -l PQ_ELAKE pq_e_lake.zx02 > PQ_ELAKE.PAS
+
+pq_e_lake.zx02:	pq_e_lake.cga
+	$(ZX02) -f pq_e_lake.cga pq_e_lake.zx02
+
+pq_e_lake.cga:	pq_e_lake.png
+	$(PNG2CGA) -r ./pq_e_lake.png > pq_e_lake.cga
+
+###
 
 PQ_INN.PAS:	pq_inn.zx02
 	$(BIN2PAS) -l PQ_INN pq_inn.zx02 > PQ_INN.PAS
@@ -74,7 +134,8 @@ pq_inn.cga:	pq_inn.png
 	$(PNG2CGA) -r ./pq_inn.png > pq_inn.cga
 
 
-####
+#################################################
+#################################################
 
 PQ_KER1.PAS:	pq_ker1.zx02
 	$(BIN2PAS) -l PQ_KERREK1 pq_ker1.zx02 > PQ_KER1.PAS
@@ -88,47 +149,18 @@ pq_ker1.cga:	pq_ker1.png
 
 ####
 
-PQ_WFALL.PAS:	pq_waterfall.zx02
-	$(BIN2PAS) -l PQ_WFALL pq_waterfall.zx02 > PQ_WFALL.PAS
-
-pq_waterfall.zx02:	pq_waterfall.cga
-	$(ZX02) -f pq_waterfall.cga pq_waterfall.zx02
-
-pq_waterfall.cga:	pq_waterfall.png
-	$(PNG2CGA) -r ./pq_waterfall.png > pq_waterfall.cga
 
 ####
 
-PQ_KNGHT.PAS:	pq_knight.zx02
-	$(BIN2PAS) -l PQ_KNIGHT pq_knight.zx02 > PQ_KNGHT.PAS
 
-pq_knight.zx02:	pq_knight.cga
-	$(ZX02) -f pq_knight.cga pq_knight.zx02
-
-pq_knight.cga:	pq_knight.png
-	$(PNG2CGA) -r ./pq_knight.png > pq_knight.cga
 
 ####
 
-PQ_YTREE.PAS:	pq_ytree.zx02
-	$(BIN2PAS) -l PQ_YTREE pq_ytree.zx02 > PQ_YTREE.PAS
 
-pq_ytree.zx02:	pq_ytree.cga
-	$(ZX02) -f pq_ytree.cga pq_ytree.zx02
-
-pq_ytree.cga:	pq_ytree.png
-	$(PNG2CGA) -r ./pq_ytree.png > pq_ytree.cga
 
 ####
 
-PQ_ROCK.PAS:	pq_rock.zx02
-	$(BIN2PAS) -l PQ_ROCK pq_rock.zx02 > PQ_ROCK.PAS
 
-pq_rock.zx02:	pq_rock.cga
-	$(ZX02) -f pq_rock.cga pq_rock.zx02
-
-pq_rock.cga:	pq_rock.png
-	$(PNG2CGA) -r ./pq_rock.png > pq_rock.cga
 
 
 ####

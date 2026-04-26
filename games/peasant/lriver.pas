@@ -1,8 +1,8 @@
 	{=====================================}
-	{ WATERFALL ACTIONS                   }
+	{ RIVER/ROCK ACTIONS                  }
 	{=====================================}
 
-Procedure waterfall_actions;
+Procedure river_actions;
 
 begin
 
@@ -37,12 +37,12 @@ end;
 
 
 {************************************}
-{ do_waterfall                       }
+{ do_river                           }
 {************************************}
 
-Procedure do_waterfall;
+Procedure do_river;
 
-label done_waterfall;
+label done_river;
 
 begin
 	level_over:=LEVEL_NOT_OVER;
@@ -58,7 +58,7 @@ begin
 
 	{ load bg }
 
-	wad_load(file_buffer,'GWFALL');
+	wad_load(file_buffer,'GROCK');
 	decompress(background,file_buffer);
 
 	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
@@ -88,7 +88,7 @@ begin
 
 		move_peasant;
 
-		if level_over <> LEVEL_NOT_OVER then goto done_waterfall;
+		if level_over <> LEVEL_NOT_OVER then goto done_river;
 
 		{ update screen }
 
@@ -110,7 +110,7 @@ begin
 
 	end;
 
-done_waterfall:
+done_river:
 
 {	repeat until keypressed;
 	ch:=readkey;

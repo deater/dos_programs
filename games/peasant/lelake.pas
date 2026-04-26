@@ -1,8 +1,8 @@
 	{=====================================}
-	{ WATERFALL ACTIONS                   }
+	{ EAST LAKE ACTIONS                   }
 	{=====================================}
 
-Procedure waterfall_actions;
+Procedure east_lake_actions;
 
 begin
 
@@ -37,12 +37,12 @@ end;
 
 
 {************************************}
-{ do_waterfall                       }
+{ do_east_lake                       }
 {************************************}
 
-Procedure do_waterfall;
+Procedure do_east_lake;
 
-label done_waterfall;
+label done_east_lake;
 
 begin
 	level_over:=LEVEL_NOT_OVER;
@@ -58,7 +58,7 @@ begin
 
 	{ load bg }
 
-	wad_load(file_buffer,'GWFALL');
+	wad_load(file_buffer,'GELAKE');
 	decompress(background,file_buffer);
 
 	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
@@ -88,7 +88,7 @@ begin
 
 		move_peasant;
 
-		if level_over <> LEVEL_NOT_OVER then goto done_waterfall;
+		if level_over <> LEVEL_NOT_OVER then goto done_east_lake;
 
 		{ update screen }
 
@@ -110,7 +110,7 @@ begin
 
 	end;
 
-done_waterfall:
+done_east_lake:
 
 {	repeat until keypressed;
 	ch:=readkey;

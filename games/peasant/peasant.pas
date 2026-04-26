@@ -8,19 +8,17 @@ uses crt,zx02,cga;
 {$I pq_tips.pas}
 
 
-Procedure knight_actions; forward;
+Procedure yellow_tree_actions; forward;
 Procedure waterfall_actions; forward;
+Procedure east_lake_actions; forward;
+Procedure river_actions; forward;
+Procedure knight_actions; forward;
+Procedure outside_inn_actions; forward;
+
 
 {$I o_knight.pas}
 {$I o_wfall.pas}
 
-(*
-{$I pq_ker1.pas}
-{$I pq_ytree.pas}
-{$I pq_inn.pas}
-{$I pq_knght.pas}
-{$I d_knight.pas}
-*)
 
 {$I s_walk.pas}
 
@@ -1359,8 +1357,12 @@ end;
 
 {$I wad_load.pas}
 
-{$I lknight.pas}
+{$I lytree.pas}
 {$I lwfall.pas}
+{$I lriver.pas}
+{$I lknight.pas}
+{$I lelake.pas}
+{$I linn.pas}
 
 
 {************************************}
@@ -1579,18 +1581,18 @@ begin
 		LOCATION_POOR_GARY:		do_knight;
 		LOCATION_KERREK_1:		do_knight;
 		LOCATION_OLD_WELL:		do_knight;
-		LOCATION_YELLOW_TREE:		do_knight;
+		LOCATION_YELLOW_TREE:		do_yellow_tree;
 		LOCATION_WATERFALL:		do_waterfall;
 		LOCATION_HAY_BALE:		do_knight;
 		LOCATION_MUD_PUDDLE:		do_knight;
 		LOCATION_ARCHERY:		do_knight;
-		LOCATION_RIVER_STONE:		do_knight;
+		LOCATION_RIVER_STONE:		do_river;
 		LOCATION_MOUNTAIN_PASS:		do_knight;
 		LOCATION_JHONKA_CAVE:		do_knight;
 		LOCATION_YOUR_COTTAGE:		do_knight;
 		LOCATION_LAKE_WEST:		do_knight;
-		LOCATION_LAKE_EAST:		do_knight;
-		LOCATION_OUTSIDE_INN:		do_knight;
+		LOCATION_LAKE_EAST:		do_east_lake;
+		LOCATION_OUTSIDE_INN:		do_outside_inn;
 		LOCATION_OUTSIDE_NN:		do_knight;
 		LOCATION_WAVY_TREE:		do_knight;
 		LOCATION_KERREK_2:		do_knight;

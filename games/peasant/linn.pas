@@ -1,8 +1,8 @@
 	{=====================================}
-	{ WATERFALL ACTIONS                   }
+	{ OUTSIDE INN ACTIONS                 }
 	{=====================================}
 
-Procedure waterfall_actions;
+Procedure outside_inn_actions;
 
 begin
 
@@ -37,12 +37,12 @@ end;
 
 
 {************************************}
-{ do_waterfall                       }
+{ do_outside_inn                     }
 {************************************}
 
-Procedure do_waterfall;
+Procedure do_outside_inn;
 
-label done_waterfall;
+label done_outside_inn;
 
 begin
 	level_over:=LEVEL_NOT_OVER;
@@ -58,7 +58,7 @@ begin
 
 	{ load bg }
 
-	wad_load(file_buffer,'GWFALL');
+	wad_load(file_buffer,'GINN');
 	decompress(background,file_buffer);
 
 	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
@@ -88,7 +88,7 @@ begin
 
 		move_peasant;
 
-		if level_over <> LEVEL_NOT_OVER then goto done_waterfall;
+		if level_over <> LEVEL_NOT_OVER then goto done_outside_inn;
 
 		{ update screen }
 
@@ -110,7 +110,7 @@ begin
 
 	end;
 
-done_waterfall:
+done_outside_inn:
 
 {	repeat until keypressed;
 	ch:=readkey;
