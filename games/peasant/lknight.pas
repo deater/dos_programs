@@ -192,7 +192,9 @@ begin
 
 done_knight:
 
-	repeat until keypressed;
+{	repeat until keypressed;
 	ch:=readkey;
+}
 end;
+
 

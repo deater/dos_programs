@@ -279,7 +279,7 @@ var
 	screen:screentype absolute $B800:0000;
 	frame,flame_count:byte;
 	visited_0,visited_1,visited_2:byte;
-	peasant_x,peasant_y:byte;
+	peasant_x,peasant_y,peasant_newy:integer; {signed }
 	peasant_xadd,peasant_yadd:integer; { signed }
 	peasant_dir,peasant_steps:byte;
 	ch:char;
@@ -1220,6 +1220,8 @@ begin
 
 	{ moving }
 
+	{ adjust steps }
+
 	peasant_steps:=peasant_steps+1;
 	if (peasant_steps>=6) then peasant_steps:=0;
 
@@ -1231,24 +1233,48 @@ begin
 
 	if peasant_x<0 then begin
 		move_map_west;
-		peasant_x:=200;
+		peasant_x:=300;
+		peasant_newy:=peasant_y;
 		goto peasant_the_same;
 	end;
 
 	{ check if too far right }
 
-	if peasant_x>=200 then begin
+	if peasant_x>300 then begin
 		move_map_east;
 		peasant_x:=0;
+		peasant_newy:=peasant_y;
 		goto peasant_the_same;
 	end;
 
 	{ collision detect x }
 
+	{ TODO }
+	{ peasant_collide; }
 
 
+	{ Move Peasant Y }
 
 	peasant_y:=peasant_y+peasant_yadd;
+
+	{ check if too far up }
+	if peasant_y<45 then begin
+		move_map_north;
+		peasant_newy:=160;
+		goto peasant_the_same;
+	end;
+
+	{ check if too far down }
+	if peasant_y>160 then begin
+		move_map_south;
+		peasant_newy:=45;
+		goto peasant_the_same;
+	end;
+
+	{ collision detect y }
+
+	{ TODO }
+	{ peasant_collide; }
 
 
 peasant_the_same:
@@ -1481,8 +1507,15 @@ begin
 
 	map_location:=LOCATION_MOUNTAIN_PASS;
 
-	do_knight(0);
+	{ main game loop }
 
+	while(true) do begin
+
+		do_knight(0);
+
+		if level_over<>LEVEL_NEW_FROM_LOAD then peasant_y:=peasant_newy;
+
+	end;
 
 	{ Restore Text Mode}
 	SetCGAMode(3);
