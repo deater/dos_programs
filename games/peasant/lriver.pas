@@ -5,31 +5,31 @@
 Procedure river_actions;
 
 begin
+	if (current_verb=VERB_GET) or (current_verb=VERB_STEAL) or
+		(current_verb=VERB_TAKE) then begin
+
+	end;
 
 	case current_verb of
 
-	VERB_CLIMB:
-		if current_noun=NOUN_CLIFF then
-			print_offset:=
-				waterfall_dialog(waterfall_climb_cliff_message);
-
 	VERB_LOOK:	begin
 
-		if (current_noun=NOUN_TREE) then
-			print_offset:=waterfall_dialog(waterfall_look_tree_message);
-		if (current_noun=NOUN_WATERFALL) then
-			print_offset:=waterfall_dialog(waterfall_look_waterfall_message);
+		if (current_noun=NOUN_ROCK) or (current_noun=NOUN_STONE) then
+			print_offset:=rock_dialog(river_look_at_rock_message);
+		if (current_noun=NOUN_WATER) or (current_noun=NOUN_RIVER) then
+			print_offset:=rock_dialog(river_look_at_water_message);
 		if (current_noun=NOUN_NONE) then
-			print_offset:=waterfall_dialog(waterfall_look_at_message);
+			print_offset:=rock_dialog(river_look_message);
 
 		end; {verb_look}
 
 	VERB_SWIM:
 		if (current_noun=NOUN_WATER) or
-			(current_noun=NOUN_WATERFALL) or
-			(current_noun=NOUN_NONE) then
+			(current_noun=NOUN_RIVER) or
+			(current_noun=NOUN_ROCK) or
+			(current_noun=NOUN_STONE) then
 			print_offset:=
-				waterfall_dialog(waterfall_swim_message);
+				rock_dialog(river_swim_message);
 
 	end; {case verb}
 
@@ -51,7 +51,7 @@ begin
 
 	{ decompress dialog }
 
-	wad_load(file_buffer,'DWFALL');
+	wad_load(file_buffer,'DROCK');
 	decompress(buffer_ptr(@dialog^[4096]),file_buffer);
 
 	{ decompress priority }

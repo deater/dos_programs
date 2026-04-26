@@ -13,18 +13,18 @@ all:	PEASANT.WAD \
 ####
 
 PEASANT.WAD:	\
-	pq_ytree.zx02 \
+	pq_ytree.zx02 ../text/D_YTREE.ZX2 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2 \
-	pq_rock.zx02 \
+	pq_rock.zx02 ../text/D_ROCK.ZX2 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 \
 	pq_e_lake.zx02 \
 	pq_inn.zx02 ../text/D_INN.ZX2 \
 	pq_hut.zx02 \
 	pq_btree.zx02
 	$(MKWAD) -o PEASANT.WAD \
-		pq_ytree.zx02,GYTREE \
+		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
-		pq_rock.zx02,GROCK \
+		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		pq_e_lake.zx02,GELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \

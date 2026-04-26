@@ -18,7 +18,9 @@ Procedure outside_lady_actions; forward;
 Procedure burn_tree_actions; forward;
 
 
+{$I o_ytree.pas}
 {$I o_wfall.pas}
+{$I o_rock.pas}
 {$I o_knight.pas}
 {$I o_inn.pas}
 
@@ -613,12 +615,12 @@ begin
 		LOCATION_POOR_GARY:		knight_actions;
 		LOCATION_KERREK_1:		knight_actions;
 		LOCATION_OLD_WELL:		knight_actions;
-		LOCATION_YELLOW_TREE:		knight_actions;
+		LOCATION_YELLOW_TREE:		yellow_tree_actions;
 		LOCATION_WATERFALL:		waterfall_actions;
 		LOCATION_HAY_BALE:		knight_actions;
 		LOCATION_MUD_PUDDLE:		knight_actions;
 		LOCATION_ARCHERY:		knight_actions;
-		LOCATION_RIVER_STONE:		knight_actions;
+		LOCATION_RIVER_STONE:		river_actions;
 		LOCATION_MOUNTAIN_PASS:		knight_actions;
 		LOCATION_JHONKA_CAVE:		knight_actions;
 		LOCATION_YOUR_COTTAGE:		knight_actions;

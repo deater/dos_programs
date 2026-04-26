@@ -6,9 +6,11 @@ CC = gcc
 CFLAGS = -O2 -Wall -g
 
 all:	shrink_text \
+	D_YTREE.PAS  O_YTREE.PAS \
 	D_WFALL.PAS  O_WFALL.PAS \
+	D_ROCK.PAS   O_ROCK.PAS \
 	D_KNIGHT.PAS O_KNIGHT.PAS \
-	D_INN.PAS O_INN.PAS \
+	D_INN.PAS    O_INN.PAS \
 	D_COMMON.PAS O_COMMON.PAS
 
 
@@ -48,6 +50,20 @@ all:	shrink_text \
 #	inventory.inc.lookup
 
 
+############################################
+############################################
+
+O_YTREE.PAS:	dialog_waterfall.raw
+
+D_YTREE.PAS:	D_YTREE.ZX2
+	$(BIN2PAS) -l D_YTREE D_YTREE.ZX2 > D_YTREE.PAS
+
+D_YTREE.ZX2:	dialog_yellow_tree.raw
+	$(ZX02) -f  dialog_yellow_tree.raw D_YTREE.ZX2
+
+dialog_yellow_tree.raw:	falls.inc
+	./shrink_text dialog_yellow_tree.raw O_YTREE.PAS yellow_tree < yellow_tree.inc
+
 ####
 
 O_WFALL.PAS:	dialog_waterfall.raw
@@ -62,7 +78,21 @@ dialog_waterfall.raw:	falls.inc
 	./shrink_text dialog_waterfall.raw O_WFALL.PAS waterfall < falls.inc
 
 
-####
+############################################
+############################################
+
+O_ROCK.PAS:	dialog_rock.raw
+
+D_ROCK.PAS:	D_ROCK.ZX2
+	$(BIN2PAS) -l D_ROCK D_ROCK.ZX2 > D_ROCK.PAS
+
+D_ROCK.ZX2:	dialog_rock.raw
+	$(ZX02) -f  dialog_rock.raw D_ROCK.ZX2
+
+dialog_rock.raw:	rock.inc
+	./shrink_text dialog_rock.raw O_ROCK.PAS rock < rock.inc
+
+#####
 
 O_KNIGHT.PAS:	dialog_knight.raw
 
@@ -75,7 +105,8 @@ D_KNIGHT.ZX2:	dialog_knight.raw
 dialog_knight.raw:	knight.inc
 	./shrink_text dialog_knight.raw O_KNIGHT.PAS knight < knight.inc
 
-####
+############################################
+############################################
 
 O_INN.PAS:	dialog_inn.raw
 
@@ -817,4 +848,4 @@ clean:
 	rm -f *.o *~ dump_text shrink_text *.lookup *.ZX2
 
 distclean:	
-	rm -f *.o *~ dump_text shrink_text *.lookup *.ZX2 *.raw
+	rm -f *.o *~ dump_text shrink_text *.lookup *.ZX2 *.raw D_*.PAS O_*.PAS
