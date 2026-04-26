@@ -8,108 +8,28 @@ begin
 
 	case current_verb of
 
-	VERB_ASK:	begin
-		{ default }
-		print_offset:=knight_dialog(knight_ask_unknown_message);
-
-		case current_noun of
-
-			NOUN_FIRE:
-				print_offset:=
-					knight_dialog(knight_ask_fire_message);
-			NOUN_JHONKA:
-				print_offset:=
-					knight_dialog(knight_ask_jhonka_message);
-			NOUN_KERREK:
-				print_offset:=
-					knight_dialog(knight_ask_kerrek_message);
-			NOUN_NED:
-				print_offset:=
-					knight_dialog(knight_ask_ned_message);
-			NOUN_ROBE:
-				print_offset:=
-					knight_dialog(knight_ask_robe_message);
-			NOUN_SMELL:
-				print_offset:=
-					knight_dialog(knight_ask_smell_message);
-			NOUN_TROGDOR:
-				print_offset:=
-					knight_dialog(knight_ask_trogdor_message);
-		end; {case noun}
-
-		end; {verb_ask}
-
-	VERB_ATTACK:
-		if (current_noun=NOUN_SIGN) then
+	VERB_CLIMB:
+		if current_noun=NOUN_CLIFF then
 			print_offset:=
-				knight_dialog(attack_sign_message);
-
-	VERB_BREAK:
-		if (current_noun=NOUN_SIGN) then
-			print_offset:=
-				knight_dialog(attack_sign_message);
+				waterfall_dialog(waterfall_climb_cliff_message);
 
 	VERB_LOOK:	begin
-		if (current_noun=NOUN_KNIGHT) or
-			(current_noun=NOUN_MAN) or
-			(current_noun=NOUN_DUDE) or
-			(current_noun=NOUN_GUY) then
 
-				print_offset:=knight_dialog(knight_look_message);
-
-		if (current_noun=NOUN_SIGN) then
-			print_offset:=knight_dialog(sign_look_message);
-		if (current_noun=NOUN_TROGDOR) then
-			print_offset:=knight_dialog(trogdor_look_message);
+		if (current_noun=NOUN_TREE) then
+			print_offset:=waterfall_dialog(waterfall_look_tree_message);
+		if (current_noun=NOUN_WATERFALL) then
+			print_offset:=waterfall_dialog(waterfall_look_waterfall_message);
 		if (current_noun=NOUN_NONE) then
-			print_offset:=knight_dialog(pass_look_message);
+			print_offset:=waterfall_dialog(waterfall_look_at_message);
 
 		end; {verb_look}
 
-	VERB_TALK:	begin
-		if (current_noun=NOUN_KNIGHT) or
-			(current_noun=NOUN_MAN) or
-			(current_noun=NOUN_DUDE) or
-			(current_noun=NOUN_GUY) then begin
-
-			{ extra text first time talking }
-			if (game_state.TALKED_TO_KNIGHT=false) then begin
-				print_offset:=knight_dialog(talk_knight_first_message);
-				partial_message_step;
-				print_offset:=knight_dialog(talk_knight_second_message);
-				partial_message_step;
-
-			end;
-			{ see if have belt }
-			if (inventory.KERREK_BELT) then begin
-				{TODO}
-			end;
-			{ see if wearing robe }
-			if (game_state.WEARING_ROBE) then begin
-				{TODO}
-			end;
-			{ if have nothing }
-			print_offset:=knight_dialog(talk_knight_third_message);
-			partial_message_step;
-			print_offset:=knight_dialog(talk_knight_stink_message);
-			partial_message_step;
-			print_offset:=knight_dialog(talk_knight_dress_message);
-			partial_message_step;
-			print_offset:=knight_dialog(talk_knight_fire_message);
-			partial_message_step;
-
-			print_offset:=knight_dialog(talk_knight_fourth_message);
-			{ extra text first time talking }
-			if (game_state.TALKED_TO_KNIGHT=false) then begin
-				partial_message_step;
-				print_offset:=knight_dialog(talk_knight_fifth_message);
-				game_state.TALKED_TO_KNIGHT:=true;
-			end;
-
-		end; {talking to knight}
-
-
-		end; {verb_talk}
+	VERB_SWIM:
+		if (current_noun=NOUN_WATER) or
+			(current_noun=NOUN_WATERFALL) or
+			(current_noun=NOUN_NONE) then
+			print_offset:=
+				waterfall_dialog(waterfall_swim_message);
 
 	end; {case verb}
 
@@ -131,7 +51,7 @@ begin
 
 	{ decompress dialog }
 
-	wad_load(file_buffer,'DKNIGHT');
+	wad_load(file_buffer,'DWFALL');
 	decompress(buffer_ptr(@dialog^[4096]),file_buffer);
 
 	{ decompress priority }

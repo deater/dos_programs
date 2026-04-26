@@ -12,6 +12,7 @@ Procedure knight_actions; forward;
 Procedure waterfall_actions; forward;
 
 {$I o_knight.pas}
+{$I o_wfall.pas}
 
 (*
 {$I pq_ker1.pas}
@@ -167,7 +168,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		NOUN_SKELETON, NOUN_SKULL, NOUN_SMELL, NOUN_SODA,
 		NOUN_STUFF, NOUN_STUMP, NOUN_SUB, NOUN_TARGET,
 		NOUN_TRACKS, NOUN_TREE, NOUN_TRINKET, NOUN_TROGDOR,
-		NOUN_WATER, NOUN_WATERFALL, NOUN_WELL, NOUN_WINDOW,
+		NOUN_WATERFALL, NOUN_WATER, NOUN_WELL, NOUN_WINDOW,
 		NOUN_WOMAN, NOUN_RIVER, NOUN_STONES, NOUN_IN_HAY,
 		NOUN_PUDDLE, NOUN_MENDELEV, NOUN_BLEED, NOUN_IN_WELL,
 		NOUN_BUCKET, NOUN_WISH, NOUN_ARMS, NOUN_GOLD,
@@ -201,7 +202,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		'SKELETON', 'SKULL', 'SMELL', 'SODA',
 		'STUFF', 'STUMP', 'SUB', 'TARGET',
 		'TRACKS', 'TREE', 'TRINKET', 'TROGDOR',
-		'WATER', 'WATERFALL', 'WELL', 'WINDOW',
+		'WATERFALL', 'WATER', 'WELL', 'WINDOW',
 		'WOMAN', 'RIVER', 'STONES', 'IN_HAY',
 		'PUDDLE', 'MENDELEV', 'BLEED', 'IN_WELL',
 		'BUCKET', 'WISH', 'ARMS', 'GOLD',
