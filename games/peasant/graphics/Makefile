@@ -13,10 +13,12 @@ all:	PEASANT.WAD \
 ####
 
 PEASANT.WAD:	\
-	pq_knight.zx02 ../text/D_KNIGHT.ZX2
+	pq_knight.zx02 ../text/D_KNIGHT.ZX2 \
+	pq_waterfall.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_knight.zx02,GKNIGHT \
-		../text/D_KNIGHT.ZX2,DKNIGHT
+		../text/D_KNIGHT.ZX2,DKNIGHT \
+		pq_waterfall.zx02,GWFALL
 
 ####
 

@@ -1,8 +1,8 @@
 	{=====================================}
-	{ KNIGHT ACTIONS
+	{ WATERFALL ACTIONS
 	{=====================================}
 
-Procedure knight_actions;
+Procedure waterfall_actions;
 
 begin
 
@@ -117,12 +117,12 @@ end;
 
 
 {************************************}
-{ do_knight                          }
+{ do_waterfall                       }
 {************************************}
 
-Procedure do_knight;
+Procedure do_waterfall;
 
-label done_knight;
+label done_waterfall;
 
 begin
 	level_over:=LEVEL_NOT_OVER;
@@ -138,7 +138,7 @@ begin
 
 	{ load bg }
 
-	wad_load(file_buffer,'GKNIGHT');
+	wad_load(file_buffer,'GWFALL');
 	decompress(background,file_buffer);
 
 	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
@@ -150,7 +150,7 @@ begin
 
 	reset_prompt;
 
-	{ move knight }
+	{ move waterfall }
 
 	visited_1:=visited_1 or 16;	{ MAP_MOUNTAIN_PASS}
 
@@ -168,7 +168,7 @@ begin
 
 		move_peasant;
 
-		if level_over <> LEVEL_NOT_OVER then goto done_knight;
+		if level_over <> LEVEL_NOT_OVER then goto done_waterfall;
 
 		{ update screen }
 
@@ -190,11 +190,9 @@ begin
 
 	end;
 
-done_knight:
+done_waterfall:
 
 {	repeat until keypressed;
 	ch:=readkey;
 }
 end;
-
-

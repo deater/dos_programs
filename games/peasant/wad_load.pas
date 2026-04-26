@@ -17,7 +17,7 @@ label wad_name_found;
 label done_wad_load;
 
 begin
-	writeln('Loading peasant.wad');
+	{ writeln('Loading peasant.wad'); }
 
 	assign(fff,'peasant.wad');
 
@@ -27,7 +27,7 @@ begin
 {$I+}
 	if IOresult<>0 then begin	{ Error if not}
 		{ TODO }
-		writeln('cannot access file');
+		{writeln('cannot access file'); }
 	end;
 
 	{ setup name }
@@ -51,7 +51,7 @@ begin
 		(header[10] shl 16) + (header[11] shl 24);
 
 
-	writeln('found ',lumps,' Lumps at address $',offset);
+	{ writeln('found ',lumps,' Lumps at address $',offset); }
 
 	{ TODO: seek to offset }
 
@@ -63,17 +63,17 @@ begin
 
 		blockread(fff,header,16);
 
-		write('lump ',i,' ');
+		{ write('lump ',i,' '); }
 
 		match:=0;
 		for j:=0 to 7 do begin
 			if (chr(name2[j])=chr(header[8+j])) then begin
 				match:=match+1;
-				write(':MATCH:');
+				{ write(':MATCH:'); }
 			end;
-			write( chr(name2[j]), chr(header[8+j]),';');
+			{ write( chr(name2[j]), chr(header[8+j]),';'); }
 		end;
-		writeln(' match=',match);
+		{ writeln(' match=',match); }
 		if match=8 then goto wad_name_found;
 
 	end;
@@ -82,7 +82,7 @@ begin
 
 wad_name_found:
 
-	writeln('Found match for ',name);
+	{ writeln('Found match for ',name); }
 
 	{ get offset }
 
@@ -97,26 +97,26 @@ wad_name_found:
 
 	{ seek to offset }
 
-	writeln('Seeking to offset ',offset,' size ',read_size);
+	{ writeln('Seeking to offset ',offset,' size ',read_size); }
 
 	seek(fff,offset);
 
 	{ Read File }
 
-	writeln('Position ',FilePos(fff));
-	writeln('Reading into dest');
+	{ writeln('Position ',FilePos(fff)); }
+	{ writeln('Reading into dest'); }
 
 	blockread(fff,dest^,read_size,bytes_read);
 
-	writeln('bytes read: ',bytes_read);
+	{ writeln('bytes read: ',bytes_read);
 
 	writeln('buffer[0]=',dest^[0]);
 	writeln('buffer[1]=',dest^[1]);
 	writeln('buffer[16]=',dest^[16]);
-
+	}
 done_wad_load:
 
-	writeln('Closing File');
+	{ writeln('Closing File'); }
 
 	close(fff);
 

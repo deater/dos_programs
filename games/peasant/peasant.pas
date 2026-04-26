@@ -9,6 +9,7 @@ uses crt,zx02,cga;
 
 
 Procedure knight_actions; forward;
+Procedure waterfall_actions; forward;
 
 {$I o_knight.pas}
 
@@ -586,8 +587,47 @@ begin
 
 	print_offset:=common_dialog(unknown_message);
 
+	{=======================}
 	{ Level-specific Actions}
-	knight_actions;
+	{=======================}
+	case map_location of
+
+		LOCATION_POOR_GARY:		knight_actions;
+		LOCATION_KERREK_1:		knight_actions;
+		LOCATION_OLD_WELL:		knight_actions;
+		LOCATION_YELLOW_TREE:		knight_actions;
+		LOCATION_WATERFALL:		waterfall_actions;
+		LOCATION_HAY_BALE:		knight_actions;
+		LOCATION_MUD_PUDDLE:		knight_actions;
+		LOCATION_ARCHERY:		knight_actions;
+		LOCATION_RIVER_STONE:		knight_actions;
+		LOCATION_MOUNTAIN_PASS:		knight_actions;
+		LOCATION_JHONKA_CAVE:		knight_actions;
+		LOCATION_YOUR_COTTAGE:		knight_actions;
+		LOCATION_LAKE_WEST:		knight_actions;
+		LOCATION_LAKE_EAST:		knight_actions;
+		LOCATION_OUTSIDE_INN:		knight_actions;
+		LOCATION_OUTSIDE_NN:		knight_actions;
+		LOCATION_WAVY_TREE:		knight_actions;
+		LOCATION_KERREK_2:		knight_actions;
+		LOCATION_OUTSIDE_LADY:		knight_actions;
+		LOCATION_BURN_TREES:		knight_actions;
+		LOCATION_CLIFF_BASE:		knight_actions;
+		LOCATION_CLIFF_HEIGHTS:		knight_actions;
+		LOCATION_TROGDOR_OUTER:		knight_actions;
+		LOCATION_TROGDOR_LAIR:		knight_actions;
+		LOCATION_HIDDEN_GLEN:		knight_actions;
+		LOCATION_INSIDE_LADY:		knight_actions;
+		LOCATION_INSIDE_NN:		knight_actions;
+		LOCATION_INSIDE_INN:		knight_actions;
+		LOCATION_ARCHERY_GAME:		knight_actions;
+		LOCATION_MAP:			knight_actions;
+		LOCATION_CLIMB:			knight_actions;
+		LOCATION_TROGDOR_OUTER2:	knight_actions;
+		LOCATION_TROGDOR_OUTER3:	knight_actions;
+		LOCATION_INSIDE_INN_NIGHT:	knight_actions;
+		LOCATION_EMPTY:			knight_actions;
+	end;
 
 	if (print_offset<>common_dialog(unknown_message)) then
 		goto finish_parse_message;
@@ -1301,6 +1341,7 @@ end;
 {$I wad_load.pas}
 
 {$I lknight.pas}
+{$I lwfall.pas}
 
 
 {************************************}
@@ -1511,7 +1552,45 @@ begin
 
 	while(true) do begin
 
-		do_knight(0);
+		case map_location of
+
+		LOCATION_POOR_GARY:		do_knight;
+		LOCATION_KERREK_1:		do_knight;
+		LOCATION_OLD_WELL:		do_knight;
+		LOCATION_YELLOW_TREE:		do_knight;
+		LOCATION_WATERFALL:		do_waterfall;
+		LOCATION_HAY_BALE:		do_knight;
+		LOCATION_MUD_PUDDLE:		do_knight;
+		LOCATION_ARCHERY:		do_knight;
+		LOCATION_RIVER_STONE:		do_knight;
+		LOCATION_MOUNTAIN_PASS:		do_knight;
+		LOCATION_JHONKA_CAVE:		do_knight;
+		LOCATION_YOUR_COTTAGE:		do_knight;
+		LOCATION_LAKE_WEST:		do_knight;
+		LOCATION_LAKE_EAST:		do_knight;
+		LOCATION_OUTSIDE_INN:		do_knight;
+		LOCATION_OUTSIDE_NN:		do_knight;
+		LOCATION_WAVY_TREE:		do_knight;
+		LOCATION_KERREK_2:		do_knight;
+		LOCATION_OUTSIDE_LADY:		do_knight;
+		LOCATION_BURN_TREES:		do_knight;
+		LOCATION_CLIFF_BASE:		do_knight;
+		LOCATION_CLIFF_HEIGHTS:		do_knight;
+		LOCATION_TROGDOR_OUTER:		do_knight;
+		LOCATION_TROGDOR_LAIR:		do_knight;
+		LOCATION_HIDDEN_GLEN:		do_knight;
+		LOCATION_INSIDE_LADY:		do_knight;
+		LOCATION_INSIDE_NN:		do_knight;
+		LOCATION_INSIDE_INN:		do_knight;
+		LOCATION_ARCHERY_GAME:		do_knight;
+		LOCATION_MAP:			do_knight;
+		LOCATION_CLIMB:			do_knight;
+		LOCATION_TROGDOR_OUTER2:	do_knight;
+		LOCATION_TROGDOR_OUTER3:	do_knight;
+		LOCATION_INSIDE_INN_NIGHT:	do_knight;
+		LOCATION_EMPTY:			do_knight;
+	end;
+
 
 		if level_over<>LEVEL_NEW_FROM_LOAD then peasant_y:=peasant_newy;
 
