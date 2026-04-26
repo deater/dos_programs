@@ -292,7 +292,7 @@ var
 
 	inventory,inventory_gone: inventory_type;
 
-	map_location : map_locations;
+	previous_location, map_location : map_locations;
 
 	print_offset : word;
 
@@ -1136,31 +1136,74 @@ const exits_west : array [0..34] of map_locations = (
 	LOCATION_EMPTY		{ LOCATION_EMPTY	=	34 }
 );
 
+	{=====================}
+	{ update map location }
+	{=====================}
+(*
+Procedure update_map_location;
+
+begin
+
+        ldx     MAP_LOCATION
+        stx     PREVIOUS_LOCATION
+        ldy     location_to_file,X
+        sty     WHICH_LOAD
+
+        ; save new location
+
+        sta     MAP_LOCATION
+
+same_disk:
+        lda     #NEW_LOCATION
+        sta     LEVEL_OVER
+        rts
+end
+*)
+
+
+	{=========================}
+	{ Move Map North          }
+	{=========================}
+
+Procedure move_map_north;
+begin
+	previous_location:=map_location;
+	map_location:=exits_north[ord(previous_location)];
+	level_over:=LEVEL_NEW_LOCATION;
+end;
+
+	{=========================}
+	{ Move Map SOUTH          }
+	{=========================}
+
+Procedure move_map_south;
+begin
+	previous_location:=map_location;
+	map_location:=exits_south[ord(previous_location)];
+	level_over:=LEVEL_NEW_LOCATION;
+end;
+
 	{=========================}
 	{ Move Map EAST           }
 	{=========================}
 
 Procedure move_map_east;
 begin
-
-
-{        lda     MAP_LOCATION
-        tax
-        lda     exits_east,X
-        jmp     update_map_location
-	}
+	previous_location:=map_location;
+	map_location:=exits_east[ord(previous_location)];
+	level_over:=LEVEL_NEW_LOCATION;
 end;
+
+
 
 	{=========================}
 	{ Move Map WEST           }
 	{=========================}
 Procedure move_map_west;
 begin
-    {    lda     MAP_LOCATION
-        tax
-        lda     exits_west,X
-        jmp     update_map_location
-}
+	previous_location:=map_location;
+	map_location:=exits_west[ord(previous_location)];
+	level_over:=LEVEL_NEW_LOCATION;
 end;
 
 
