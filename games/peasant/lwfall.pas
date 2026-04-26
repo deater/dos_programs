@@ -65,14 +65,14 @@ begin
 
 	screen_copy(@screen,screen_ptr(framebuffer));
 
-	PrintStringXor('Score:0 out of 150',0,0);
-	PrintStringXor('Peasant''s Quest',25,0);
+	update_score;
 
 	reset_prompt;
 
-	{ move waterfall }
 
-	visited_1:=visited_1 or 16;	{ MAP_MOUNTAIN_PASS}
+	{ mark visited }
+
+	visited_locations[ord(map_location)]:=true;
 
 	while(level_over=LEVEL_NOT_OVER) do begin
 

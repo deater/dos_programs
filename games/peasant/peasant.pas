@@ -56,7 +56,8 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		LEVEL_NOT_OVER,
 		LEVEL_NEW_LOCATION,
 		LEVEL_NEW_FROM_DISK,
-		LEVEL_NEW_FROM_LOAD
+		LEVEL_NEW_FROM_LOAD,
+		LEVEL_EXIT_TO_DOS
 	);
 
 	type map_locations = (
@@ -276,11 +277,13 @@ const WalkingSprites : array[0..23] of SpritePtr =
 
 
 var
+	visited_locations : array [0..34] of boolean;
+
 	file_buffer,dialog,background,framebuffer:buffer_ptr;
 
+	score: word;
 	screen:screentype absolute $B800:0000;
 	frame,flame_count:byte;
-	visited_0,visited_1,visited_2:byte;
 	peasant_x,peasant_y,peasant_newy:integer; {signed }
 	peasant_xadd,peasant_yadd:integer; { signed }
 	peasant_dir,peasant_steps:byte;
@@ -301,7 +304,21 @@ var
 	current_verb: verb_type;
 	current_noun: noun_type;
 
+label exit_to_dos;
 
+
+{=====================================}
+{ Update Score                        }
+{=====================================}
+
+Procedure update_score;
+
+begin
+	{ TODO: actually update score }
+
+	PrintStringXor('Score:0 out of 150',0,0);
+	PrintStringXor('Peasant''s Quest',25,0);
+end;
 
 {=====================================}
 { Reset Prompt                        }
@@ -674,6 +691,7 @@ begin
 		VERB_DANCE:	print_offset:=common_dialog(dance_message);
 
 		VERB_DIE:	begin
+				level_over:=LEVEL_EXIT_TO_DOS;
 				{ TODO }
 				end;
 
@@ -1543,6 +1561,9 @@ begin
 	peasant_dir:=0;
 	peasant_steps:=0;
 	input_x:=0;
+	score:=0;
+
+	for i:=0 to 34 do visited_locations[i]:=false;
 
 	init_game_state;
 	init_inventory;
@@ -1595,7 +1616,10 @@ begin
 
 		if level_over<>LEVEL_NEW_FROM_LOAD then peasant_y:=peasant_newy;
 
+		if level_over=LEVEL_EXIT_TO_DOS then goto exit_to_dos;
 	end;
+
+exit_to_dos:
 
 	{ Restore Text Mode}
 	SetCGAMode(3);
