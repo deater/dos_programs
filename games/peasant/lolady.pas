@@ -128,7 +128,7 @@ begin
 
 	{ decompress dialog }
 
-	wad_load(file_buffer,'DINN');
+	wad_load(file_buffer,'DOLADY');
 	decompress(buffer_ptr(@dialog^[4096]),file_buffer);
 
 	{ decompress priority }
