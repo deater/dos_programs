@@ -22,7 +22,9 @@ Procedure burn_tree_actions; forward;
 {$I o_wfall.pas}
 {$I o_rock.pas}
 {$I o_knight.pas}
+{$I o_elake.pas}
 {$I o_inn.pas}
+{$I o_olady.pas}
 {$I o_btree.pas}
 
 {$I s_walk.pas}
@@ -626,12 +628,12 @@ begin
 		LOCATION_JHONKA_CAVE:		knight_actions;
 		LOCATION_YOUR_COTTAGE:		knight_actions;
 		LOCATION_LAKE_WEST:		knight_actions;
-		LOCATION_LAKE_EAST:		knight_actions;
+		LOCATION_LAKE_EAST:		east_lake_actions;
 		LOCATION_OUTSIDE_INN:		outside_inn_actions;
 		LOCATION_OUTSIDE_NN:		knight_actions;
 		LOCATION_WAVY_TREE:		knight_actions;
 		LOCATION_KERREK_2:		knight_actions;
-		LOCATION_OUTSIDE_LADY:		knight_actions;
+		LOCATION_OUTSIDE_LADY:		outside_lady_actions;
 		LOCATION_BURN_TREES:		burn_tree_actions;
 		LOCATION_CLIFF_BASE:		knight_actions;
 		LOCATION_CLIFF_HEIGHTS:		knight_actions;

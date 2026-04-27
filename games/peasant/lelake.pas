@@ -8,28 +8,139 @@ begin
 
 	case current_verb of
 
-	VERB_CLIMB:
-		if current_noun=NOUN_CLIFF then
-			print_offset:=
-				waterfall_dialog(waterfall_climb_cliff_message);
-
 	VERB_LOOK:	begin
 
-		if (current_noun=NOUN_TREE) then
-			print_offset:=waterfall_dialog(waterfall_look_tree_message);
-		if (current_noun=NOUN_WATERFALL) then
-			print_offset:=waterfall_dialog(waterfall_look_waterfall_message);
-		if (current_noun=NOUN_NONE) then
-			print_offset:=waterfall_dialog(waterfall_look_at_message);
+		if (current_noun=NOUN_BOAT) or (current_noun=NOUN_DINGHY) then begin
+			if game_state.FISH_FED then
+				print_offset:=lake_east_dialog(
+					lake_east_look_at_boat_gone_message)
+			else
+				print_offset:=lake_east_dialog(
+					lake_east_look_at_boat_message);
+		end;
+
+		if (current_noun=NOUN_DUDE) or (current_noun=NOUN_MAN) or
+			(current_noun=NOUN_GUY) or (current_noun=NOUN_PEASANT)
+				then
+			if game_state.FISH_FED=false then
+				print_offset:=lake_east_dialog(
+					lake_east_look_at_man_message);
+
+		if (current_noun=NOUN_LAKE) or (current_noun=NOUN_NONE) then begin
+
+			if game_state.FISH_FED then
+				print_offset:=lake_east_dialog(
+					lake_east_look_at_lake_message_man_gone)
+			else
+				print_offset:=lake_east_dialog(
+					lake_east_look_at_lake_message);
+
+		end;
+
+		if (current_noun=NOUN_SAND) then begin
+			print_offset:=lake_east_dialog(lake_east_look_at_sand_message);
+			partial_message_step;
+			print_offset:=lake_east_dialog(lake_east_look_at_sand_message2);
+			end;
 
 		end; {verb_look}
 
-	VERB_SWIM:
-		if (current_noun=NOUN_WATER) or
-			(current_noun=NOUN_WATERFALL) or
-			(current_noun=NOUN_NONE) then
+	VERB_TALK:
+		if (current_noun=NOUN_DUDE) or (current_noun=NOUN_MAN) or
+			(current_noun=NOUN_GUY) or (current_noun=NOUN_PEASANT)
+				then
+			if game_state.FISH_FED then
+				print_offset:=lake_east_dialog(
+					lake_east_talk_man_after_message)
+			else
+				print_offset:=lake_east_dialog(
+					lake_east_talk_man_message);
+
+
+	VERB_THROW: begin
+
+		if (current_noun=NOUN_FEED) then begin
+
+			if (inventory.CHICKEN_FEED) then begin
+
+				{ check if too far up/down}
+				if (peasant_y<52) or (peasant_y>120) then begin
+					print_offset:=
+					lake_east_dialog(
+					lake_east_throw_feed_too_south_message);
+				end
+				else begin
+					{ check if man still there }
+					if (game_state.FISH_FED) then begin
+						print_offset:=
+						lake_east_dialog(
+						lake_east_throw_feed_already_message);
+					end
+					else begin
+						{ he's there still }
+						{TODO}
+						{pesant_walkto(27,64);}
+						{peasant_dir:=PEASANT_DIR_LEFT;}
+
+						{ actually throw food }
+						print_offset:=
+						lake_east_dialog(
+						lake_east_throw_feed_message);
+						partial_message_step;
+
+						{ animate throwing}
+						{ TODO}
+
+						{ feed fish }
+						game_state.FISH_FED:=true;
+						inventory_gone.CHICKEN_FEED:=true;
+
+						{ FIXME: score should happen }
+						{ after message? }
+
+						{ score_points(2);}
+
+						print_offset:=
+						lake_east_dialog(
+						lake_east_throw_feed2_message);
+
+
+					end;
+				end;
+
+			end {inventory chicken_feed }
+			else
+				print_offset:=
+				lake_east_dialog(lake_east_throw_feed_none_message);
+
+		end {NOUN_FEED}
+		else if (current_noun=NOUN_STONES) or
+			(current_noun=NOUN_STONE) or
+			(current_noun=NOUN_ROCK) or
+			(current_noun=NOUN_ROCKS) then begin
 			print_offset:=
-				waterfall_dialog(waterfall_swim_message);
+				lake_east_dialog(lake_east_skip_stones_message);
+		end {NOUN_STONES}
+		else
+			{ throw anything else }
+			if (game_state.FISH_FED) then
+				print_offset:=
+				lake_east_dialog(lake_east_throw_default_gone_message)
+			else
+				print_offset:=
+				lake_east_dialog(lake_east_throw_default_message);
+
+	end; {verb throw}
+
+	VERB_SKIP: begin
+		if (current_noun=NOUN_STONES) or
+			(current_noun=NOUN_STONE) or
+			(current_noun=NOUN_ROCK) or
+			(current_noun=NOUN_ROCKS) then begin
+			print_offset:=
+				lake_east_dialog(lake_east_skip_stones_message);
+		end;
+	end; {verb skip}
 
 	end; {case verb}
 
@@ -51,7 +162,7 @@ begin
 
 	{ decompress dialog }
 
-	wad_load(file_buffer,'DWFALL');
+	wad_load(file_buffer,'DELAKE');
 	decompress(buffer_ptr(@dialog^[4096]),file_buffer);
 
 	{ decompress priority }

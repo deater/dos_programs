@@ -10,46 +10,11 @@ all:	shrink_text \
 	D_WFALL.PAS  O_WFALL.PAS \
 	D_ROCK.PAS   O_ROCK.PAS \
 	D_KNIGHT.PAS O_KNIGHT.PAS \
+	D_ELAKE.PAS  O_ELAKE.PAS \
 	D_INN.PAS    O_INN.PAS \
-	D_BTREE.PAS    O_BTREE.PAS \
+	D_OLADY.PAS  O_OLADY.PAS \
+	D_BTREE.PAS  O_BTREE.PAS \
 	D_COMMON.PAS O_COMMON.PAS
-
-
-#	DIALOG_NED_COTTAGE.ZX02 dialog_ned_cottage.inc \
-#	DIALOG_WAVY_TREE.ZX02 dialog_wavy_tree.inc \
-#	DIALOG_LADY_COTTAGE.ZX02 dialog_lady_cottage.inc \
-#	DIALOG_KERREK2.ZX02 dialog_kerrek2.inc \
-#	DIALOG_BURNINATED_TREE.ZX02 dialog_burninated_tree.inc \
-#	DIALOG_JHONKA.ZX02 dialog_jhonka.inc \
-#	DIALOG_COTTAGE.ZX02 dialog_cottage.inc \
-#	DIALOG_LAKE_WEST.ZX02 dialog_lake_west.inc \
-#	DIALOG_LAKE_EAST.ZX02 dialog_lake_east.inc \
-#	DIALOG_OUTSIDE_INN.ZX02 dialog_outside_inn.inc \
-#	DIALOG_GARY.ZX02 dialog_gary.inc \
-#	DIALOG_KERREK1.ZX02 dialog_kerrek1.inc \
-#	DIALOG_WELL.ZX02 dialog_well.inc \
-#	DIALOG_YELLOW_TREE.ZX02 dialog_yellow_tree.inc \
-#	DIALOG_WATERFALL.ZX02 dialog_waterfall.inc \
-#	DIALOG_PUDDLE.ZX02 dialog_puddle.inc \
-#	DIALOG_HAYSTACK.ZX02 dialog_haystack.inc \
-#	DIALOG_BROTHERS.ZX02 dialog_brothers.inc \
-#	DIALOG_RIVER.ZX02 dialog_river.inc \
-#	DIALOG_KNIGHT.ZX02 dialog_knight.inc \
-#	DIALOG_INSIDE_LADY.ZX02 dialog_inside_lady.inc \
-#	DIALOG_INSIDE_NED.ZX02 dialog_inside_ned.inc \
-#	DIALOG_HIDDEN_GLEN.ZX02 dialog_hidden_glen.inc \
-#	DIALOG_INSIDE_INN.ZX02 dialog_inside_inn.inc \
-#	DIALOG_INSIDE_INN_NIGHT.ZX02 dialog_inside_inn_night.inc \
-#	DIALOG_CLIFF_BASE.ZX02 dialog_cliff_base.inc \
-#	DIALOG_CLIFF_HEIGHTS.ZX02 dialog_cliff_heights.inc \
-#	DIALOG_OUTER1.ZX02 dialog_outer1.inc \
-#	DIALOG_OUTER2.ZX02 dialog_outer2.inc \
-#	DIALOG_OUTER3.ZX02 dialog_outer3.inc \
-#	DIALOG_TROGDOR.ZX02 dialog_trogdor.inc \
-#	DIALOG_CLIMB.ZX02 dialog_climb.inc \
-#	common.inc.lookup \
-#	inventory.inc.lookup
-
 
 ############################################
 ############################################
@@ -109,6 +74,19 @@ dialog_knight.raw:	knight.inc
 ############################################
 ############################################
 
+O_ELAKE.PAS:	dialog_lake_east.raw
+
+D_ELAKE.PAS:	D_ELAKE.ZX2
+	$(BIN2PAS) -l D_ELAKE D_ELAKE.ZX2 > D_ELAKE.PAS
+
+D_ELAKE.ZX2:	dialog_lake_east.raw
+	$(ZX02) -f  dialog_lake_east.raw D_ELAKE.ZX2
+
+dialog_lake_east.raw:	lake_east.inc
+	./shrink_text dialog_lake_east.raw O_ELAKE.PAS lake_east < lake_east.inc
+
+#####
+
 O_INN.PAS:	dialog_inn.raw
 
 D_INN.PAS:	D_INN.ZX2
@@ -123,6 +101,19 @@ dialog_inn.raw:	outside_inn.inc
 ############################################
 ############################################
 
+O_OLADY.PAS:	dialog_lady_cottage.raw
+
+D_OLADY.PAS:	D_OLADY.ZX2
+	$(BIN2PAS) -l D_OLADY D_OLADY.ZX2 > D_OLADY.PAS
+
+D_OLADY.ZX2:	dialog_lady_cottage.raw
+	$(ZX02) -f  dialog_lady_cottage.raw D_OLADY.ZX2
+
+dialog_lady_cottage.raw:	lady_cottage.inc
+	./shrink_text dialog_lady_cottage.raw O_OLADY.PAS lady_cottage < lady_cottage.inc
+
+###
+
 O_BTREE.PAS:	dialog_burninated_tree.raw
 
 D_BTREE.PAS:	D_BTREE.ZX2
@@ -135,7 +126,8 @@ dialog_burninated_tree.raw:	burninated_tree.inc
 	./shrink_text dialog_burninated_tree.raw O_BTREE.PAS burninated_tree < burninated_tree.inc
 
 
-
+############################################
+############################################
 
 
 ####

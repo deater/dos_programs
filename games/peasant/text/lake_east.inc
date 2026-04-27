@@ -9,7 +9,8 @@ lake_east_look_at_lake_message_man_gone:
 
 ; + look (when the old man is fishing)
 lake_east_look_at_lake_message:
-.byte "Why it's half a lake.With a",13	; [SIC] on the space after lake
+; [SIC] on the space after lake
+.byte "Why it's half a lake.With a",13
 .byte "fisherman in it. And he's",13
 .byte "fishing!",0
 
