@@ -1,4 +1,5 @@
 PNG2CGA = ../../../utils/cga-utils/png2cga
+PNG2COLLISION = ../../../utils/cga-utils/png2collision
 ZX02 = ~/research/6502_compression/zx02.git/build/zx02
 BIN2PAS = ../../../utils/pas-utils/bin2pas
 MKWAD = ../../../utils/disk-utils/mkwad
@@ -16,7 +17,7 @@ PEASANT.WAD:	\
 	pq_ytree.zx02     ../text/D_YTREE.ZX2 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2 \
-	pq_knight.zx02    ../text/D_KNIGHT.ZX2 \
+	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_priority.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2 \
 	pq_inn.zx02       ../text/D_INN.ZX2 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2 \
@@ -26,6 +27,7 @@ PEASANT.WAD:	\
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
+		knight_priority.zx02,PKNIGHT \
 		pq_e_lake.zx02,GELAKE ../text/D_ELAKE.ZX2,DELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
 		pq_hut.zx02,GOLADY ../text/D_OLADY.ZX2,DOLADY \
@@ -112,6 +114,22 @@ pq_knight.zx02:	pq_knight.cga
 
 pq_knight.cga:	pq_knight.png
 	$(PNG2CGA) -r ./pq_knight.png > pq_knight.cga
+
+knight_priority.zx02:	knight_priority.combined
+	$(ZX02) -f knight_priority.combined knight_priority.zx02
+
+knight_priority.combined:	knight_collision.bin
+#knight_collision.gr
+#	cat knight_priority.gr >  knight_priority.combined
+	cat knight_collision.bin >> knight_priority.combined
+
+knight_priority.gr:	knight_priority.png
+	$(PNG2GR) knight_priority.png knight_priority.gr
+
+knight_collision.bin:	knight_collision.png
+	$(PNG2COLLISION) knight_collision.png knight_collision.bin
+
+
 
 #################################################
 #################################################

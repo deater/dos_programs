@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -O2 -Wall -g
 
-all:	png2cga cga2png cga_make_sprite cga_make_sprite_mask
+all:	png2cga cga2png cga_make_sprite cga_make_sprite_mask png2collision
 
 ###
 
@@ -39,8 +39,17 @@ cga2png.o:		cga2png.c
 
 ###
 
+png2collision:		png2collision.o
+			$(CC) -o png2collision png2collision.o $(LFLAGS) -lpng
+
+png2collision.o:		png2collision.c
+			$(CC) $(CFLAGS) -c png2collision.c
+
+
+###
+
 #install:	
 #		cp pcx2cga png2cga cga2png $(INSTALL_LOC)
 
 clean:		
-		rm -f *~ *.o pcx2cga png2cga cga2png cga_make_sprite cga_make_sprite_mask
+		rm -f *~ *.o pcx2cga png2cga cga2png cga_make_sprite cga_make_sprite_mask png2collision

@@ -284,7 +284,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 var
 	visited_locations : array [0..34] of boolean;
 
-	file_buffer,dialog,background,framebuffer:buffer_ptr;
+	collision,file_buffer,dialog,background,framebuffer:buffer_ptr;
 
 	score: word;
 	screen:screentype absolute $B800:0000;
@@ -1272,12 +1272,88 @@ end;
 
 
 {=============================}
+{ Peasant Collide             }
+{=============================}
+{ newx/7 in Y				}
+{ newy in X				}
+{ returns C=0 if no collide		}
+{ C=1 if collide			}
+{					}
+{ collide data, 6 rows of 40 columns	}
+{       then in 8 bit chunks		}
+{					}
+{ rrrtttii				}
+{       bottom 2 bits don't matter (lores tile is 4 rows high) }
+{       next 3 bits = which of 8 bits is relevant	}
+{       top 3 bits are row lookup	}
+
+function peasant_collide(newx, newy: integer) : boolean;
+
+begin
+	{ assume 3-wide sprite, colliding with feet of the middle? }
+
+{        iny
+        sty     collision_smc1+1
+; add 28 to collide with feet
+        txa
+        clc
+        adc     #28             ; FIXME: if want to collide somewhere else
+
+        lsr
+        lsr             ; need to divide by 4 for offset lookup
+        pha
+        and     #$7
+        sta     collision_smc2+1
+        pla
+
+        lsr
+        lsr             ; shift 3 more times for row lookup
+        lsr
+
+        tax
+        lda     collision_offset,X              ; get collision offset
+        clc
+collision_smc1:
+        adc     #$00                            ; add in XPOS
+
+        tax
+lda     collision_location,X            ; get 8 bits of collision info
+
+collision_smc2:
+        ldx     #$01
+        and     collision_masks,X
+
+        bne     collide_true            ; true if bit set
+
+collide_false:
+        clc
+        rts
+
+collide_true:
+        sec
+        rts
+
+collision_offset:
+        .byte 0,40,80,120,160,200
+
+collision_masks:
+        .byte $80,$40,$20,$10,$08,$04,$02,$01
+
+}
+
+	peasant_collide:=false;
+
+end;
+
+{=============================}
 { Move peasant                }
 {=============================}
 
 Procedure move_peasant;
 
 label peasant_the_same;
+
+var newx,newy : integer;
 
 begin
 	if (peasant_xadd=0) and (peasant_yadd=0) then goto peasant_the_same;
@@ -1291,11 +1367,11 @@ begin
 
 	{ move x }
 
-	peasant_x:=peasant_x+peasant_xadd;
+	newx:=peasant_x+peasant_xadd;
 
 	{ check if too far left }
 
-	if peasant_x<0 then begin
+	if newx<0 then begin
 		move_map_west;
 		peasant_x:=300;
 		peasant_newy:=peasant_y;
@@ -1304,7 +1380,7 @@ begin
 
 	{ check if too far right }
 
-	if peasant_x>300 then begin
+	if newx>300 then begin
 		move_map_east;
 		peasant_x:=0;
 		peasant_newy:=peasant_y;
@@ -1313,23 +1389,25 @@ begin
 
 	{ collision detect x }
 
-	{ TODO }
-	{ peasant_collide; }
-
+	if (peasant_collide(newx,peasant_y)=true) then begin
+		stop_peasant;
+		newx:=peasant_x;
+	end;
 
 	{ Move Peasant Y }
+	peasant_x:=newx;
 
-	peasant_y:=peasant_y+peasant_yadd;
+	newy:=peasant_y+peasant_yadd;
 
 	{ check if too far up }
-	if peasant_y<45 then begin
+	if newy<45 then begin
 		move_map_north;
 		peasant_newy:=160;
 		goto peasant_the_same;
 	end;
 
 	{ check if too far down }
-	if peasant_y>160 then begin
+	if newy>160 then begin
 		move_map_south;
 		peasant_newy:=45;
 		goto peasant_the_same;
@@ -1337,9 +1415,12 @@ begin
 
 	{ collision detect y }
 
-	{ TODO }
-	{ peasant_collide; }
+	if (peasant_collide(peasant_x,newy)=true) then begin
+		stop_peasant;
+		newy:=peasant_y;
+	end;
 
+	peasant_y:=newy;
 
 peasant_the_same:
 
@@ -1557,6 +1638,7 @@ begin
 	GetMem(framebuffer,16384);
 	GetMem(dialog,8192);		{ probably could be smaller }
 	GetMem(file_buffer,5*1024);	{ 4k is slightly to small }
+	GetMem(collision,1024+256);
 
 	decompress(dialog,@D_COMMON);
 
