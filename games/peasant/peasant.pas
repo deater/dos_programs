@@ -1287,61 +1287,44 @@ end;
 {       next 3 bits = which of 8 bits is relevant	}
 {       top 3 bits are row lookup	}
 
-function peasant_collide(newx, newy: integer) : boolean;
+function peasant_collide(x, y: integer) : boolean;
+
+const collision_offset : array[0..5] of byte = (
+	0,40,80,120,160,200);
+
+const collision_masks : array [0..7] of byte = (
+	$80,$40,$20,$10,$08,$04,$02,$01
+);
+
+var temp2,temp3,temp4,temp5 : byte;
 
 begin
-	{ assume 3-wide sprite, colliding with feet of the middle? }
+	{ sprite is 24 wide? collide only with feet in the middle? }
+	{ also assume 28 high? }
 
-{        iny
-        sty     collision_smc1+1
-; add 28 to collide with feet
-        txa
-        clc
-        adc     #28             ; FIXME: if want to collide somewhere else
+	{ the collision map is like this: }
+	{ 6 rows of 40 bytes }
 
-        lsr
-        lsr             ; need to divide by 4 for offset lookup
-        pha
-        and     #$7
-        sta     collision_smc2+1
-        pla
+	x:=(x shr 3)+1;	{ each block 8 pixels wide, point to middle }
 
-        lsr
-        lsr             ; shift 3 more times for row lookup
-        lsr
+	y:=y+28;	{ point to feet }
 
-        tax
-        lda     collision_offset,X              ; get collision offset
-        clc
-collision_smc1:
-        adc     #$00                            ; add in XPOS
+	{ temp:=y shr 2;}	{ offset lookup? }
 
-        tax
-lda     collision_location,X            ; get 8 bits of collision info
+	temp2:=(y shr 2) and $7;	{ mask off bits }
 
-collision_smc2:
-        ldx     #$01
-        and     collision_masks,X
+	{ temp:=y shr 5; }
 
-        bne     collide_true            ; true if bit set
+	{ shift right 5 for row }
 
-collide_false:
-        clc
-        rts
+	temp3:=collision_offset[(y shr 5)]+x;
 
-collide_true:
-        sec
-        rts
+	temp4:=collision^[temp3]; { get 8 bits of collision info }
 
-collision_offset:
-        .byte 0,40,80,120,160,200
+	temp5:=temp4 and collision_masks[temp2];
 
-collision_masks:
-        .byte $80,$40,$20,$10,$08,$04,$02,$01
-
-}
-
-	peasant_collide:=false;
+	if (temp5=0) then peasant_collide:=false
+	else peasant_collide:=true;
 
 end;
 
