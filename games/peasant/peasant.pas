@@ -1,7 +1,7 @@
 program peasants_quest;
 {by Vince 'Deater' Weaver}
 
-uses crt,zx02,cga;
+uses crt,zx02_asm,cga;
 
 {$I pq_vid.pas}
 {$I pq_title.pas}

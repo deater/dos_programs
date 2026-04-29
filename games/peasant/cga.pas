@@ -160,12 +160,17 @@ Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
 
 var	even_offset,odd_offset,mask_offset,width,height:word;
 	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
-	col_offset:word;
+	peasant_priority,tempy,col_offset:word;
+
 
 label even_loopy,even_loopx;
 label odd_loopy,odd_loopx;
 
 begin
+	tempy:=y;
+	if (tempy<48) then tempy:=48;
+	peasant_priority:=((tempy-48) shr 3)+2;
+
 	f_seg:=seg(framebuffer^);
 	f_off:=ofs(framebuffer^);
 
