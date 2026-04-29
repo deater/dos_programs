@@ -413,32 +413,55 @@ int main(int argc, char **argv) {
 	int row=0;
 	int col=0;
 //	int x;
-	unsigned char out_buffer[1024];
 
 	unsigned char *image;
 	int xsize,ysize;
 	FILE *outfile;
 
-	if (argc<3) {
-		fprintf(stderr,"Usage:\t%s INFILE OUTFILE\n\n",argv[0]);
+	if (argc<4) {
+		fprintf(stderr,"Usage:\t%s COLLISION PRIORITY OUTFILE\n\n",argv[0]);
 		exit(-1);
 	}
 
-	outfile=fopen(argv[2],"w");
+	outfile=fopen(argv[3],"w");
 	if (outfile==NULL) {
 		fprintf(stderr,"Error!  Could not open %s\n",argv[2]);
 		exit(-1);
 	}
 
+	/*****************/
+	/* load priority */
+	if (loadpng(argv[2],&image,&xsize,&ysize,PNG_WHOLETHING)<0) {
+		fprintf(stderr,"Error loading png!\n");
+		exit(-1);
+	}
+
+	fprintf(stderr,"Loaded priority image %s, %d by %d\n",
+		argv[2],xsize,ysize);
+
+	int temp;
+	for(row=0;row<24;row++) {
+		for(col=0;col<40;col++) {
+			temp=((image[((row*4)+0)*xsize+col])&0xf)<<4;
+			temp|=image[((row*4)+1)*xsize+col]&0xf;
+			fputc( temp,outfile);
+		}
+	}
+
+	/******************/
+	/* load collision */
 	if (loadpng(argv[1],&image,&xsize,&ysize,PNG_WHOLETHING)<0) {
 		fprintf(stderr,"Error loading png!\n");
 		exit(-1);
 	}
 
-	fprintf(stderr,"Loaded image %d by %d\n",xsize,ysize);
+	fprintf(stderr,"Loaded collision image %s %d by %d\n",
+			argv[1],xsize,ysize);
+	/* output the distance table, 40x24 = 960 bytes */
+	/* high/low nibble, opposite of Apple II */
 
 
-	memset(out_buffer,0,240);
+	/* output the collision table (240 bytes) */
 
 	int temp_byte;
 

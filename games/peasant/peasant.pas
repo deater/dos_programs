@@ -1307,7 +1307,7 @@ begin
 
 	x:=(x shr 3)+1;	{ each block 8 pixels wide, point to middle }
 
-	y:=y+28;	{ point to feet }
+	y:=y+30;	{ point to feet }
 
 	{ temp:=y shr 2;}	{ offset lookup? }
 
@@ -1319,7 +1319,7 @@ begin
 
 	temp3:=collision_offset[(y shr 5)]+x;
 
-	temp4:=collision^[temp3]; { get 8 bits of collision info }
+	temp4:=collision^[960+temp3]; { get 8 bits of collision info }
 
 	temp5:=temp4 and collision_masks[temp2];
 
@@ -1422,7 +1422,9 @@ begin
 
 	which := (peasant_dir*6)+peasant_steps;
 
-	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],screen_ptr(framebuffer));
+	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
+		screen_ptr(framebuffer),screen_ptr(collision));
+{	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],screen_ptr(framebuffer));}
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],@screen);}
 end;
 

@@ -118,16 +118,8 @@ pq_knight.cga:	pq_knight.png
 knight_priority.zx02:	knight_priority.combined
 	$(ZX02) -f knight_priority.combined knight_priority.zx02
 
-knight_priority.combined:	knight_collision.bin
-#knight_collision.gr
-#	cat knight_priority.gr >  knight_priority.combined
-	cat knight_collision.bin >> knight_priority.combined
-
-knight_priority.gr:	knight_priority.png
-	$(PNG2GR) knight_priority.png knight_priority.gr
-
-knight_collision.bin:	knight_collision.png
-	$(PNG2COLLISION) knight_collision.png knight_collision.bin
+knight_priority.combined:	knight_priority.png knight_collision.png
+	$(PNG2COLLISION) knight_collision.png knight_priority.png knight_priority.combined
 
 
 

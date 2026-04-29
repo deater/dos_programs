@@ -14,6 +14,8 @@ type
 
 Procedure PrintChar(which: char);
 Procedure PrintCharXor(which: char;x,y:word);
+Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
+		framebuffer,priority: screen_ptr);
 Procedure SpriteXY(x,y: word; sprite: SpritePtr; framebuffer: screen_ptr);
 Procedure PrintStringXor(st:string;x,y:word);
 Procedure screen_copy(dest,src:screen_ptr);
@@ -149,6 +151,104 @@ begin
 end;
 
 
+{***********************************************}
+{ CGA_draw_sprite_bg_mask                       }
+{***********************************************}
+
+Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
+			framebuffer,priority: screen_ptr);
+
+var	even_offset,odd_offset,mask_offset,width,height:word;
+	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
+	col_offset:word;
+
+label even_loopy,even_loopx;
+label odd_loopy,odd_loopx;
+
+begin
+	f_seg:=seg(framebuffer^);
+	f_off:=ofs(framebuffer^);
+
+	s_seg:=seg(sprite^);
+	s_off:=ofs(sprite^)+2;
+
+	even_offset:=((y div 2)*80)+(x div 4);
+	even_offset:=even_offset+f_off;
+	odd_offset:=even_offset+$2000;
+
+	xsize:=Word(sprite^[0]);
+	ysize:=Word(sprite^[1]);
+
+	mask_offset:=xsize*ysize*2;
+
+	asm
+
+		{; even first }
+
+		push	ds
+		push	es
+
+		mov	ax,[f_seg]
+		mov	es,ax
+		mov	di,[even_offset]	{; es:di = destination}
+
+		mov	ax,[s_seg]
+		mov	ds,ax
+		mov	si,[s_off]	{; ds:si = source}
+
+		mov	bx,[mask_offset]
+
+		mov	dx,[ysize]
+
+even_loopy:
+		mov	cx,[xsize]
+even_loopx:
+
+		mov	al,es:[di]
+		and	al,ds:[si][bx]
+		or	al,ds:[si]
+		inc	si
+		stosb
+
+		loop	even_loopx
+
+		add	di,(80-4)
+
+		dec	dx
+		jne	even_loopy
+
+
+		{; odd next }
+		{; at this point }
+
+		mov	di,[odd_offset]	{; es:di = destination}
+
+		mov	dx,[ysize]
+
+odd_loopy:
+		mov	cx,[xsize]
+odd_loopx:
+
+		mov	al,es:[di]
+		and	al,ds:[si][bx]
+		or	al,ds:[si]
+		inc	si
+		stosb
+
+		loop	odd_loopx
+
+		add	di,(80-4)
+
+		dec	dx
+		jne	odd_loopy
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
 
 
 {***********************************************}
@@ -183,6 +283,7 @@ Procedure SpriteXY(x,y: word; sprite: SpritePtr; framebuffer: screen_ptr);
 
 var	even_offset,odd_offset,mask_offset,width,height:word;
 	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
+	col_offset:word;
 
 label even_loopy,even_loopx;
 label odd_loopy,odd_loopx;
