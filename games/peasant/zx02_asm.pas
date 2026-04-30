@@ -170,7 +170,7 @@ elias_skip1:
 	jc	elias_get
 
 					{ Got ending bit, stop reading }
-        ret
+        retn
 
 zx02_exit:
 	pop	si

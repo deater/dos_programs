@@ -135,7 +135,7 @@ dzx0s_new_offset:
 	lodsb				# load from ZX0_src, increment
 plus5:
 					# Divide by 2
-	rcr	%al			#  @
+	rcr	$1,%al			#  @
 	mov	%al,%bl
 
 	# And get the copy length.
