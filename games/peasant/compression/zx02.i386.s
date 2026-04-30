@@ -42,6 +42,8 @@ _start:
 	int	$0x80
 
 	#======================================
+	# zx02_full_decomp
+	#======================================
 
 zx02_full_decomp:
 
@@ -52,68 +54,76 @@ zx02_full_decomp:
 
 	xor	%ebx,%ebx		# set offset to 0
 
-# Decode literal: Ccopy next N bytes from compressed file
-#   Elias(length)  byte[1]  byte[2]  ...  byte[N]
+	#=======================================================
+	# Decode literal: Ccopy next N bytes from compressed file
+	#   Elias(length)  byte[1]  byte[2]  ...  byte[N]
 decode_literal:
 
 	call	get_elias
 
-
-
 cop0:
-	lodsb			# load byte from ZX0_src, inc
+	lodsb				# load byte from ZX0_src, 16-bit inc
 plus1:
-	stosb			# store byte to ZX0_dst, inc
+	stosb				# store byte to ZX0_dst, 16-bit inc
 plus2:
-	dec	%cl
+	dec	%cl			# X
 	jne	cop0
 
-	salb	$1,bitr
+	salb	$1,bitr			# arith shift left bitr, top in carry
 	jc	dzx0s_new_offset
 
-# Copy from last offset (repeat N bytes from last offset)
-#    Elias(length)
+	##########################################################
+	# Copy from last offset (repeat N bytes from last offset)
+	#    Elias(length)
 
 	call	get_elias
 
 dzx0s_copy:
-	mov	%edi,%edx		# load ZX0_dst
-	sub	%edx,%ebx		# subtract offset
+	# 16-bit subtract: pntr = ZX0_dst - offset
+	# on 6502 C=0 here so we can't use SUB but
+	# instead SBB+sec (is carry inverted vs 6502?) to match
+	stc
+	mov	%edi,%edx		# load offset into edx
+	sbb	%ebx,%edx		# edx=edi-%ebx
 					# store in pntr
 cop1:
 	movb	(%edx),%al		# load byte from ptr
-	inc	%edx			# increment pntr
+	inc	%edx			# increment pntr 16-bit
 
 plus3:
 	stosb				# store byte to ZX0_dst
 plus4:
-	dec	%ebx
+	dec	%cl
 	jne	cop1
 
 	salb	$1,bitr
 	jnc	decode_literal
 
-# Copy from new offset (repeat N bytes from new offset)
-#    Elias(MSB(offset))  LSB(offset)  Elias(length-1)
+	#=======================================================
+	# Copy from new offset (repeat N bytes from new offset)
+	#    Elias(MSB(offset))  LSB(offset)  Elias(length-1)
 
 dzx0s_new_offset:
 
 	#  Read elias code for high part of offset
 	call	get_elias
-	je	zx02_exit	#  Read a 0, signals the end
+
+	jz	zx02_exit		#  Read a 0, signals the end
 
 	# Decrease and divide by 2
-	dec	%cx
-	shr	$1,%cx		# @
-	mov	%cl,%bh
+
+	dec	%cl
+	mov	%cl,%al
+	shr	$1,%al			# @
+	mov	%al,%bh
 
 	# Get low part of offset, a literal 7 bits
 
 	lodsb			# load from ZX0_src, increment
 plus5:
 				# Divide by 2
-	ror	%ax		#  @
-	mov	%ax,%bx
+	rcr	%al		#  @
+	mov	%al,%bl
 
 	# And get the copy length.
 	# Start elias reading with the bit already in carry:
@@ -134,19 +144,19 @@ get_elias:
 	jmp	elias_start
 
 elias_get:				# Read next data bit to result
-	salb	$1,bitr
-	rol	%ecx			# @
+	salb	$1,bitr			# arith shift left
+	rcl	%cl			# move bit into low bit of cx?
 
 elias_start:
 	# Get one bit
-	salb	$1,bitr
-	jne	elias_skip1
+	salb	$1,bitr			#
+	jne	elias_skip1		#
 
 	# Read new bit from stream
 	lodsb				# load ZX0_src, inc (16-bit)
 
 	stc				# set carry
-	rol	%al			# @
+	rcl	%al			# @
 	mov	%al,bitr
 
 elias_skip1:
