@@ -92,8 +92,8 @@ dzx0s_copy:
 	# on 6502 C=0 here so we can't use SUB but
 	# instead SBB+sec (is carry inverted vs 6502?) to match
 	stc
-	mov	%edi,%ebp		# load offset into edx
-	sbb	%ebx,%ebp		# edx=edi-%ebx
+	mov	%edi,%ebp		# load offset into ebp
+	sbb	%ebx,%ebp		# ebp=edi-%ebp
 					# store in pntr
 cop1:
 	movb	(%ebp),%al		# load byte from ptr

@@ -19,246 +19,170 @@ procedure decompress(dest,src:buffer_ptr);
 IMPLEMENTATION
 
 
-var
-	bitr : byte;		{ * bit reserve }
-	extra_bit: byte;	{ extra bit to inject }
-	offset: word;		{ last offset }
-	ipos: word;		{ * input position }
-	opos: word;		{ * output position }
-	input,output: buffer_ptr; { ** }
-
-
-{************ get byte *************}
-
-function get_byte:byte;
-
-begin
-
-	ipos := ipos + 1;
-
-	get_byte := 0;
-
-	get_byte:=input^[ipos-1];
-end;
-
-{************ get bit *************}
-
-function get_bit:byte;
-
-var	bit,c:byte;
-
-begin
-
-	if (extra_bit<>0) then begin
-		bit := extra_bit and 1;
-		extra_bit := 0;
-	end
-	else begin
-		if (bitr = $80) then begin
-			c := get_byte;
-			if ((c and $80) <> 0) then bit:=1 else bit:=0;
-			bitr := ((c shl 1) or 1);
-		end 
-		else begin
-			if ((bitr and $80) <> 0) then bit:=1 else bit:=0;
-			bitr := (bitr shl 1);
-		end
-	end;
-	get_bit:=bit;
-end;
-
-{************ put byte *************}
-
-procedure put_byte(b:byte);
-
-begin
-
-    output^[opos] := b;
-    opos := opos + 1;
-
-end;
-
-{************ get elias *************}
-{* Reads interlaced elias code      *}
-
-function get_elias:word;
-
-var
-	ret,retval:word;
-	i,b:byte;
-
-label
-	early_out;
-
-begin
-	ret:=1;
-	retval:=0;
-
-	for i:=0 to 8 do begin
-
-		b := get_bit;
-		if (b = 0) then begin
-			retval:=ret;
-			goto early_out;
-		end;
-
-		ret := ((ret shl 1) or get_bit);
-
-		if (ret > $100) then begin
-			retval:=0;
-			goto early_out;
-		end;
-	end;
-early_out:
-	get_elias:= retval;
-end;
-
-
-{************ decode literal *************}
-
-procedure decode_literal;
-
-var
-	c:byte;
-	len:word;
-
-label	early_out;
-
-begin
-
-	len := get_elias;
-
-	if (len=0) then goto early_out;
-
-	while (len<>0) do begin
-		c := get_byte;
-		put_byte(c);
-		len:=len-1;
-	end;
-
-early_out:
-
-end;
-
-
-{************ decode match *************}
-
-procedure decode_match(len_add:word);
-
-var
-	len,pos:word;
-
-label	early_out;
-
-begin
-
-	len := get_elias + len_add;
-	pos := opos;
-
-	if (len > $100) then len := len and $FF;
-
-	pos := pos - offset - 1;
-
-	if (len=0) then goto early_out;
-
-	while (len<>0) do begin
-		put_byte(output^[pos]);
-		pos := pos + 1;
-		len := len - 1;
-	end;
-
-early_out:
-
-end;
-
-{************ decode offset *************}
-
-function decode_offset:word;
-
-var
-	msb,off,retval:word;
-
-label	early_out;
-
-begin
-	retval := 0;
-	msb := get_elias;
-
-	if ((msb and $FF) = 0) then begin
-		retval := 1;
-		goto early_out;
-	end;
-
-	msb := msb - 1;
-
-	off := get_byte;
-
-	{ last bit in offset LSB is used as next bit to be read:}
-	extra_bit := 2 or (off and 1);
-	offset := (msb shl 7) or (off shr 1);
-
-early_out:
-	decode_offset:=retval;
-
-end;
-
-
-
-
-{*****************}
-{ Decompress file }
-{*****************}
-
 procedure decompress(dest,src:buffer_ptr);
 
-var state:word;
-label	early_out;
+var
+	dest_seg,dest_off,src_seg,src_off : word;
+
+label decode_literal,cop0,plus1,plus2;
+label dzx0s_copy,cop1,plus3,plus4,dzx0s_new_offset;
+label plus5,get_elias,elias_get,elias_skip1,elias_start,plus6;
+label zx02_exit;
 
 begin
-	opos := 0;
-	bitr := $80;
-	ipos := 0;
+	dest_seg:=seg(dest^);
+	dest_off:=ofs(dest^);
+	src_seg:=seg(src^);
+	src_off:=ofs(src^);
 
-	extra_bit:=0;
-	offset:=0;
+	asm
 
-	input := src;
-	output := dest;
+	push	es
+	push	ds			{ turbo pascal needs ds/bp saved }
+	push	bp
+	push	di
+	push	si
 
+	mov	ax,[dest_seg]
+	mov	es,ax			{ ZX0_dst }
+	mov	di,[dest_off]		{ es:di = destination}
 
-	{*****************}
-	{ Decode Loop     }
-	{*****************}
+	mov	ax,[src_seg]
+	mov	ds,ax			{ ZX0_src }
+	mov	si,[src_off]		{ ds:si = source}
 
+	mov	dl,80h			{ bitr }
 
-	state := 0; { LITERAL }
+	xor     bx,bx			{ set offset to 0 }
 
-	while(true) do begin
-		case state of
+	{=======================================================  }
+	{ Decode literal: Ccopy next N bytes from compressed file }
+	{   Elias(length)  byte[1]  byte[2]  ...  byte[N]         }
+decode_literal:
 
-			0: begin		{ Decode literal value: }
-				decode_literal;
-				if (get_bit<>0) then state := 2
-				else state := 1;
-			   end;
+	call	get_elias
 
-			2: begin		{ Decode new offset: }
-				if (decode_offset<>0) then goto early_out;
-				decode_match(1);
+cop0:
+	lodsb				{ load byte from ZX0_src, 16-bit inc }
+plus1:
+	stosb				{ store byte to ZX0_dst, 16-bit inc }
+plus2:
+	dec     cl			{ X }
+	jne	cop0
 
-				if (get_bit<>0) then state := 2
-				else state := 0;
-			   end;
-			1: begin		{  Decode repeated offset: }
-				decode_match(0);
-				if (get_bit<>0) then state := 2
-				else state := 0;
-			   end;
-		end;
+	sal	dl,1			{ arith shift left bitr, top in carry}
+	jc	dzx0s_new_offset
+
+	{ ########################################################## }
+	{ # Copy from last offset (repeat N bytes from last offset)  }
+	{ #    Elias(length)                                         }
+
+	call	get_elias
+
+dzx0s_copy:
+	{ # 16-bit subtract: pntr = ZX0_dst - offset                 }
+	{ # on 6502 C=0 here so we can't use SUB but                 }
+	{ # instead SBB+sec (is carry inverted vs 6502?) to match    }
+	stc
+	mov	bp,di			{ load offset into ebp }
+	sbb	bp,bx			{ ebp=edi-ebx }
+					{ ebp is pntr }
+cop1:
+	mov	al,[es:bp]		{ load byte from ptr }
+	inc	bp			{ increment pntr 16-bit }
+
+plus3:
+	stosb				{ store byte to ZX0_dst }
+plus4:
+	dec	cl
+	jnz	cop1
+
+	sal	dl,1
+	jnc	decode_literal
+
+	{ ======================================================= }
+	{ Copy from new offset (repeat N bytes from new offset)   }
+	{ Elias(MSB(offset))  LSB(offset)  Elias(length-1)        }
+
+dzx0s_new_offset:
+	{ Read elias code for high part of offset }
+
+	call	get_elias
+
+	or	al,al			{ see if 0 }
+					{ we can't do this inside get_elias }
+					{ because OR clears the carry flag }
+					{ which broke things }
+
+	jz	zx02_exit		{ Read a 0, signals the end }
+
+	{ Decrease and divide by 2 }
+
+	dec	cl
+	mov	bh,cl			{ move to high part of offset }
+	shr	bh,1			{ @ }
+
+	{ Get low part of offset, a literal 7 bits }
+
+	lodsb				{ load from ZX0_src, increment }
+plus5:
+					{ Divide by 2 }
+	rcr	al,1			{ @ }
+	mov	bl,al
+
+	{ And get the copy length. }
+	{ Start elias reading with the bit already in carry: }
+
+	mov     cl,1
+	call	elias_skip1
+
+	inc	cl
+	jnc	dzx0s_copy
+
+{===================================== }
+{ Read an elias-gamma interlaced code. }
+{ ------------------------------------ }
+
+get_elias:
+					{ Initialize return value to #1 }
+	mov     cl,1			{ ldx   #1 }
+	jmp	elias_start
+
+elias_get:				{ Read next data bit to result }
+	sal	dl,1			{ arith shift left bitr }
+	rcl     al,1			{ rotate into low bit }
+	mov	cl,al			{ move to count register }
+
+elias_start:
+        { Get one bit }
+	sal	dl,1			{ arith shift left bitr }
+	jnz	elias_skip1             { }
+
+	{ Read new bit from stream }
+	lodsb				{ load ZX0_src, inc (16-bit) }
+plus6:
+	stc				{ set carry }
+	rcl	al,1			{ @ }
+	mov	dl,al			{ move into bitr }
+
+elias_skip1:
+	mov     al,cl			{ note: mov doesn't set zero flag }
+	jc	elias_get
+
+					{ Got ending bit, stop reading }
+        ret
+
+zx02_exit:
+	pop	si
+	pop	di
+	pop	bp
+	pop	ds
+	pop	es
+
 	end;
 
-early_out:
 
 end;
+
 
 end.
