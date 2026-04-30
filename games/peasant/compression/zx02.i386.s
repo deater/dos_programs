@@ -41,6 +41,9 @@ _start:
 	pop	%eax
 	int	$0x80
 
+#	call	zx02_full_decomp
+#	jmp	write_out
+
 	#======================================
 	# zx02_full_decomp
 	#======================================
@@ -72,6 +75,8 @@ plus2:
 	salb	$1,bitr			# arith shift left bitr, top in carry
 	jc	dzx0s_new_offset
 
+
+
 	##########################################################
 	# Copy from last offset (repeat N bytes from last offset)
 	#    Elias(length)
@@ -94,7 +99,7 @@ plus3:
 	stosb				# store byte to ZX0_dst
 plus4:
 	dec	%cl
-	jne	cop1
+	jnz	cop1
 
 	salb	$1,bitr
 	jnc	decode_literal
@@ -108,7 +113,12 @@ dzx0s_new_offset:
 	#  Read elias code for high part of offset
 	call	get_elias
 
-	jz	zx02_exit		#  Read a 0, signals the end
+	or	%al,%al			# see if 0
+					# we can't do this inside get_elias
+					# because OR clears the carry flag
+					# which broke things
+
+	jz	zx02_exit		# Read a 0, signals the end
 
 	# Decrease and divide by 2
 
@@ -128,10 +138,10 @@ plus5:
 	# And get the copy length.
 	# Start elias reading with the bit already in carry:
 
-	mov	$1,%cx
+	mov	$1,%cl
 	call	elias_skip1
 
-	inc	%cx
+	inc	%cl
 	jnc	dzx0s_copy
 
 # Read an elias-gamma interlaced code.
@@ -140,28 +150,30 @@ plus5:
 get_elias:
 
 					# Initialize return value to #1
-	mov	$1,%ecx			# ldx   #1
+	mov	$1,%cl			# ldx   #1
 	jmp	elias_start
 
 elias_get:				# Read next data bit to result
 	salb	$1,bitr			# arith shift left
-	rcl	%cl			# move bit into low bit of cx?
+	rcl	$1,%al			# move bit into low bit of cx?
+	mov	%al,%cl
 
 elias_start:
 	# Get one bit
 	salb	$1,bitr			#
-	jne	elias_skip1		#
+	jnz	elias_skip1		#
 
 	# Read new bit from stream
 	lodsb				# load ZX0_src, inc (16-bit)
-
+plus6:
 	stc				# set carry
-	rcl	%al			# @
+	rcl	$1,%al			# @
 	mov	%al,bitr
 
 elias_skip1:
-	mov	%cl,%al
+	mov	%cl,%al			# mov doesn't set zero flag
 	jc	elias_get
+
 					#  Got ending bit, stop reading
 	ret
 
@@ -171,10 +183,11 @@ zx02_exit:
 
 
 
+
 	#======================================
 	# write out output to stdout
 	#======================================
-
+write_out:
 
 	push	$1			# stdout
 	pop	%ebx			# in bx
