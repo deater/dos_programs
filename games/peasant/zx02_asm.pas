@@ -203,19 +203,33 @@ early_out:
 end;
 
 
+
+
 {*****************}
-{ Decode Loop     }
+{ Decompress file }
 {*****************}
 
+procedure decompress(dest,src:buffer_ptr);
 
-procedure decode_loop;
-
-var
-	state:word;
-
+var state:word;
 label	early_out;
 
 begin
+	opos := 0;
+	bitr := $80;
+	ipos := 0;
+
+	extra_bit:=0;
+	offset:=0;
+
+	input := src;
+	output := dest;
+
+
+	{*****************}
+	{ Decode Loop     }
+	{*****************}
+
 
 	state := 0; { LITERAL }
 
@@ -244,28 +258,6 @@ begin
 	end;
 
 early_out:
-
-end;
-
-
-{*****************}
-{ Decompress file }
-{*****************}
-
-procedure decompress(dest,src:buffer_ptr);
-
-begin
-	opos := 0;
-	bitr := $80;
-	ipos := 0;
-
-	extra_bit:=0;
-	offset:=0;
-
-	input := src;
-	output := dest;
-
-	decode_loop;
 
 end;
 
