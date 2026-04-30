@@ -1,0 +1,250 @@
+# decompress zx02 compressed data in x86 assembly
+# by Vince `Deater` Weaver
+
+# based on the 6502 version that is (c) 2022 DMSC under MIT license
+
+
+# Syscalls
+.equ SYSCALL_EXIT,     1
+.equ SYSCALL_READ,     3
+.equ SYSCALL_WRITE,    4
+.equ SYSCALL_OPEN,     5
+.equ SYSCALL_CLOSE,    6
+
+	.globl _start
+_start:
+
+
+
+.if 0
+	#======================================
+	# read in the file
+	#======================================
+
+	push	$SYSCALL_OPEN		# load 5 [ open() ]
+	pop	%eax			# in 3 bytes
+
+	mov	$filename,%ebx		# '/proc/cpuinfo'
+	xor	%ecx,%ecx		# 0 = O_RDONLY <bits/fcntl.h>
+	cdq				# clear edx in clever way
+	int	$0x80			# syscall.  fd in eax.
+					# we should check that eax>=0
+
+	mov	%eax,%ebx		# save our fd
+
+	push	$SYSCALL_READ		# load 3 = read()
+	pop	%eax			# in 3 bytes
+
+	mov	$disk_buffer,%ecx
+
+	mov	$32,%dh			# 8192 bytes
+					# we load sneakily by knowing
+					# 32<<8 = 8192. be sure edx clear
+
+
+	int	$0x80
+
+	push	$SYSCALL_CLOSE		# close (to be correct)
+	pop	%eax
+	int	$0x80
+
+#	call	zx02_full_decomp
+#	jmp	write_out
+
+.endif
+
+
+
+.code16
+.arch i8086
+
+	#======================================
+	# zx02_full_decomp
+	#======================================
+
+zx02_full_decomp:
+
+	mov	$out_buffer,%di	# set destination ZX0_dst
+	mov	$disk_buffer,%si	# set source ZX0_src
+
+	movb	$0x80,%dl
+
+	xor	%bx,%bx		# set offset to 0
+
+	#=======================================================
+	# Decode literal: Ccopy next N bytes from compressed file
+	#   Elias(length)  byte[1]  byte[2]  ...  byte[N]
+decode_literal:
+
+	call	get_elias
+
+cop0:
+	lodsb				# load byte from ZX0_src, 16-bit inc
+plus1:
+	stosb				# store byte to ZX0_dst, 16-bit inc
+plus2:
+	dec	%cl			# X
+	jne	cop0
+
+	salb	$1,%dl			# arith shift left bitr, top in carry
+	jc	dzx0s_new_offset
+
+
+
+	##########################################################
+	# Copy from last offset (repeat N bytes from last offset)
+	#    Elias(length)
+
+	call	get_elias
+
+dzx0s_copy:
+	# 16-bit subtract: pntr = ZX0_dst - offset
+	# on 6502 C=0 here so we can't use SUB but
+	# instead SBB+sec (is carry inverted vs 6502?) to match
+	stc
+	mov	%di,%bp		# load offset into ebp
+	sbb	%bx,%bp		# ebp=edi-%ebp
+					# store in pntr
+cop1:
+	movb	(%bp),%al		# load byte from ptr
+	inc	%bp			# increment pntr 16-bit
+
+plus3:
+	stosb				# store byte to ZX0_dst
+plus4:
+	dec	%cl
+	jnz	cop1
+
+	salb	$1,%dl
+	jnc	decode_literal
+
+	#=======================================================
+	# Copy from new offset (repeat N bytes from new offset)
+	#    Elias(MSB(offset))  LSB(offset)  Elias(length-1)
+
+dzx0s_new_offset:
+
+	#  Read elias code for high part of offset
+	call	get_elias
+
+	or	%al,%al			# see if 0
+					# we can't do this inside get_elias
+					# because OR clears the carry flag
+					# which broke things
+
+	jz	zx02_exit		# Read a 0, signals the end
+
+	# Decrease and divide by 2
+
+	dec	%cl
+	mov	%cl,%bh			# move to high part of offset
+	shr	$1,%bh			# @
+
+	# Get low part of offset, a literal 7 bits
+
+	lodsb				# load from ZX0_src, increment
+plus5:
+					# Divide by 2
+	rcr	%al			#  @
+	mov	%al,%bl
+
+	# And get the copy length.
+	# Start elias reading with the bit already in carry:
+
+	mov	$1,%cl
+	call	elias_skip1
+
+	inc	%cl
+	jnc	dzx0s_copy
+
+#=====================================
+# Read an elias-gamma interlaced code.
+# ------------------------------------
+
+get_elias:
+
+					# Initialize return value to #1
+	mov	$1,%cl			# ldx   #1
+	jmp	elias_start
+
+elias_get:				# Read next data bit to result
+	salb	$1,%dl			# arith shift left bitr
+	rcl	$1,%al			# rotate into low bit
+	mov	%al,%cl			# move to count register
+
+elias_start:
+	# Get one bit
+	salb	$1,%dl			# arith shift left bitr
+	jnz	elias_skip1		#
+
+	# Read new bit from stream
+	lodsb				# load ZX0_src, inc (16-bit)
+plus6:
+	stc				# set carry
+	rcl	$1,%al			# @
+	mov	%al,%dl			# move into bitr
+
+elias_skip1:
+	mov	%cl,%al			# note: mov doesn't set zero flag
+	jc	elias_get
+
+					#  Got ending bit, stop reading
+	ret
+
+zx02_exit:
+
+
+.if 0
+
+	#======================================
+	# write out output to stdout
+	#======================================
+write_out:
+
+	push	$1			# stdout
+	pop	%ebx			# in bx
+
+	push	$SYSCALL_WRITE		# load 3 = read()
+	pop	%eax			# in 3 bytes
+
+	mov	$out_buffer,%ecx
+
+	cdq				# clear dx (sign extend ax into it)
+
+	mov	$64,%dh			# 16384 bytes
+					# we load sneakily by knowing
+					# 64<<8 = 16384. be sure edx clear
+
+
+	int	$0x80
+
+	push	$SYSCALL_CLOSE		# close (to be correct)
+	pop	%eax
+	int	$0x80
+
+
+	#================================
+	# Exit
+	#================================
+exit:
+	xor     %ebx,%ebx
+	xor	%eax,%eax
+	inc	%eax	 		# put exit syscall number (1) in eax
+	int     $0x80             	# and exit
+.endif
+
+
+#===========================================================================
+#	section .data
+#===========================================================================
+.data
+
+filename:	.ascii	"pq_title.zx02"
+
+#============================================================================
+#	section .bss
+#============================================================================
+.bss
+.lcomm	disk_buffer,8192
+.lcomm	out_buffer,16384
+#.lcomm	bitr,1
