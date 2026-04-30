@@ -57,7 +57,7 @@ zx02_full_decomp:
 	mov	$out_buffer,%edi	# set destination ZX0_dst
 	mov	$disk_buffer,%esi	# set source ZX0_src
 
-	movb	$0x80,%dl
+	movb	$0x80,bitr
 
 	xor	%ebx,%ebx		# set offset to 0
 
@@ -76,7 +76,7 @@ plus2:
 	dec	%cl			# X
 	jne	cop0
 
-	salb	$1,%dl			# arith shift left bitr, top in carry
+	salb	$1,bitr			# arith shift left bitr, top in carry
 	jc	dzx0s_new_offset
 
 
@@ -92,12 +92,12 @@ dzx0s_copy:
 	# on 6502 C=0 here so we can't use SUB but
 	# instead SBB+sec (is carry inverted vs 6502?) to match
 	stc
-	mov	%edi,%ebp		# load offset into edx
-	sbb	%ebx,%ebp		# edx=edi-%ebx
+	mov	%edi,%edx		# load offset into edx
+	sbb	%ebx,%edx		# edx=edi-%ebx
 					# store in pntr
 cop1:
-	movb	(%ebp),%al		# load byte from ptr
-	inc	%ebp			# increment pntr 16-bit
+	movb	(%edx),%al		# load byte from ptr
+	inc	%edx			# increment pntr 16-bit
 
 plus3:
 	stosb				# store byte to ZX0_dst
@@ -105,7 +105,7 @@ plus4:
 	dec	%cl
 	jnz	cop1
 
-	salb	$1,%dl
+	salb	$1,bitr
 	jnc	decode_literal
 
 	#=======================================================
@@ -127,15 +127,16 @@ dzx0s_new_offset:
 	# Decrease and divide by 2
 
 	dec	%cl
-	mov	%cl,%bh			# move to high part of offset
-	shr	$1,%bh			# @
+	mov	%cl,%al
+	shr	$1,%al			# @
+	mov	%al,%bh
 
 	# Get low part of offset, a literal 7 bits
 
-	lodsb				# load from ZX0_src, increment
+	lodsb			# load from ZX0_src, increment
 plus5:
-					# Divide by 2
-	rcr	%al			#  @
+				# Divide by 2
+	rcr	%al		#  @
 	mov	%al,%bl
 
 	# And get the copy length.
@@ -158,13 +159,13 @@ get_elias:
 	jmp	elias_start
 
 elias_get:				# Read next data bit to result
-	salb	$1,%dl			# arith shift left bitr
-	rcl	$1,%al			# rotate into low bit
-	mov	%al,%cl			# move to count register
+	salb	$1,bitr			# arith shift left
+	rcl	$1,%al			# move bit into low bit of cx?
+	mov	%al,%cl
 
 elias_start:
 	# Get one bit
-	salb	$1,%dl			# arith shift left bitr
+	salb	$1,bitr			#
 	jnz	elias_skip1		#
 
 	# Read new bit from stream
@@ -172,10 +173,10 @@ elias_start:
 plus6:
 	stc				# set carry
 	rcl	$1,%al			# @
-	mov	%al,%dl			# move into bitr
+	mov	%al,bitr
 
 elias_skip1:
-	mov	%cl,%al			# note: mov doesn't set zero flag
+	mov	%cl,%al			# mov doesn't set zero flag
 	jc	elias_get
 
 					#  Got ending bit, stop reading
@@ -238,4 +239,4 @@ filename:	.ascii	"pq_title.zx02"
 .bss
 .lcomm	disk_buffer,8192
 .lcomm	out_buffer,16384
-#.lcomm	bitr,1
+.lcomm	bitr,1
