@@ -7,32 +7,34 @@ MKWAD = ../../../utils/disk-utils/mkwad
 all:	PEASANT.WAD \
 	PQ_VID.PAS PQ_TITLE.PAS PQ_TIPS.PAS
 
-#	PQ_WFALL.PAS PQ_KNGHT.PAS PQ_INN.PAS \
-#	PQ_YTREE.PAS PQ_ROCK.PAS \
-#	PQ_KER1.PAS PQ_TIPS.PAS
-
 ####
 
 PEASANT.WAD:	\
-	pq_ytree.zx02     ../text/D_YTREE.ZX2 \
-	pq_waterfall.zx02 ../text/D_WFALL.ZX2 waterfall_priority.zx02 \
-	pq_rock.zx02      ../text/D_ROCK.ZX2 \
+	pq_ytree.zx02     ../text/D_YTREE.ZX2  yellow_tree_priority.zx02 \
+	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_priority.zx02 \
+	pq_rock.zx02      ../text/D_ROCK.ZX2   river_priority.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_priority.zx02 \
-	pq_e_lake.zx02    ../text/D_ELAKE.ZX2 \
-	pq_inn.zx02       ../text/D_INN.ZX2 \
-	pq_hut.zx02       ../text/D_OLADY.ZX2 \
-	pq_btree.zx02     ../text/D_BTREE.ZX2
+	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_priority.zx02 \
+	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_priority.zx02 \
+	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_priority.zx02 \
+	pq_btree.zx02     ../text/D_BTREE.ZX2 crooked_tree_priority.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
+		yellow_tree_priority.zx02,PYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		waterfall_priority.zx02,PWFALL \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
+		river_priority.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		knight_priority.zx02,PKNIGHT \
 		pq_e_lake.zx02,GELAKE ../text/D_ELAKE.ZX2,DELAKE \
+		lake_e_priority.zx02,PELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
+		outside_inn_priority.zx02,PINN \
 		pq_hut.zx02,GOLADY ../text/D_OLADY.ZX2,DOLADY \
-		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE
+		lady_cottage_priority.zx02,POLADY \
+		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE \
+		crooked_tree_priority.zx02,PBTREE
 
 
 ####
@@ -81,6 +83,12 @@ pq_ytree.zx02:	pq_ytree.cga
 pq_ytree.cga:	pq_ytree.png
 	$(PNG2CGA) -r ./pq_ytree.png > pq_ytree.cga
 
+yellow_tree_priority.zx02:	yellow_tree_priority.combined
+	$(ZX02) -f yellow_tree_priority.combined yellow_tree_priority.zx02
+
+yellow_tree_priority.combined:	yellow_tree_priority.png yellow_tree_collision.png
+	$(PNG2COLLISION) yellow_tree_collision.png yellow_tree_priority.png yellow_tree_priority.combined
+
 ####
 
 PQ_WFALL.PAS:	pq_waterfall.zx02
@@ -109,6 +117,12 @@ pq_rock.zx02:	pq_rock.cga
 
 pq_rock.cga:	pq_rock.png
 	$(PNG2CGA) -r ./pq_rock.png > pq_rock.cga
+
+river_priority.zx02:	river_priority.combined
+	$(ZX02) -f river_priority.combined river_priority.zx02
+
+river_priority.combined:	river_priority.png river_collision.png
+	$(PNG2COLLISION) river_collision.png river_priority.png river_priority.combined
 
 ###
 
@@ -141,6 +155,12 @@ pq_e_lake.zx02:	pq_e_lake.cga
 pq_e_lake.cga:	pq_e_lake.png
 	$(PNG2CGA) -r ./pq_e_lake.png > pq_e_lake.cga
 
+lake_e_priority.zx02:	lake_e_priority.combined
+	$(ZX02) -f lake_e_priority.combined lake_e_priority.zx02
+
+lake_e_priority.combined:	lake_e_priority.png lake_e_collision.png
+	$(PNG2COLLISION) lake_e_collision.png lake_e_priority.png lake_e_priority.combined
+
 ###
 
 PQ_INN.PAS:	pq_inn.zx02
@@ -152,6 +172,11 @@ pq_inn.zx02:	pq_inn.cga
 pq_inn.cga:	pq_inn.png
 	$(PNG2CGA) -r ./pq_inn.png > pq_inn.cga
 
+outside_inn_priority.zx02:	outside_inn_priority.combined
+	$(ZX02) -f outside_inn_priority.combined outside_inn_priority.zx02
+
+outside_inn_priority.combined:	outside_inn_priority.png outside_inn_collision.png
+	$(PNG2COLLISION) outside_inn_collision.png outside_inn_priority.png outside_inn_priority.combined
 
 #################################################
 #################################################
@@ -165,6 +190,12 @@ pq_hut.zx02:	pq_hut.cga
 pq_hut.cga:	pq_hut.png
 	$(PNG2CGA) -r ./pq_hut.png > pq_hut.cga
 
+lady_cottage_priority.zx02:	lady_cottage_priority.combined
+	$(ZX02) -f lady_cottage_priority.combined lady_cottage_priority.zx02
+
+lady_cottage_priority.combined:	lady_cottage_priority.png lady_cottage_collision.png
+	$(PNG2COLLISION) lady_cottage_collision.png lady_cottage_priority.png lady_cottage_priority.combined
+
 ####
 
 PQ_BTREE.PAS:	pq_btree.zx02
@@ -176,7 +207,11 @@ pq_btree.zx02:	pq_btree.cga
 pq_btree.cga:	pq_burntree.png
 	$(PNG2CGA) -r ./pq_burntree.png > pq_btree.cga
 
+crooked_tree_priority.zx02:	crooked_tree_priority.combined
+	$(ZX02) -f crooked_tree_priority.combined crooked_tree_priority.zx02
 
+crooked_tree_priority.combined:	crooked_tree_priority.png crooked_tree_collision.png
+	$(PNG2COLLISION) crooked_tree_collision.png crooked_tree_priority.png crooked_tree_priority.combined
 
 #####
 

@@ -167,6 +167,9 @@ begin
 
 	{ decompress priority }
 
+	wad_load(file_buffer,'PELAKE');
+	decompress(buffer_ptr(collision),file_buffer);
+
 	{ load bg }
 
 	wad_load(file_buffer,'GELAKE');

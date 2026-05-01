@@ -1453,7 +1453,7 @@ end;
  'talk man'                                     13
 -Take items by typing 'get (item)'              14
 -Use items by typing 'use (item)' You can       15
- also 'give (item)' 'throw(item)' or some       16
+ also 'give (item)' 'throw (item)' or some      16
  other action words                             17
 -Type 'inv' to see your INVENTORY               18
 -Type 'save' to save your game and 'load'       19
@@ -1476,7 +1476,7 @@ begin
 	PrintStringXor(' ''talk man''',0,13);
 	PrintStringXor('-Take items by typing ''get (item)''',0,14);
 	PrintStringXor('-Use items by typing ''use (item)'' You',0,15);
-	PrintStringXor(' can also ''give (item)'' ''throw(item)''',0,16);
+	PrintStringXor(' can also ''give (item)'' ''throw (item)''',0,16);
 	PrintStringXor(' or some other action words',0,17);
 	PrintStringXor('-Type ''inv'' to see your INVENTORY',0,18);
 	PrintStringXor('-Type ''save'' to save your game and',0,19);

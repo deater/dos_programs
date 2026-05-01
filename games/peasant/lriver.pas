@@ -56,6 +56,9 @@ begin
 
 	{ decompress priority }
 
+	wad_load(file_buffer,'PROCK');
+	decompress(buffer_ptr(collision),file_buffer);
+
 	{ load bg }
 
 	wad_load(file_buffer,'GROCK');
