@@ -15,7 +15,7 @@ all:	PEASANT.WAD \
 
 PEASANT.WAD:	\
 	pq_ytree.zx02     ../text/D_YTREE.ZX2 \
-	pq_waterfall.zx02 ../text/D_WFALL.ZX2 \
+	pq_waterfall.zx02 ../text/D_WFALL.ZX2 waterfall_priority.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_priority.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2 \
@@ -25,6 +25,7 @@ PEASANT.WAD:	\
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
+		waterfall_priority.zx02,PWFALL \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		knight_priority.zx02,PKNIGHT \
@@ -91,6 +92,11 @@ pq_waterfall.zx02:	pq_waterfall.cga
 pq_waterfall.cga:	pq_waterfall.png
 	$(PNG2CGA) -r ./pq_waterfall.png > pq_waterfall.cga
 
+waterfall_priority.zx02:	waterfall_priority.combined
+	$(ZX02) -f waterfall_priority.combined waterfall_priority.zx02
+
+waterfall_priority.combined:	waterfall_priority.png waterfall_collision.png
+	$(PNG2COLLISION) waterfall_collision.png waterfall_priority.png waterfall_priority.combined
 
 #################################################
 #################################################
