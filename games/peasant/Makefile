@@ -24,6 +24,7 @@ TEST.EXE:	test.pas
 
 PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
+	lolady.pas \
 	sprites/s_walk.pas
 	cp peasant.pas zx02_asm.pas cga.pas $(TPDIR)
 	cp wad_load.pas $(TPDIR)

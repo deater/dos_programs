@@ -299,6 +299,7 @@ var
 
 	level_over: level_over_type;
 	game_state: game_state_type;
+	bush_status: byte;
 
 	inventory,inventory_gone: inventory_type;
 
@@ -1644,6 +1645,8 @@ begin
 	for i:=0 to 34 do visited_locations[i]:=false;
 
 	init_game_state;
+	bush_status:=0;
+
 	init_inventory;
 
 	map_location:=LOCATION_MOUNTAIN_PASS;
