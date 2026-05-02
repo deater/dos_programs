@@ -19,7 +19,7 @@ PEASANT.WAD:	\
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_priority.zx02 \
 	pq_btree.zx02     ../text/D_BTREE.ZX2  crooked_tree_priority.zx02 \
 	pq_iinn.zx02      ../text/D_IINN.ZX2 \
-	pq_ilady.zx02     ../text/D_ILADY.ZX2
+	pq_ilady.zx02     ../text/D_ILADY.ZX2  inside_cottage_priority.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		yellow_tree_priority.zx02,PYTREE \
@@ -38,8 +38,8 @@ PEASANT.WAD:	\
 		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE \
 		crooked_tree_priority.zx02,PBTREE \
 		pq_iinn.zx02,GIINN ../text/D_IINN.ZX2,DIINN \
-		pq_ilady.zx02,GILADY ../text/D_ILADY.ZX2,DILADY
-
+		pq_ilady.zx02,GILADY ../text/D_ILADY.ZX2,DILADY \
+		inside_cottage_priority.zx02,PILADY
 
 ####
 
@@ -262,11 +262,11 @@ pq_ilady.zx02:	pq_ilady.cga
 pq_ilady.cga:	pq_ilady.png
 	$(PNG2CGA) -r ./pq_ilady.png > pq_ilady.cga
 
-#inside_lady_priority.zx02:	inside_lady_priority.combined
-#	$(ZX02) -f inside_lady_priority.combined inside_lady_priority.zx02
+inside_cottage_priority.zx02:	inside_cottage_priority.combined
+	$(ZX02) -f inside_cottage_priority.combined inside_cottage_priority.zx02
 
-#inside_lady_priority.combined:	inside_lady_priority.png inside_lady_collision.png
-#	$(PNG2COLLISION) inside_lady_collision.png inside_lady_priority.png inside_lady_priority.combined
+inside_cottage_priority.combined:	inside_cottage_priority.png inside_cottage_collision.png
+	$(PNG2COLLISION) inside_cottage_collision.png inside_cottage_priority.png inside_cottage_priority.combined
 
 
 

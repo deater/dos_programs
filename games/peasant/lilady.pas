@@ -146,7 +146,7 @@ begin
 
 	{ decompress priority }
 
-	wad_load(file_buffer,'POLADY');
+	wad_load(file_buffer,'PILADY');
 	decompress(buffer_ptr(collision),file_buffer);
 
 	{ load bg }
