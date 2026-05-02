@@ -43,8 +43,9 @@ begin
 		3:
 			print_offset:=lady_cottage_dialog(lady_cottage_searched_3_bushes_message);
 		4: 	begin
-			{ TODO: }
-			{ score_points(2);}
+
+			score_points(2);
+			update_score;
 
 			{ get trinket }
 			inventory.TRINKET:=true;

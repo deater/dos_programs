@@ -316,15 +316,50 @@ label exit_to_dos;
 {=====================================}
 { Update Score                        }
 {=====================================}
+{ also print it?  would we ever update w/o printing? }
 
 Procedure update_score;
 
+var score_string : string[30];
+    ch : Integer;
 begin
-	{ TODO: actually update score }
+	{ erase old score }
+	Rectangle(0,0,319,10,$ff,@screen);
 
-	PrintStringXor('Score:0 out of 150',0,0);
+	if (score<10) then begin
+		score_string:='Score: 0 out of 150';
+		ch:=score mod 10;
+		score_string[8]:=chr(ch+48);
+		PrintStringXor(score_string,0,0);
+	end
+	else if (score<100) then begin
+		score_string:='Score: 10 out of 150';
+		PrintStringXor(score_string,0,0);
+	end
+	else begin
+		score_string:='Score: 100 out of 150';
+		PrintStringXor(score_string,0,0);
+	end;
+
 	PrintStringXor('Peasant''s Quest',25,0);
 end;
+
+{=====================================}
+{ Score Points                        }
+{=====================================}
+
+Procedure score_points(pts : byte);
+
+begin
+	score:=score+pts;
+
+	update_score;
+
+	{TODO: make noise}
+
+end;
+
+
 
 {=====================================}
 { Reset Prompt                        }
