@@ -86,8 +86,18 @@ wad_name_found:
 
 	{ get offset }
 
-	offset:=header[0]+(header[1] shl 8)+
-		(header[2] shl 16) + (header[3] shl 24);
+{	offset:=header[0]+(header[1] shl 8)+
+		(header[2] shl 16) + (header[3] shl 24);}
+
+	{ above goes negative }
+
+	offset:=header[3];
+	offset:=offset shl 8;
+	offset:=offset+header[2];
+	offset:=offset shl 8;
+	offset:=offset+header[1];
+	offset:=offset shl 8;
+	offset:=offset+header[0];
 
 	{ get size }
 
