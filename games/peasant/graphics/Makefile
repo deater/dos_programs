@@ -17,7 +17,9 @@ PEASANT.WAD:	\
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_priority.zx02 \
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_priority.zx02 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_priority.zx02 \
-	pq_btree.zx02     ../text/D_BTREE.ZX2 crooked_tree_priority.zx02
+	pq_btree.zx02     ../text/D_BTREE.ZX2  crooked_tree_priority.zx02 \
+	pq_iinn.zx02      ../text/D_IINN.ZX2 \
+	pq_ilady.zx02     ../text/D_ILADY.ZX2
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		yellow_tree_priority.zx02,PYTREE \
@@ -34,7 +36,9 @@ PEASANT.WAD:	\
 		pq_hut.zx02,GOLADY ../text/D_OLADY.ZX2,DOLADY \
 		lady_cottage_priority.zx02,POLADY \
 		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE \
-		crooked_tree_priority.zx02,PBTREE
+		crooked_tree_priority.zx02,PBTREE \
+		pq_iinn.zx02,GIINN ../text/D_IINN.ZX2,DIINN \
+		pq_ilady.zx02,GILADY ../text/D_ILADY.ZX2,DILADY
 
 
 ####
@@ -227,8 +231,43 @@ pq_ker1.cga:	pq_ker1.png
 
 ####
 
+#################################################
+#################################################
+
+PQ_IINN.PAS:	pq_iinn.zx02
+	$(BIN2PAS) -l PQ_IINN pq_iinn.zx02 > PQ_IINN.PAS
+
+pq_iinn.zx02:	pq_iinn.cga
+	$(ZX02) -f pq_iinn.cga pq_iinn.zx02
+
+pq_iinn.cga:	pq_iinn.png
+	$(PNG2CGA) -r ./pq_iinn.png > pq_iinn.cga
+
+#inside_inn_priority.zx02:	inside_inn_priority.combined
+#	$(ZX02) -f inside_inn_priority.combined inside_inn_priority.zx02
+
+#inside_inn_priority.combined:	inside_inn_priority.png inside_inn_collision.png
+#	$(PNG2COLLISION) inside_inn_collision.png inside_inn_priority.png inside_inn_priority.combined
+
 
 ####
+
+
+PQ_ILADY.PAS:	pq_ilady.zx02
+	$(BIN2PAS) -l PQ_ILADY pq_ilady.zx02 > PQ_ILADY.PAS
+
+pq_ilady.zx02:	pq_ilady.cga
+	$(ZX02) -f pq_ilady.cga pq_ilady.zx02
+
+pq_ilady.cga:	pq_ilady.png
+	$(PNG2CGA) -r ./pq_ilady.png > pq_ilady.cga
+
+#inside_lady_priority.zx02:	inside_lady_priority.combined
+#	$(ZX02) -f inside_lady_priority.combined inside_lady_priority.zx02
+
+#inside_lady_priority.combined:	inside_lady_priority.png inside_lady_collision.png
+#	$(PNG2COLLISION) inside_lady_collision.png inside_lady_priority.png inside_lady_priority.combined
+
 
 
 

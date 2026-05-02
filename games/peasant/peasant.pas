@@ -16,6 +16,8 @@ Procedure knight_actions; forward;
 Procedure outside_inn_actions; forward;
 Procedure outside_lady_actions; forward;
 Procedure burn_tree_actions; forward;
+Procedure inside_inn_actions; forward;
+Procedure inside_lady_actions; forward;
 
 
 {$I o_ytree.pas}
@@ -26,6 +28,8 @@ Procedure burn_tree_actions; forward;
 {$I o_inn.pas}
 {$I o_olady.pas}
 {$I o_btree.pas}
+{$I o_iinn.pas}
+{$I o_ilady.pas}
 
 {$I s_walk.pas}
 
@@ -688,8 +692,8 @@ begin
 		LOCATION_TROGDOR_OUTER:		knight_actions;
 		LOCATION_TROGDOR_LAIR:		knight_actions;
 		LOCATION_HIDDEN_GLEN:		knight_actions;
-		LOCATION_INSIDE_LADY:		knight_actions;
-		LOCATION_INSIDE_NN:		knight_actions;
+		LOCATION_INSIDE_LADY:		inside_lady_actions;
+		LOCATION_INSIDE_NN:		inside_inn_actions;
 		LOCATION_INSIDE_INN:		knight_actions;
 		LOCATION_ARCHERY_GAME:		knight_actions;
 		LOCATION_MAP:			knight_actions;
@@ -1486,6 +1490,8 @@ end;
 {$I linn.pas}
 {$I lolady.pas}
 {$I lbtree.pas}
+{$I liinn.pas }
+{$I lilady.pas }
 
 
 {************************************}

@@ -14,6 +14,8 @@ all:	shrink_text \
 	D_INN.PAS    O_INN.PAS \
 	D_OLADY.PAS  O_OLADY.PAS \
 	D_BTREE.PAS  O_BTREE.PAS \
+	D_IINN.PAS   O_IINN.PAS \
+	D_ILADY.PAS   O_ILADY.PAS \
 	D_COMMON.PAS O_COMMON.PAS
 
 ############################################
@@ -129,8 +131,33 @@ dialog_burninated_tree.raw:	burninated_tree.inc
 ############################################
 ############################################
 
+O_IINN.PAS:	dialog_inside_inn.raw
 
-####
+D_IINN.PAS:	D_IINN.ZX2
+	$(BIN2PAS) -l D_IINN D_IINN.ZX2 > D_IINN.PAS
+
+D_IINN.ZX2:	dialog_inside_inn.raw
+	$(ZX02) -f  dialog_inside_inn.raw D_IINN.ZX2
+
+dialog_inside_inn.raw:	inside_inn.inc
+	./shrink_text dialog_inside_inn.raw O_IINN.PAS inside_inn < inside_inn.inc
+
+###
+
+O_ILADY.PAS:	dialog_inside_lady.raw
+
+D_ILADY.PAS:	D_ILADY.ZX2
+	$(BIN2PAS) -l D_ILADY D_ILADY.ZX2 > D_ILADY.PAS
+
+D_ILADY.ZX2:	dialog_inside_lady.raw
+	$(ZX02) -f  dialog_inside_lady.raw D_ILADY.ZX2
+
+dialog_inside_lady.raw:	inside_lady.inc
+	./shrink_text dialog_inside_lady.raw O_ILADY.PAS inside_lady < inside_lady.inc
+
+
+############################################
+############################################
 
 O_COMMON.PAS:	dialog_common.raw
 
