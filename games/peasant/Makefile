@@ -34,6 +34,7 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	cp lelake.pas linn.pas $(TPDIR)
 	cp lolady.pas lbtree.pas $(TPDIR)
 	cp liinn.pas lilady.pas $(TPDIR)
+	cp lunknown.pas $(TPDIR)
 	cp test2.pas $(TPDIR)
 	cp graphics/PQ_VID.PAS $(TPDIR)
 	cp graphics/PQ_TITLE.PAS $(TPDIR)

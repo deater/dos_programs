@@ -18,8 +18,9 @@ PEASANT.WAD:	\
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_priority.zx02 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_priority.zx02 \
 	pq_btree.zx02     ../text/D_BTREE.ZX2  crooked_tree_priority.zx02 \
-	pq_iinn.zx02      ../text/D_IINN.ZX2 \
-	pq_ilady.zx02     ../text/D_ILADY.ZX2  inside_cottage_priority.zx02
+	pq_iinn.zx02      ../text/D_IINN.ZX2   inside_inn_priority.zx02 \
+	pq_ilady.zx02     ../text/D_ILADY.ZX2  inside_cottage_priority.zx02 \
+	pq_unknown.zx02	unknown_priority.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		yellow_tree_priority.zx02,PYTREE \
@@ -38,8 +39,11 @@ PEASANT.WAD:	\
 		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE \
 		crooked_tree_priority.zx02,PBTREE \
 		pq_iinn.zx02,GIINN ../text/D_IINN.ZX2,DIINN \
+		inside_inn_priority.zx02,PIINN \
 		pq_ilady.zx02,GILADY ../text/D_ILADY.ZX2,DILADY \
-		inside_cottage_priority.zx02,PILADY
+		inside_cottage_priority.zx02,PILADY \
+		pq_unknown.zx02,GUNKNOWN \
+		unknown_priority.zx02,PUNKNOWN
 
 ####
 
@@ -229,8 +233,6 @@ pq_ker1.cga:	pq_ker1.png
 	$(PNG2CGA) -r ./pq_ker1.png > pq_ker1.cga
 
 
-####
-
 #################################################
 #################################################
 
@@ -243,15 +245,14 @@ pq_iinn.zx02:	pq_iinn.cga
 pq_iinn.cga:	pq_iinn.png
 	$(PNG2CGA) -r ./pq_iinn.png > pq_iinn.cga
 
-#inside_inn_priority.zx02:	inside_inn_priority.combined
-#	$(ZX02) -f inside_inn_priority.combined inside_inn_priority.zx02
+inside_inn_priority.zx02:	inside_inn_priority.combined
+	$(ZX02) -f inside_inn_priority.combined inside_inn_priority.zx02
 
-#inside_inn_priority.combined:	inside_inn_priority.png inside_inn_collision.png
-#	$(PNG2COLLISION) inside_inn_collision.png inside_inn_priority.png inside_inn_priority.combined
+inside_inn_priority.combined:	inside_inn_priority.png inside_inn_collision.png
+	$(PNG2COLLISION) inside_inn_collision.png inside_inn_priority.png inside_inn_priority.combined
 
 
 ####
-
 
 PQ_ILADY.PAS:	pq_ilady.zx02
 	$(BIN2PAS) -l PQ_ILADY pq_ilady.zx02 > PQ_ILADY.PAS
@@ -268,21 +269,25 @@ inside_cottage_priority.zx02:	inside_cottage_priority.combined
 inside_cottage_priority.combined:	inside_cottage_priority.png inside_cottage_collision.png
 	$(PNG2COLLISION) inside_cottage_collision.png inside_cottage_priority.png inside_cottage_priority.combined
 
+#################################################
+#################################################
 
+PQ_UNKNOWN.PAS:	pq_unknown.zx02
+	$(BIN2PAS) -l PQ_UNKNOWN pq_unknown.zx02 > PQ_UNKNOWN.PAS
 
+pq_unknown.zx02:	pq_unknown.cga
+	$(ZX02) -f pq_unknown.cga pq_unknown.zx02
+
+pq_unknown.cga:	pq_unknown.png
+	$(PNG2CGA) -r ./pq_unknown.png > pq_unknown.cga
+
+unknown_priority.zx02:	unknown_priority.combined
+	$(ZX02) -f unknown_priority.combined unknown_priority.zx02
+
+unknown_priority.combined:	unknown_priority.png unknown_collision.png
+	$(PNG2COLLISION) unknown_collision.png unknown_priority.png unknown_priority.combined
 
 ####
-
-
-
-####
-
-
-
-
-####
-
-
 
 clean:	
 	rm -f *.PAS *.WAD

@@ -18,6 +18,7 @@ Procedure outside_lady_actions; forward;
 Procedure burn_tree_actions; forward;
 Procedure inside_inn_actions; forward;
 Procedure inside_lady_actions; forward;
+Procedure unknown_actions; forward;
 
 
 {$I o_ytree.pas}
@@ -701,7 +702,7 @@ begin
 		LOCATION_TROGDOR_OUTER2:	knight_actions;
 		LOCATION_TROGDOR_OUTER3:	knight_actions;
 		LOCATION_INSIDE_INN_NIGHT:	knight_actions;
-		LOCATION_EMPTY:			knight_actions;
+		LOCATION_EMPTY:			unknown_actions;
 	end;
 
 	if (print_offset<>common_dialog(unknown_message)) then
@@ -1483,6 +1484,7 @@ end;
 {$I lbtree.pas}
 {$I liinn.pas }
 {$I lilady.pas }
+{$I lunknown.pas }
 
 
 {************************************}
@@ -1701,41 +1703,41 @@ begin
 
 		case map_location of
 
-		LOCATION_POOR_GARY:		do_knight;
-		LOCATION_KERREK_1:		do_knight;
-		LOCATION_OLD_WELL:		do_knight;
+		LOCATION_POOR_GARY:		do_unknown;
+		LOCATION_KERREK_1:		do_unknown;
+		LOCATION_OLD_WELL:		do_unknown;
 		LOCATION_YELLOW_TREE:		do_yellow_tree;
 		LOCATION_WATERFALL:		do_waterfall;
-		LOCATION_HAY_BALE:		do_knight;
-		LOCATION_MUD_PUDDLE:		do_knight;
-		LOCATION_ARCHERY:		do_knight;
+		LOCATION_HAY_BALE:		do_unknown;
+		LOCATION_MUD_PUDDLE:		do_unknown;
+		LOCATION_ARCHERY:		do_unknown;
 		LOCATION_RIVER_STONE:		do_river;
 		LOCATION_MOUNTAIN_PASS:		do_knight;
-		LOCATION_JHONKA_CAVE:		do_knight;
-		LOCATION_YOUR_COTTAGE:		do_knight;
-		LOCATION_LAKE_WEST:		do_knight;
+		LOCATION_JHONKA_CAVE:		do_unknown;
+		LOCATION_YOUR_COTTAGE:		do_unknown;
+		LOCATION_LAKE_WEST:		do_unknown;
 		LOCATION_LAKE_EAST:		do_east_lake;
 		LOCATION_OUTSIDE_INN:		do_outside_inn;
-		LOCATION_OUTSIDE_NN:		do_knight;
-		LOCATION_WAVY_TREE:		do_knight;
-		LOCATION_KERREK_2:		do_knight;
+		LOCATION_OUTSIDE_NN:		do_unknown;
+		LOCATION_WAVY_TREE:		do_unknown;
+		LOCATION_KERREK_2:		do_unknown;
 		LOCATION_OUTSIDE_LADY:		do_outside_lady;
 		LOCATION_BURN_TREES:		do_burn_tree;
-		LOCATION_CLIFF_BASE:		do_knight;
-		LOCATION_CLIFF_HEIGHTS:		do_knight;
-		LOCATION_TROGDOR_OUTER:		do_knight;
-		LOCATION_TROGDOR_LAIR:		do_knight;
-		LOCATION_HIDDEN_GLEN:		do_knight;
+		LOCATION_CLIFF_BASE:		do_unknown;
+		LOCATION_CLIFF_HEIGHTS:		do_unknown;
+		LOCATION_TROGDOR_OUTER:		do_unknown;
+		LOCATION_TROGDOR_LAIR:		do_unknown;
+		LOCATION_HIDDEN_GLEN:		do_unknown;
 		LOCATION_INSIDE_LADY:		do_inside_lady;
-		LOCATION_INSIDE_NN:		do_knight;
+		LOCATION_INSIDE_NN:		do_unknown;
 		LOCATION_INSIDE_INN:		do_inside_inn;
-		LOCATION_ARCHERY_GAME:		do_knight;
-		LOCATION_MAP:			do_knight;
-		LOCATION_CLIMB:			do_knight;
-		LOCATION_TROGDOR_OUTER2:	do_knight;
-		LOCATION_TROGDOR_OUTER3:	do_knight;
-		LOCATION_INSIDE_INN_NIGHT:	do_knight;
-		LOCATION_EMPTY:			do_knight;
+		LOCATION_ARCHERY_GAME:		do_unknown;
+		LOCATION_MAP:			do_unknown;
+		LOCATION_CLIMB:			do_unknown;
+		LOCATION_TROGDOR_OUTER2:	do_unknown;
+		LOCATION_TROGDOR_OUTER3:	do_unknown;
+		LOCATION_INSIDE_INN_NIGHT:	do_unknown;
+		LOCATION_EMPTY:			do_unknown;
 	end;
 
 
