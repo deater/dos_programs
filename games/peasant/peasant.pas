@@ -1255,26 +1255,17 @@ const exits_west : array [0..34] of map_locations = (
 	{=====================}
 	{ update map location }
 	{=====================}
-(*
-Procedure update_map_location;
+
+Procedure update_map_location(new_location : map_locations);
 
 begin
+	previous_location:=map_location;
 
-        ldx     MAP_LOCATION
-        stx     PREVIOUS_LOCATION
-        ldy     location_to_file,X
-        sty     WHICH_LOAD
+	map_location:=new_location;
 
-        ; save new location
+	level_over:=LEVEL_NEW_LOCATION;
+end;
 
-        sta     MAP_LOCATION
-
-same_disk:
-        lda     #NEW_LOCATION
-        sta     LEVEL_OVER
-        rts
-end
-*)
 
 
 	{=========================}
@@ -1735,9 +1726,9 @@ begin
 		LOCATION_TROGDOR_OUTER:		do_knight;
 		LOCATION_TROGDOR_LAIR:		do_knight;
 		LOCATION_HIDDEN_GLEN:		do_knight;
-		LOCATION_INSIDE_LADY:		do_knight;
+		LOCATION_INSIDE_LADY:		do_inside_lady;
 		LOCATION_INSIDE_NN:		do_knight;
-		LOCATION_INSIDE_INN:		do_knight;
+		LOCATION_INSIDE_INN:		do_inside_inn;
 		LOCATION_ARCHERY_GAME:		do_knight;
 		LOCATION_MAP:			do_knight;
 		LOCATION_CLIMB:			do_knight;

@@ -167,8 +167,7 @@ begin
 
 			print_offset:=lady_cottage_dialog(lady_cottage_open_door_message);
 
-			{ TODO: location=LOCATION_INSIDE_LADY }
-			{ update_map_location()}
+			update_map_location(LOCATION_INSIDE_LADY);
 		end;
 
 	end; {verb open }

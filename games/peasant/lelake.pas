@@ -98,7 +98,7 @@ begin
 						{ FIXME: score should happen }
 						{ after message? }
 
-						{ score_points(2);}
+						score_points(2);
 
 						print_offset:=
 						lake_east_dialog(

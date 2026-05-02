@@ -31,7 +31,11 @@ begin
 
 	writeln;
 
-	wad_load(file_buffer,'DKNIGHT');
+	writeln('Testing loading GILADY from WAD');
+
+	wad_load(file_buffer,'GILADY');
+
+
 
 (*
 	while(true) do begin
