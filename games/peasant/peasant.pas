@@ -318,26 +318,38 @@ label exit_to_dos;
 {=====================================}
 { also print it?  would we ever update w/o printing? }
 
+{ this could be optimized more }
+
 Procedure update_score;
 
 var score_string : string[30];
-    ch : Integer;
+    result,ones,tens,hundreds : Integer;
 begin
 	{ erase old score }
 	Rectangle(0,0,319,10,$ff,@screen);
 
+	ones:=score mod 10;		{ 3 }
+	result:=score div 10;
+	tens:=result mod 10;		{ 2 }
+	result:=result div 10;
+	hundreds:=result mod 10;	{ 1 }
+
 	if (score<10) then begin
 		score_string:='Score: 0 out of 150';
-		ch:=score mod 10;
-		score_string[8]:=chr(ch+48);
+		score_string[8]:=chr(ones+48);
 		PrintStringXor(score_string,0,0);
 	end
 	else if (score<100) then begin
 		score_string:='Score: 10 out of 150';
+		score_string[8]:=chr(tens+48);
+		score_string[9]:=chr(ones+48);
 		PrintStringXor(score_string,0,0);
 	end
 	else begin
 		score_string:='Score: 100 out of 150';
+		score_string[8]:=chr(hundreds+48);
+		score_string[9]:=chr(tens+48);
+		score_string[10]:=chr(ones+48);
 		PrintStringXor(score_string,0,0);
 	end;
 
