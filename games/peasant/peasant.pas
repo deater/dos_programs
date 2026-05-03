@@ -155,7 +155,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		VERB_COPY, VERB_DANCE, VERB_DEPLOY, VERB_DIE,
 		VERB_DITCH, VERB_DRINK, VERB_DROP, VERB_ENTER,
 		VERB_FEED, VERB_GET, VERB_GIVE, VERB_GO,
-		VERB_HALDO, VERB_INV, VERB_INVENTORY, VERB_JUMP, VERB_KICK,
+		VERB_HALDO, VERB_INVENTORY, VERB_JUMP, VERB_KICK,
 		VERB_KILL, VERB_KNOCK, VERB_LIGHT, VERB_LOAD,
 		VERB_LOOK, VERB_MAKE, VERB_MAP, VERB_NO,
 		VERB_OPEN, VERB_PARTY, VERB_PET, VERB_PLAY,
@@ -172,13 +172,13 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		VERB_CUT, VERB_SAY, VERB_SLAY,
 		VERB_ALL_DONE );
 
-	const verb_lookup : array [0..79] of string[10] =
+	const verb_lookup : array [0..78] of string[10] =
 		('UNKNOWN', 'ASK', 'BOO', 'BREAK',
 		'BUY', 'CHEAT', 'CLIMB', 'CLOSE',
 		'COPY', 'DANCE', 'DEPLOY', 'DIE',
 		'DITCH', 'DRINK', 'DROP', 'ENTER',
 		'FEED', 'GET', 'GIVE', 'GO',
-		'HALDO', 'INV', 'INVENTORY', 'JUMP', 'KICK',
+		'HALDO', 'INV', 'JUMP', 'KICK',
 		'KILL', 'KNOCK', 'LIGHT', 'LOAD',
 		'LOOK', 'MAKE', 'MAP', 'NO',
 		'OPEN', 'PARTY', 'PET', 'PLAY',
@@ -763,7 +763,6 @@ begin
 	if (current_verb=VERB_SNIFF) then current_verb:=VERB_SMELL;
 	if (current_verb=VERB_TAKE) then current_verb:=VERB_GET;
 	if (current_verb=VERB_STEAL) then current_verb:=VERB_GET;
-	if (current_verb=VERB_INV) then current_verb:=VERB_INVENTORY;
 
 	case current_verb of
 
