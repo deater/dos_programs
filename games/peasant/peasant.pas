@@ -110,6 +110,46 @@ const WalkingSprites : array[0..23] of SpritePtr =
 	);
 
 
+	const location_names : array [0..34] of string[28] = (
+		'Poor Gary''s Glen',		{ 00 LOCATION_POOR_GARY }
+		'Kerrek Tracks 1',		{ 01 LOCATION_KERREK_1 }
+		'Old Well',			{ 02 LOCATION_OLD_WELL }
+		'Yellow Tree',			{ 03 LOCATION_YELLOW_TREE }
+		'Waterfall',			{ 04 LOCATION_WATERFALL }
+		'That Hay Bale',		{ 05 LOCATION_HAY_BALE}
+		'That Mud Puddle',		{ 06 LOCATION_MUD_PUDDLE }
+		'Archery Range',		{ 07 LOCATION_ARCHERY }
+		'River and Stone',		{ 08 LOCATION_RIVER_STONE }
+		'Mountain Pass',		{ 09 LOCATION_MOUNTAIN_PASS }
+		'Jhonka''s Cave',		{ 10 LOCATION_JHONKA_CAVE }
+		'Your Burninated Cottage',	{ 11 LOCATION_YOUR_COTTAGE }
+		'Pebble Lake West',		{ 12 LOCATION_LAKE_WEST }
+		'Pebble Lake East',		{ 13 LOCATION_LAKE_EAST }
+		'Outside Giant Inn',		{ 14 LOCATION_OUTSIDE_INN }
+		'Outside Mysterious Cottage',	{ 15 LOCATION_OUTSIDE_NN }
+		'Wavy Tree',			{ 16 LOCATION_WAVY_TREE }
+		'Kerrek Tracks 2',		{ 17 LOCATION_KERREK_2 }
+		'Outside Baby Lady Cottage',	{ 18 LOCATION_OUTSIDE_LADY }
+		'Burninated Trees',		{ 19 LOCATION_BURN_TREES }
+		'Cliff Base',			{ 20 LOCATION_CLIFF_BASE }
+		'Cliffland Heights',		{ 21 LOCATION_CLIFF_HEIGHTS }
+		'Trogdor''s Outer Sanctum',	{ 22 LOCATION_TROGDOR_OUTER }
+		'Trogdor''s Posh Lair',		{ 23 LOCATION_TROGDOR_LAIR }
+		'Hidden Glen',			{ 24 LOCATION_HIDDEN_GLEN }
+		'Inside Baby Lady Cottage',	{ 25 LOCATION_INSIDE_LADY }
+		'Inside Mysterious Cottage',	{ 26 LOCATION_INSIDE_NN }
+		'Inside Giant Inn',		{ 27 LOCATION_INSIDE_INN }
+		'Archery Game',			{ 28 LOCATION_ARCHERY_GAME }
+		'Map',				{ 29 LOCATION_MAP }
+		'Climbing',			{ 30 LOCATION_CLIMB }
+		'Trogdor''s Outer Sanctum',	{ 31 LOCATION_TROGDOR_OUTER2 }
+		'Trogdor''s Outer Sanctum',	{ 32 LOCATION_TROGDOR_OUTER3 }
+		'Inside Giant Inn',		{ 33 LOCATION_INSIDE_INN_NIGHT }
+		'Unknown'			{ 34 LOCATION_EMPTY }
+	);
+
+
+
 	type verb_type = (
 		VERB_UNKNOWN, VERB_ASK, VERB_BOO, VERB_BREAK,
 		VERB_BUY, VERB_CHEAT, VERB_CLIMB, VERB_CLOSE,
@@ -863,8 +903,20 @@ begin
 		VERB_PARTY:	print_offset:=common_dialog(party_message);
 
 		VERB_PWD:	begin
-				{ TODO }
+
+				{ The NUL termination is not working }
+				{ and I am not sure why }
+
+				for i:=1 to length(location_names[ord(map_location)]) do begin
+					dialog^[common_dialog(pwd_message_offset)+i]:=
+					byte(location_names[ord(map_location)][i]);
 				end;
+				dialog^[common_dialog(pwd_message_offset)+
+					length(location_names[ord(map_location)])+1]:=0;
+
+				print_offset:=common_dialog(pwd_message);
+				end;
+
 
 		VERB_QUIT:	print_offset:=common_dialog(quit_message);
 
@@ -872,6 +924,7 @@ begin
 				{ TODO }
 				end;
 
+				{ This is VMW specific }
 		VERB_SHOW:	begin
 				{ TODO }
 				end;
@@ -911,7 +964,18 @@ begin
 		VERB_WHAT:	print_offset:=common_dialog(what_message);
 
 		VERB_WHERE:	begin
-				{ TODO }
+
+				{ The NUL termination is not working }
+				{ and I am not sure why }
+
+				for i:=1 to length(location_names[ord(map_location)]) do begin
+					dialog^[common_dialog(where_message_offset)+i]:=
+					byte(location_names[ord(map_location)][i]);
+				end;
+				dialog^[common_dialog(where_message_offset)+
+					length(location_names[ord(map_location)])+1]:=0;
+
+				print_offset:=common_dialog(where_message);
 				end;
 
 		VERB_WHY:	print_offset:=common_dialog(why_message);
