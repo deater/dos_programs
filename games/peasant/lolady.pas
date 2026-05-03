@@ -48,7 +48,7 @@ begin
 			update_score;
 
 			{ get trinket }
-			inventory.TRINKET:=true;
+			inventory[ord(TRINKET)]:=true;
 
 			print_offset:=lady_cottage_dialog(lady_cottage_searched_4_bushes_message);
 			end;

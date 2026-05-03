@@ -81,7 +81,7 @@ begin
 
 			end;
 			{ see if have belt }
-			if (inventory.KERREK_BELT) then begin
+			if (inventory[ord(KERREK_BELT)]) then begin
 				{TODO}
 			end;
 			{ see if wearing robe }

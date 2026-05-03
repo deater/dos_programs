@@ -61,7 +61,7 @@ begin
 
 		if (current_noun=NOUN_FEED) then begin
 
-			if (inventory.CHICKEN_FEED) then begin
+			if (inventory[ord(CHICKEN_FEED)]) then begin
 
 				{ check if too far up/down}
 				if (peasant_y<52) or (peasant_y>120) then begin
@@ -93,7 +93,7 @@ begin
 
 						{ feed fish }
 						game_state.FISH_FED:=true;
-						inventory_gone.CHICKEN_FEED:=true;
+						inventory_gone[ord(CHICKEN_FEED)]:=true;
 
 						{ FIXME: score should happen }
 						{ after message? }

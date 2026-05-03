@@ -20,7 +20,6 @@ Procedure inside_inn_actions; forward;
 Procedure inside_lady_actions; forward;
 Procedure unknown_actions; forward;
 
-{$I inv.pas}
 
 {$I o_ytree.pas}
 {$I o_wfall.pas}
@@ -156,7 +155,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		VERB_COPY, VERB_DANCE, VERB_DEPLOY, VERB_DIE,
 		VERB_DITCH, VERB_DRINK, VERB_DROP, VERB_ENTER,
 		VERB_FEED, VERB_GET, VERB_GIVE, VERB_GO,
-		VERB_HALDO, VERB_INVENTORY, VERB_JUMP, VERB_KICK,
+		VERB_HALDO, VERB_INV, VERB_INVENTORY, VERB_JUMP, VERB_KICK,
 		VERB_KILL, VERB_KNOCK, VERB_LIGHT, VERB_LOAD,
 		VERB_LOOK, VERB_MAKE, VERB_MAP, VERB_NO,
 		VERB_OPEN, VERB_PARTY, VERB_PET, VERB_PLAY,
@@ -173,13 +172,13 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		VERB_CUT, VERB_SAY, VERB_SLAY,
 		VERB_ALL_DONE );
 
-	const verb_lookup : array [0..78] of string[10] =
+	const verb_lookup : array [0..79] of string[10] =
 		('UNKNOWN', 'ASK', 'BOO', 'BREAK',
 		'BUY', 'CHEAT', 'CLIMB', 'CLOSE',
 		'COPY', 'DANCE', 'DEPLOY', 'DIE',
 		'DITCH', 'DRINK', 'DROP', 'ENTER',
 		'FEED', 'GET', 'GIVE', 'GO',
-		'HALDO', 'INVENTORY', 'JUMP', 'KICK',
+		'HALDO', 'INV', 'INVENTORY', 'JUMP', 'KICK',
 		'KILL', 'KNOCK', 'LIGHT', 'LOAD',
 		'LOOK', 'MAKE', 'MAP', 'NO',
 		'OPEN', 'PARTY', 'PET', 'PLAY',
@@ -301,7 +300,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		GOT_RICHES : boolean;
 	end;
 
-	type inventory_type = record
+	type inventory_type = (
 		{ Inventory 1}
 		ARROW,
 		BABY,
@@ -310,7 +309,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		BOW,
 		MONSTER_MASK,
 		PEBBLES,
-		PILLS : boolean;
+		PILLS,
 		{ Inventory 2}
 		RICHES,
 		ROBE,
@@ -319,12 +318,12 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		TRINKET,
 		TROGHELM,
 		TROGSHIELD,
-		TROGSWORD : boolean;
+		TROGSWORD,
 		{ Inventory 3}
 		IMPOSSIBLE,
 		SHIRT,
-		MAP : boolean;
-	end;
+		MAP
+	);
 
 
 var
@@ -347,7 +346,7 @@ var
 	game_state: game_state_type;
 	bush_status: byte;
 
-	inventory,inventory_gone: inventory_type;
+	inventory,inventory_gone: array[1..19] of boolean;
 
 	previous_location, map_location : map_locations;
 
@@ -416,6 +415,8 @@ begin
 	{TODO: make noise}
 
 end;
+
+{$I inv.pas}
 
 
 
@@ -762,6 +763,7 @@ begin
 	if (current_verb=VERB_SNIFF) then current_verb:=VERB_SMELL;
 	if (current_verb=VERB_TAKE) then current_verb:=VERB_GET;
 	if (current_verb=VERB_STEAL) then current_verb:=VERB_GET;
+	if (current_verb=VERB_INV) then current_verb:=VERB_INVENTORY;
 
 	case current_verb of
 
@@ -801,8 +803,8 @@ begin
 
 				if (current_noun = NOUN_BABY) then begin
 
-					if (inventory.baby = true) and
-						(inventory_gone.baby = false)
+					if (inventory[ord(BABY)] = true) and
+						(inventory_gone[ord(BABY)] = false)
 						then begin
 
 						print_offset:=common_dialog(ditch_baby_message);
@@ -830,8 +832,8 @@ begin
 
 				if (current_noun = NOUN_BABY) then begin
 
-					if (inventory.baby = true) and
-						(inventory_gone.baby = false)
+					if (inventory[ord(BABY)] = true) and
+						(inventory_gone[ord(BABY)] = false)
 						then begin
 
 						print_offset:=common_dialog(throw_baby_yes_message);
@@ -850,7 +852,7 @@ begin
 		VERB_GET:	begin
 
 				if (current_noun = NOUN_PEBBLES) and
-					(inventory.pebbles)
+					(inventory[ord(PEBBLES)])
 								then begin
 
 					print_offset:=common_dialog(get_pebbles_message);
@@ -891,7 +893,7 @@ begin
 				end;
 
 		VERB_MAP:	begin
-				if (inventory.map) then begin
+				if (inventory[ord(MAP)]) then begin
 
 				{TODO}
 
@@ -941,18 +943,18 @@ begin
 		VERB_WEAR:	begin
 
 				if (current_noun = NOUN_ROBE) then begin
-					if (inventory.ROBE) then begin
+					if (inventory[ord(ROBE)]) then begin
 						{ TODO }
 					end;
 
 				end
 				else if (current_noun = NOUN_BELT) then begin
-					if (inventory.KERREK_BELT) then begin
+					if (inventory[ord(KERREK_BELT)]) then begin
 						print_offset:=common_dialog(wear_belt_message);
 					end;
 				end
 				else if (current_noun = NOUN_MASK) then begin
-					if (inventory.MONSTER_MASK) then begin
+					if (inventory[ord(MONSTER_MASK)]) then begin
 						print_offset:=common_dialog(wear_mask_message);
 					end;
 				end
@@ -1647,50 +1649,13 @@ end;
 
 Procedure init_inventory;
 
-begin
-	with inventory do begin
-		ARROW := false;
-		BABY := false;
-		KERREK_BELT := false;
-		CHICKEN_FEED := false;
-		BOW := false;
-		MONSTER_MASK := false;
-		PEBBLES := false;
-		PILLS := false;
-		RICHES := false;
-		ROBE := false;
-		SODA := false;
-		MEATBALL_SUB := false;
-		TRINKET := false;
-		TROGHELM := false;
-		TROGSHIELD := false;
-		TROGSWORD := false;
-		IMPOSSIBLE := false;
-		SHIRT := false;
-		MAP := false;
-	end;
-	with inventory_gone do begin
-		ARROW := false;
-		BABY := false;
-		KERREK_BELT := false;
-		CHICKEN_FEED := false;
-		BOW := false;
-		MONSTER_MASK := false;
-		PEBBLES := false;
-		PILLS := false;
-		RICHES := false;
-		ROBE := false;
-		SODA := false;
-		MEATBALL_SUB := false;
-		TRINKET := false;
-		TROGHELM := false;
-		TROGSHIELD := false;
-		TROGSWORD := false;
-		IMPOSSIBLE := false;
-		SHIRT := false;
-		MAP := false;
-	end;
+var i: inventory_type;
 
+begin
+	for i:=ARROW to MAP do inventory[ord(i)]:=false;
+	inventory[ord(SHIRT)]:=true;
+
+	for i:=ARROW to MAP do inventory_gone[ord(i)]:=false;
 end;
 
 
