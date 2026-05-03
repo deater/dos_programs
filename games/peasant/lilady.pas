@@ -7,120 +7,259 @@
 Procedure inside_lady_actions;
 
 begin
-(*
-	if ( ((current_verb=VERB_GET) or (current_verb=VERB_TAKE)) and (current_noun=NOUN_BERRIES)) or
-	   ((current_verb=VERB_SEARCH) and (current_noun=NOUN_BUSH)) then begin
 
-		if (bush_status=$f) then begin
-			print_offset:=lady_cottage_dialog(lady_cottage_already_trinket_message);
-		end
-		else begin
-			{ sort of a quadrant }
-			{ walks you over to the one in the quadrant }
+	if (current_verb=VERB_GET)
+		or (current_verb=VERB_TAKE)
+		or (current_verb=VERB_STEAL) then begin
 
-			if (peasant_x<15*8) then begin
-				{ left bush }
-				{ top left }
-				if (peasant_y<$6D) then begin
-					{ handle_bush2}
-					if ((bush_status and $2)<>0) then begin
-						bush_already_searched;
-					end
-					else begin
-						bush_status:=bush_status or 2;
-						actually_search_bush;
-					end;
-				end
-				else begin
-					{handle bush1}
-					{ bottom left }
-					if ((bush_status and $1)<>0) then begin
-						bush_already_searched;
-					end
-					else begin
-						bush_status:=bush_status or 1;
-						actually_search_bush;
-					end;
-				end;
-			end else begin
-				{right bush }
-				if (peasant_y<$6D) then begin
-					{ handle_bush4}
-					if ((bush_status and $8)<>0) then begin
-						bush_already_searched;
-					end
-					else begin
-						bush_status:=bush_status or 8;
-						actually_search_bush;
-					end;
-				end
-				else begin
-					{handle bush3}
-					{bottom right}
-					if ((bush_status and $4)<>0) then begin
-						bush_already_searched;
-					end
-					else begin
-						bush_status:=bush_status or 4;
-						actually_search_bush;
-					end;
-				end;
+		if (current_noun=NOUN_FEED) then begin
+			if (inventory[ord(CHICKEN_FEED)] or inventory_gone[ord(CHICKEN_FEED)]) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_get_feed_already_message);
+			end
+			else begin
+				{walk to feed}
+				{TODO}
+				{peasant_walkto(11,116);}
+				{ face left }
+				peasant_dir:=2;
 
+				{get the feed}
+				inventory[ord(CHICKEN_FEED)]:=true;
+
+				{update score}
+				score_points(1);
+
+				print_offset:=
+				inside_lady_dialog(inside_cottage_get_feed_message);
 			end;
-
 		end;
+		if (current_noun=NOUN_BABY) then begin
+			if game_state.LADY_GONE then begin
+			end
+			else begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_get_baby_message);
+			end;
+		end;
+		if (current_noun=NOUN_CHAIR) then begin
+			if game_state.LADY_GONE then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_get_chair_gone_message);
+			end
+			else begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_get_chair_message);
+			end;
+		end;
+		if (current_noun=NOUN_GOLD) or (current_noun=NOUN_MONEY) then print_offset:=
+			inside_lady_dialog(inside_cottage_get_gold_message);
+		if (current_noun=NOUN_HAY) then print_offset:=
+			inside_lady_dialog(inside_cottage_get_hay_message);
+		if (current_noun=NOUN_FOOD) or (current_noun=NOUN_STUFF) then print_offset:=
+			inside_lady_dialog(inside_cottage_get_food_message);
+		if (current_noun=NOUN_PILLOW) then print_offset:=
+			inside_lady_dialog(inside_cottage_get_pillow_message);
+
+
 	end;
 
-*)
+
 	case current_verb of
 
 	VERB_LOOK:	begin
 
-		if (current_noun=NOUN_BERRIES) then print_offset:=
-			lady_cottage_dialog(lady_cottage_look_at_berries_message);
-		if (current_noun=NOUN_BUSH) then print_offset:=
-			lady_cottage_dialog(lady_cottage_look_at_bushes_message);
-		if (current_noun=NOUN_COTTAGE) then print_offset:=
-			lady_cottage_dialog(lady_cottage_look_at_cottage_message);
-		if (current_noun=NOUN_DOOR) then print_offset:=
-			lady_cottage_dialog(lady_cottage_look_at_door_message);
-		if (current_noun=NOUN_NONE) then print_offset:=
-			lady_cottage_dialog(lady_cottage_look_at_message);
+		if (current_noun=NOUN_BABY) then begin
+			if (game_state.LADY_GONE=false) then
+			print_offset:=
+			inside_lady_dialog(inside_cottage_look_at_baby_message);
+		end; { look baby }
+		if (current_noun=NOUN_CHAIR) then print_offset:=
+			inside_lady_dialog(inside_cottage_look_at_chair_message);
+		if (current_noun=NOUN_FEED) then print_offset:=
+			inside_lady_dialog(inside_cottage_look_at_feed_message);
+		if (current_noun=NOUN_HAY) then print_offset:=
+			inside_lady_dialog(inside_cottage_look_at_hay_message);
+		if (current_noun=NOUN_PEASANT) or
+			(current_noun=NOUN_LADY) or
+			(current_noun=NOUN_WOMAN) then begin
+
+			if (game_state.LADY_GONE) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_look_at_lady_gone_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_look_at_lady_gone2_message);
+			end
+			else begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_look_at_lady_message);
+			end;
+		end;
+		if (current_noun=NOUN_PILLOW) then print_offset:=
+			inside_lady_dialog(inside_cottage_look_at_pillow_message);
+		if (current_noun=NOUN_SHELF) then print_offset:=
+			inside_lady_dialog(inside_cottage_look_at_shelf_message);
+
+		if (current_noun=NOUN_NONE) then begin
+			if (game_state.LADY_GONE) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_look_at_gone_message);
+			end
+			else begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_look_at_message);
+			end;
+		end;
 
 		end; {verb_look}
 
 
-	VERB_KNOCK:
-		if (current_noun=NOUN_DOOR) or (current_noun=NOUN_NONE) then begin
-			if game_state.LADY_GONE then
+	VERB_TALK: begin
+
+		if (current_noun=NOUN_BABY) then begin
+			print_offset:=
+			inside_lady_dialog(inside_cottage_talk_baby_message);
+		end; { talk baby }
+		if (current_noun=NOUN_PEASANT) or
+			(current_noun=NOUN_LADY) or
+			(current_noun=NOUN_WOMAN) or
+			(current_noun=NOUN_NONE) then begin
+
+			if (game_state.LADY_GONE) then begin
 				print_offset:=
-					lady_cottage_dialog(lady_cottage_knock_door_gone_message)
-			else
+				inside_lady_dialog(inside_cottage_look_at_gone_message);
+			end
+			else begin
 				print_offset:=
-					lady_cottage_dialog(lady_cottage_knock_door_message);
+				inside_lady_dialog(inside_cottage_talk_lady_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_talk_lady2_message);
 
-
-		end; { verb_knock }
-
-
-	VERB_OPEN: begin
-
-		{ handle both, I guess this is safe? }
-
-		if (current_noun=NOUN_DOOR) then current_noun:=NOUN_NONE;
-
-		if (current_noun=NOUN_NONE) then begin
-
-			{ TODO: walk to door }
-			{peasant_walkto(23,116);}
-
-			print_offset:=lady_cottage_dialog(lady_cottage_open_door_message);
-
-			{ TODO: location=LOCATION_INSIDE_LADY }
-			{ update_map_location()}
+			end;
 		end;
 
-	end; {verb open }
+		end; { verb_talk }
+
+
+	VERB_GIVE: begin
+
+		if (current_noun=NOUN_RICHES) then begin
+			if (inventory_gone[ord(RICHES)]) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_give_riches_already_message);
+			end
+			else if (inventory[ord(RICHES)]) then begin
+				{ give the riches }
+				print_offset:=
+				inside_lady_dialog(inside_cottage_give_riches_message);
+				partial_message_step;
+				{ update score}
+				score_points(5);
+				{ get baby }
+				inventory[ord(BABY)]:=true;
+				{ get rid of lady }
+				game_state.LADY_GONE:=true;
+
+				{TODO}
+				{update_chair_priority}
+
+				print_offset:=
+				inside_lady_dialog(inside_cottage_give_riches2_message);
+
+			end
+			else begin
+				{notyet}
+				print_offset:=
+				inside_lady_dialog(inside_cottage_give_riches_notyet_message);
+			end;
+		end else
+
+		if (current_noun=NOUN_TRINKET) then begin
+
+			if (inventory[ord(TRINKET)]) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_give_trinket_message);
+			end
+			else begin
+				if (game_state.LADY_GONE) then begin
+					print_offset:=
+					inside_lady_dialog(inside_cottage_give_trinket_nolady_message);
+				end else begin
+					print_offset:=
+					inside_lady_dialog(inside_cottage_give_trinket_nohave_message);
+					partial_message_step;
+					print_offset:=
+					inside_lady_dialog(inside_cottage_give_trinket_nohave2_message);
+
+				end;
+			end;
+
+		end else
+
+		if (game_state.LADY_GONE=false) then begin
+			print_offset:=
+				inside_lady_dialog(inside_cottage_give_default_message);
+		end;
+
+	end; {verb give }
+
+	VERB_ASK: begin
+		if (game_state.LADY_GONE=false) then begin
+
+			{ default }
+			print_offset:=
+			inside_lady_dialog(inside_cottage_ask_unknown_message);
+
+			if (current_noun=NOUN_BABY) then print_offset:=
+				inside_lady_dialog(inside_cottage_ask_baby_message);
+			if (current_noun=NOUN_FIRE) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_fire_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_fire2_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_fire3_message);
+			end;
+			if (current_noun=NOUN_JHONKA) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_jhonka_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_jhonka2_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_jhonka3_message);
+			end;
+
+			if (current_noun=NOUN_NED) then print_offset:=
+				inside_lady_dialog(inside_cottage_ask_ned_message);
+
+			if (current_noun=NOUN_ROBE) then print_offset:=
+				inside_lady_dialog(inside_cottage_ask_robe_message); 
+
+			if (current_noun=NOUN_SMELL) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_smell_message);
+				partial_message_step;
+				print_offset:=
+				inside_lady_dialog(inside_cottage_ask_smell2_message);
+			end;
+
+			if (current_noun=NOUN_TROGDOR) then print_offset:=
+				inside_lady_dialog(inside_cottage_ask_trogdor_message); 
+
+		end; { ask lady there }
+
+	end; {verb ask }
+
+	VERB_SLEEP: begin
+		print_offset:=
+			inside_lady_dialog(inside_cottage_sleep_message);
+	end; {verb sleep }
 
 	end; {case}
 end;
