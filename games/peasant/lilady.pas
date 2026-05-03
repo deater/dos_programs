@@ -334,6 +334,26 @@ begin
 
 		{ increment flame }
 
+		{ level specific }
+
+		if (peasant_y>$95) then begin
+
+			if ((inventory[ord(TRINKET)]) or
+				(inventory_gone[ord(TRINKET)])) then begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_leaving_post_trinket_message);
+				partial_message_step;
+			end
+			else begin
+				print_offset:=
+				inside_lady_dialog(inside_cottage_leaving_message);
+				partial_message_step;
+			end;
+			{ actually leave }
+			{ we update position later }
+			update_map_location(LOCATION_OUTSIDE_LADY);
+		end;
+
 		{ wait vblank }
 
 		wait_vsync;
@@ -344,7 +364,15 @@ begin
 
 done_inside_lady:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+	if (map_location=LOCATION_OUTSIDE_LADY) then begin
+		peasant_x:=23*8;
+		peasant_newy:=120;
+
+		peasant_dir:=3;	{ PEASANT_DIR_DOWN }
+
+		stop_peasant;
+	end
+
 end;

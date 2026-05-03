@@ -255,7 +255,11 @@ begin
 
 done_outside_lady:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+	if (map_location=LOCATION_INSIDE_LADY) then begin
+		peasant_x:=25*8;
+		peasant_newy:=140;
+		peasant_dir:=2; { PEASANT_DIR_LEFT }
+	end;
 end;
