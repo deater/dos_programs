@@ -20,6 +20,7 @@ Procedure inside_inn_actions; forward;
 Procedure inside_lady_actions; forward;
 Procedure unknown_actions; forward;
 
+{$I inv.pas}
 
 {$I o_ytree.pas}
 {$I o_wfall.pas}
@@ -611,7 +612,7 @@ end;
 Procedure parse_input;
 
 label finish_parse_message;
-
+label skip_print_message;
 
 begin
 
@@ -743,6 +744,7 @@ begin
 				end;
 
 		VERB_COPY:	begin
+				{ Note this is a VMW specific joke}
 				{ TODO }
 				end;
 
@@ -751,6 +753,7 @@ begin
 		VERB_DIE:	begin
 				level_over:=LEVEL_EXIT_TO_DOS;
 				{ TODO }
+				print_offset:=common_dialog(die_message);
 				end;
 
 		{also VERB_DITCH}
@@ -827,7 +830,11 @@ begin
 		VERB_HELP:	print_offset:=common_dialog(help_message);
 
 		VERB_INVENTORY:	begin
-				{ TODO }
+
+				show_inventory;
+
+				goto skip_print_message;
+
 				end;
 
 		VERB_LOAD:	begin
@@ -915,6 +922,8 @@ begin
 finish_parse_message:
 
 	partial_message_step;
+
+skip_print_message:
 
 end;
 

@@ -15,6 +15,7 @@ static char word_list[NUM_WORDS][20]={
 	"an","at","be","do","go","he","He","in","is","it","It","my","no","No","of","on","or","so","to","up",
 };
 
+#if 0
 static char replacement_list[NUM_WORDS][32]={
 	"DIALOG_ALREADY",
 	"DIALOG_COTTAGE",
@@ -98,7 +99,7 @@ static char replacement_list[NUM_WORDS][32]={
 	"DIALOG_UP",
 
 };
-
+#endif
 
 static int char_count=0;
 
@@ -114,6 +115,26 @@ void parse_line(char *string) {
 	len=strlen(string);
 
 	if (string[0]==';') return;
+
+	if (string[0]=='.') {
+		if (string[1]=='i') {
+			char *newfile;
+			FILE *fff;
+			/* assume include */
+			/* HACK: only handle 1-line includes */
+			/* doing more would be a lot more work */
+			newfile=strtok(string,"\"");
+			newfile=strtok(NULL,"\"");
+			if (newfile!=NULL) {
+				fff=fopen(newfile,"r");
+				if (fff!=NULL) {
+					fgets(string,BUFSIZ,fff);
+				}
+			} else {
+				return;
+			}
+		}
+	}
 
 	/* if line ends in : then label */
 	/* want to grab it and offset */
