@@ -1,6 +1,29 @@
 
 Procedure show_inventory;
 
+
+const item_string : array [0..18] of string [20] = (
+	'arrow',
+	'baby',
+	'kerrek belt',
+	'chicken feed',
+	'SuperTime FunBow TM',
+	'monster maskus',
+	'pebbles',
+	'pills',
+	'riches',
+	'robe',
+	'soda',
+	'meatball sub',
+	'super trinket',
+	'TrogHelmet',
+	'TrogShield',
+	'TrogSword',
+	'???',
+	'shirt',
+	'map'
+);
+
 var
 	x,y: Integer;
 
@@ -16,7 +39,13 @@ begin
 	{ 4...12 }
 	for x:=0 to 1 do begin
 		for y:=0 to 8 do begin
-			PrintStringXor('???',5+(x*14),4+y);
+			if inventory[(x*9)+y]=true then begin
+				PrintStringXor(item_string[(x*9)+y],
+					6+(x*16),4+y);
+			end
+			else begin
+				PrintStringXor('???',6+(x*16),4+y);
+			end;
 		end;
 	end;
 
