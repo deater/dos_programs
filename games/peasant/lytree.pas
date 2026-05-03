@@ -103,7 +103,10 @@ begin
 
 done_yellow_tree:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+
+	{ possible to get stuck on edge of river }
+	{ TODO: the apple II version here is likely bugged }
+
 end;

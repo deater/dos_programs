@@ -226,7 +226,6 @@ begin
 
 done_east_lake:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
 end;

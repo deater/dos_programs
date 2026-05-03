@@ -196,9 +196,22 @@ begin
 
 done_knight:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+
+	{ avoid the inn }
+	if (map_location=LOCATION_OUTSIDE_INN) then begin
+		if (peasant_x>=(6*8)) and (peasant_x<(18*8)) then
+			peasant_x:=4*8		{ move to left }
+		else if (peasant_x<(31*8)) then
+			peasant_x:=31*8;	{ move to right}
+	end;
+
+	if (map_location=LOCATION_CLIFF_BASE) then begin
+		peasant_x:=18*8;
+		peasant_newy:=140;
+		peasant_dir:=0;		{ DIR_UP }
+		stop_peasant;
+	end;
+
 end;
-
-

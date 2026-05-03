@@ -77,14 +77,18 @@ begin
 			if game_state.FISH_FED then begin
 				{ unlocked case }
 				{ walk to door }
+
 				{ walk_to(9,116); TODO }
-				{ peasant_dir:=PEADANT_DIR_UP;}
+				peasant_x:=9*8;
+				peasant_y:=116;
+				peasant_dir:=0;	{PEASANT_DIR_UP}
+
 				{ check if night }
 				if (game_state.NIGHT) then begin
-					{ new location LOCATION_INSIDE_INN_NIGHT }
+					update_map_location(LOCATION_INSIDE_INN_NIGHT);
 				end
 				else begin
-					{ new location LOCATION_INSIDE_INN }
+					update_map_location(LOCATION_INSIDE_INN);
 				end;
 				{ update_map_location(); TODO }
 
@@ -182,6 +186,8 @@ begin
 
 		{ increment flame }
 
+		{  level specific }
+
 		{ wait vblank }
 
 		wait_vsync;
@@ -192,7 +198,11 @@ begin
 
 done_outside_inn:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+	{ avoid getting stuck in cliff }
+	if (map_location=LOCATION_BURN_TREES) then
+		if (peasant_x >= 33*8) then
+			peasant_x:=(32*8);
+
 end;

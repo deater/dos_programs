@@ -181,7 +181,7 @@ begin
 
 done_burn_tree:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+
 end;

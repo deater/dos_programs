@@ -182,6 +182,13 @@ begin
 
 		{ increment flame }
 
+		{ per-level }
+
+		if (peasant_y>149) then begin
+			update_map_location(LOCATION_OUTSIDE_INN);
+		end;
+
+
 		{ wait vblank }
 
 		wait_vsync;
@@ -192,7 +199,13 @@ begin
 
 done_inside_inn:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+	if (map_location=LOCATION_OUTSIDE_INN) then begin
+		peasant_x:=9*8;
+		peasant_newy:=112;
+		peasant_dir:=3;		{PEASANT_DIR_DOWN}
+
+	end;
+
 end;

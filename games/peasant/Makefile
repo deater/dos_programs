@@ -25,7 +25,10 @@ TEST.EXE:	test.pas
 PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	inv.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
-	lolady.pas \
+	lytree.pas lwfall.pas \
+	lriver.pas lknight.pas \
+	lelake.pas linn.pas \
+	lolady.pas lbtree.pas \
 	liinn.pas lilady.pas\
 	sprites/s_walk.pas
 	cp peasant.pas zx02_asm.pas cga.pas inv.pas $(TPDIR)
