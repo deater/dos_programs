@@ -236,7 +236,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 		'BUSH', 'CANDLE', 'CAVE', 'CHAIR',
 		'CLIFF', 'CLUB', 'COLD', 'COTTAGE',
 		'CRANK', 'CURTAIN', 'DAN', 'DESK',
-		'DINGHY', 'DOING_SPROINGS', 'DOOR', 'DRAWER',
+		'DINGHY', 'DOING', 'DOOR', 'DRAWER',
 		'DRESSER', 'DUDE', 'FEED', 'FENCE',
 		'FIRE', 'FLIES', 'FOOD', 'FOOTPRINTS',
 		'GAME', 'GARY', 'GREASE', 'GREEN',
@@ -736,8 +736,8 @@ begin
 		LOCATION_TROGDOR_LAIR:		knight_actions;
 		LOCATION_HIDDEN_GLEN:		knight_actions;
 		LOCATION_INSIDE_LADY:		inside_lady_actions;
-		LOCATION_INSIDE_NN:		inside_inn_actions;
-		LOCATION_INSIDE_INN:		knight_actions;
+		LOCATION_INSIDE_NN:		knight_actions;
+		LOCATION_INSIDE_INN:		inside_inn_actions;
 		LOCATION_ARCHERY_GAME:		knight_actions;
 		LOCATION_MAP:			knight_actions;
 		LOCATION_CLIMB:			knight_actions;

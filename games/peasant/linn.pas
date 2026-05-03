@@ -80,7 +80,7 @@ begin
 
 				{ walk_to(9,116); TODO }
 				peasant_x:=9*8;
-				peasant_y:=116;
+				peasant_y:=120;
 				peasant_dir:=0;	{PEASANT_DIR_UP}
 
 				{ check if night }

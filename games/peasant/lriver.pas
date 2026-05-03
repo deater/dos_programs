@@ -115,7 +115,10 @@ begin
 
 done_river:
 
-{	repeat until keypressed;
-	ch:=readkey;
-}
+	{ check borders }
+
+	if (map_location=LOCATION_LAKE_EAST) then begin
+		if (peasant_x<16*8) then peasant_x:=16*8;
+	end;
+
 end;

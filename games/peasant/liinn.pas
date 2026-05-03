@@ -6,108 +6,174 @@ Procedure inside_inn_actions;
 
 begin
 
+	if (current_verb=VERB_GIVE) or (current_verb=VERB_USE) then begin
+		if (current_noun=NOUN_BABY) then begin
+			if (inventory[ord(PILLS)]) then begin
+				print_offset:=inside_inn_dialog(inside_inn_give_baby_already_message);
+			end
+			else if (inventory[ord(BABY)]) then begin
+				print_offset:=inside_inn_dialog(inside_inn_give_baby_message);
+				partial_message_step;
+				{ add 5 points to score }
+				score_points(5);
+				{ get pills }
+				inventory[ord(PILLS)]:=true;
+								print_offset:=inside_inn_dialog(inside_inn_give_baby2_message);
+			end
+			else begin
+				{no pills and no baby }
+				print_offset:=inside_inn_dialog(inside_inn_give_baby_before_message);
+			end;
+
+		end;
+
+	end;
+
 	case current_verb of
-
-	VERB_GET:
-		if current_noun=NOUN_NOTE then begin
-
-			if game_state.FISH_FED then
-				print_offset:=
-					outside_inn_dialog(outside_inn_note_look_gone_message)
-			else
-				print_offset:=
-					outside_inn_dialog(outside_inn_note_get_message);
-		end;
-
-	VERB_KNOCK:
-		if (current_noun=NOUN_DOOR) or (current_noun=NOUN_NONE) then begin
-			if game_state.FISH_FED then
-				print_offset:=
-					outside_inn_dialog(outside_inn_door_knock_message)
-			else
-				print_offset:=
-					outside_inn_dialog(outside_inn_door_knock_locked_message);
-
-
-		end;
 
 	VERB_LOOK:	begin
 
-		if (current_noun=NOUN_DOOR) then begin
-
-			if game_state.FISH_FED then
-				print_offset:=
-					outside_inn_dialog(outside_inn_door_look_message)
-			else
-				print_offset:=
-					outside_inn_dialog(outside_inn_door_look_note_message);
-
-		end;
-
-		if (current_noun=NOUN_INN) then
-			print_offset:=outside_inn_dialog(outside_inn_inn_look_message);
-		if (current_noun=NOUN_SIGN) then
-			print_offset:=outside_inn_dialog(outside_inn_sign_look_message);
+		if (current_noun=NOUN_PILLOW) then
+			print_offset:=inside_inn_dialog(inside_inn_look_pillow_message);
+		if (current_noun=NOUN_PARCHMENT) or
+			(current_noun=NOUN_NOTE) or
+			(current_noun=NOUN_PAPER) then
+			print_offset:=inside_inn_dialog(inside_inn_look_paper_message);
+		if (current_noun=NOUN_PAINTING) then
+			print_offset:=inside_inn_dialog(inside_inn_look_painting_message);
+		if (current_noun=NOUN_DUDE) or
+			(current_noun=NOUN_GUY) or
+			(current_noun=NOUN_MAN) then
+			print_offset:=inside_inn_dialog(inside_inn_look_man_message);
 		if (current_noun=NOUN_WINDOW) then
-			print_offset:=outside_inn_dialog(outside_inn_window_look_message);
-		if (current_noun=NOUN_NOTE) then
-
-			if game_state.FISH_FED then
-				print_offset:=
-					outside_inn_dialog(outside_inn_note_look_gone_message)
-			else
-				print_offset:=
-					outside_inn_dialog(outside_inn_note_look_message);
-
+			print_offset:=inside_inn_dialog(inside_inn_look_window_message);
+		if (current_noun=NOUN_RUG) or
+			(current_noun=NOUN_CARPET) then
+			print_offset:=inside_inn_dialog(inside_inn_look_rug_message);
+		if (current_noun=NOUN_BED) or
+			(current_noun=NOUN_MATTRESS) then
+			print_offset:=inside_inn_dialog(inside_inn_look_bed_message);
+		if (current_noun=NOUN_BELL) then
+			print_offset:=inside_inn_dialog(inside_inn_look_bell_message);
+		if (current_noun=NOUN_DESK) then
+			print_offset:=inside_inn_dialog(inside_inn_look_desk_message);
+		if (current_noun=NOUN_DOOR) then
+			print_offset:=inside_inn_dialog(inside_inn_open_door_message);
 		if (current_noun=NOUN_NONE) then
-			print_offset:=outside_inn_dialog(outside_inn_look_message);
+			print_offset:=inside_inn_dialog(inside_inn_look_message);
 
 		end; {verb_look}
 
-	VERB_OPEN: begin
+	VERB_TALK: begin
+		if (current_noun=NOUN_NONE) or
+			(current_noun=NOUN_MAN) or
+			(current_noun=NOUN_GUY) or
+			(current_noun=NOUN_DUDE) then
+				print_offset:=
+					inside_inn_dialog(inside_inn_talk_man_message)
 
-		{ handle both, I guess this is safe? }
+		end; {verb_talk}
 
-		if (current_noun=NOUN_DOOR) then current_noun:=NOUN_NONE;
 
-		if (current_noun=NOUN_NONE) then begin
+	VERB_GET:	begin
 
-			{ check if door unlocked }
+		if (current_noun=NOUN_PARCHMENT) or
+			(current_noun=NOUN_NOTE) or
+			(current_noun=NOUN_PAPER) then
+			print_offset:=inside_inn_dialog(inside_inn_get_paper_message);
+		if (current_noun=NOUN_PAINTING) then
+			print_offset:=inside_inn_dialog(inside_inn_get_painting_message);
+		if (current_noun=NOUN_RUG) or
+			(current_noun=NOUN_CARPET) then
+			print_offset:=inside_inn_dialog(inside_inn_get_rug_message);
+		if (current_noun=NOUN_DOING_SPROINGS) then
+			print_offset:=inside_inn_dialog(inside_inn_get_doing_message);
+		if (current_noun=NOUN_PILLOW) then
+			print_offset:=inside_inn_dialog(inside_inn_get_pillow_message);
+		if (current_noun=NOUN_BELL) then
+			print_offset:=inside_inn_dialog(inside_inn_get_bell_message);
+		if (current_noun=NOUN_BED) then
+			print_offset:=inside_inn_dialog(inside_inn_get_bed_message);
+		if (current_noun=NOUN_RUB) then
+			print_offset:=inside_inn_dialog(inside_inn_get_rub_message);
 
-			if game_state.FISH_FED then begin
-				{ unlocked case }
-				{ walk to door }
-				{ walk_to(9,116); TODO }
-				{ peasant_dir:=PEADANT_DIR_UP;}
-				{ check if night }
-				if (game_state.NIGHT) then begin
-					{ new location LOCATION_INSIDE_INN_NIGHT }
+		if (current_noun=NOUN_ROOM) then begin
+			if (game_state.WEARING_ROBE) then begin
+				{ wearing robe }
+				if (game_state.ON_FIRE) then begin
+					{ robe and on file }
+					print_offset:=inside_inn_dialog(inside_inn_get_room_on_fire_message);
 				end
 				else begin
-					{ new location LOCATION_INSIDE_INN }
-				end;
-				{ update_map_location(); TODO }
+					{ robe but not on fire }
 
-				print_offset:=outside_inn_dialog(outside_inn_door_open_message);
+					print_offset:=inside_inn_dialog(inside_inn_get_room_message);
+					partial_message_step;
+					{ TODO walk to bed }
+					{ peasant_walkto(33*8,95); }
+					peasant_dir:=1; { PEASANT_DIR_RIGHT}
+					game_state.NIGHT:=true;
+					game_state.asleep:=true;
+
+					{ TODO: do effect }
+					{wipe_center_to_black;}
+
+					if (game_state.ALREADY_GOT_ROOM=false) then begin
+						{ only points if not slept before }
+						game_state.ALREADY_GOT_ROOM:=true;
+						score_points(3);
+					end;
+
+					print_offset:=inside_inn_dialog(inside_inn_get_room2_message);
+					partial_message_step; {TODO: ? }
+
+					update_map_location(LOCATION_INSIDE_INN_NIGHT);
+				end;
+
 			end
 			else begin
-				{ locked door }
-
-				print_offset:=outside_inn_dialog(outside_inn_door_open_locked_message);
+				{ no robe }
+				print_offset:=inside_inn_dialog(inside_inn_get_room_no_robe_message);
 			end;
 		end;
 
-	end; {verb open }
+		end; {verb_get}
 
-	VERB_READ:
-		{ same as look note }
-		if (current_noun=NOUN_NOTE) then
-			if game_state.FISH_FED then
+	VERB_ASK: begin
+
+		{ default }
+		print_offset:=inside_inn_dialog(inside_inn_ask_about_unknown_message);
+
+		if (current_noun=NOUN_FIRE) then
+			print_offset:=inside_inn_dialog(inside_inn_ask_about_fire_message);
+		if (current_noun=NOUN_NED) then
+			print_offset:=inside_inn_dialog(inside_inn_ask_about_ned_message);
+		if (current_noun=NOUN_ROBE) then
+			print_offset:=inside_inn_dialog(inside_inn_ask_about_robe_message);
+		if (current_noun=NOUN_SMELL) then
+			print_offset:=inside_inn_dialog(inside_inn_ask_about_smell_message);
+		if (current_noun=NOUN_TROGDOR) then
+			print_offset:=inside_inn_dialog(inside_inn_ask_about_trogdor_message);
+
+		end; {verb_ask}
+
+	VERB_RING:
+		if (current_noun=NOUN_BELL) then
 				print_offset:=
-					outside_inn_dialog(outside_inn_note_look_gone_message)
-			else
+					inside_inn_dialog(inside_inn_ring_bell_message);
+
+
+
+	VERB_SLEEP: if (current_noun=NOUN_BED) or
+			(current_noun=NOUN_NONE) then
 				print_offset:=
-					outside_inn_dialog(outside_inn_note_look_message);
+					inside_inn_dialog(inside_inn_sleep_bed_message);
+
+	VERB_OPEN: if (current_noun=NOUN_DOOR) then
+				print_offset:=
+					inside_inn_dialog(inside_inn_open_door_message);
+
+
 	end; {case verb}
 
 end;
