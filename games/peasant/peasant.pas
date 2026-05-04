@@ -645,6 +645,10 @@ begin
 	{ throw away keypress }
 	ch:=readkey;
 
+	{ refresh background }
+
+	screen_update(@screen,screen_ptr(framebuffer));
+
 end;
 
 
@@ -1542,8 +1546,13 @@ begin
 
 	which := (peasant_dir*6)+(peasant_steps div 4);
 
-	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
+{	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
 		screen_ptr(framebuffer),screen_ptr(collision));
+}
+
+	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
+		@screen,screen_ptr(collision));
+
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],screen_ptr(framebuffer));}
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],@screen);}
 end;

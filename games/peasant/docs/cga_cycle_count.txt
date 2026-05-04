@@ -1,0 +1,22 @@
+Was running slow on Marty PC so did some cycle counting.
+
+To find where we are, easiest way is look for vsync by
+	iobreakpoint at 3da
+
+2568c				422 222
+	check_keyboard			    851 cycles
+25696				423 073
+	RestoreBG4			  4,691 cycles
+256b7				427 764
+	move_peasant			    402 cycles
+256ba				428 166
+	draw_peasant			  9,042 cycles
+256c6				437 208
+	screen_update			261,677 cycles
+256db				698 885
+	wait_vsync			 41,924 cycles
+256e9				740 809
+
+
+vsync can in theory take 79,648 cycles...
+

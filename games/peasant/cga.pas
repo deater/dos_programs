@@ -89,6 +89,10 @@ end;
 { so offset 400 to 7600  (190*80)/2             }
 { 7200 bytes, /2 = 3600                         }
 
+{ this code currently measured at 261,677 cycles }
+{	which is roughly 3 vsync refreshes }
+
+
 Procedure screen_update(dest,src:screen_ptr);
 
 var
@@ -220,6 +224,8 @@ begin
 {	BX+DI+IMM = 12 }
 { movsw = 26 cycles 1 word, faster if rep }
 { stosw = 15 cycles 1 word, faster if rep }
+{ Note: write to CGA memory can take up to 25 cycles / word }
+
 
 		{=======================}
 		{ draw even lines first }

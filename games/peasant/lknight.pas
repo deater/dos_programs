@@ -165,8 +165,14 @@ begin
 		check_keyboard;
 
 		{ erase peasant }
-		RestoreBG4(peasant_x,peasant_y,15,
+{		RestoreBG4(peasant_x,peasant_y,15,
 			screen_ptr(background),screen_ptr(framebuffer));
+}
+
+		RestoreBG4(peasant_x,peasant_y,15,
+			screen_ptr(background),@screen);
+
+
 
 		{ move_peasant }
 
@@ -178,7 +184,7 @@ begin
 
 		draw_peasant;
 
-		screen_update(@screen,screen_ptr(framebuffer));
+	{	screen_update(@screen,screen_ptr(framebuffer)); }
 
 		{ increment frame }
 
