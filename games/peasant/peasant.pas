@@ -1464,9 +1464,9 @@ begin
 	{ moving }
 
 	{ adjust steps }
-
+	{ used for sprite lookup }
 	peasant_steps:=peasant_steps+1;
-	if (peasant_steps>=6) then peasant_steps:=0;
+	if (peasant_steps>=24) then peasant_steps:=0;
 
 	{ move x }
 
@@ -1540,7 +1540,7 @@ var which : byte;
 
 begin
 
-	which := (peasant_dir*6)+peasant_steps;
+	which := (peasant_dir*6)+(peasant_steps div 4);
 
 	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
 		screen_ptr(framebuffer),screen_ptr(collision));

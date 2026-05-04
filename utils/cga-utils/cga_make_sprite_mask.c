@@ -240,6 +240,7 @@ int main(int argc, char **argv) {
 
 	int xsize=0,ysize=0;
 	int printsize=0,mask_offset=0,total_bytes=0;
+	int interleave=0;
 	int c,x,y;
 	unsigned char *image;
 	char label_string[BUFSIZ];
@@ -255,7 +256,7 @@ int main(int argc, char **argv) {
 
 	/* Parse command line arguments */
 
-	while ( (c=getopt(argc, argv, "hvdmsl:") ) != -1) {
+	while ( (c=getopt(argc, argv, "hvdmsil:") ) != -1) {
 
 		switch(c) {
 
@@ -273,6 +274,9 @@ int main(int argc, char **argv) {
 				break;
 			case 'm':
 				mask_offset=1;
+				break;
+			case 'i':
+				interleave=1;
 				break;
 			case 'l':
 				strncpy(label_string,optarg,BUFSIZ-1);
@@ -402,53 +406,88 @@ int main(int argc, char **argv) {
 				total_bytes>>8);
 		}
 
-		/* print even sprite */
-		for(y=y1;y<y2;y+=2) {
-			printf("\t");
-			for(x=x1/4;x<=x2/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X,",
-					cga_ram[addr]);
-			}
-			printf("\n");
-		}
+		if (interleave) {
+			/* interleave even/odd */
 
-		/* print odd sprite */
-		for(y=y1+1;y<y2;y+=2) {
-			printf("\t");
-			for(x=x1/4;x<=x2/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X,",
-					cga_ram[addr]);
-			}
-			printf("\n");
-		}
-
-		/* print even mask */
-		for(y=y3;y<y4;y+=2) {
-			printf("\t");
-			for(x=x3/4;x<=x4/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X,",
-					cga_ram[addr]);
-			}
-			printf("\n");
-		}
-
-		/* print odd mask */
-		for(y=y3+1;y<y4;y+=2) {
-			printf("\t");
-			for(x=x3/4;x<=x4/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X",
-					cga_ram[addr]);
-				if ((y==y4-1)&&(x==x4/4)) {
+			/* print sprite */
+			for(y=y1;y<y2;y++) {
+				printf("\t");
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X,",
+						cga_ram[addr]);
 				}
-				else {
-					printf(",");
-				}
+				printf("\n");
 			}
-			printf("\n");
+
+			/* print mask */
+			for(y=y3;y<y4;y++) {
+				printf("\t");
+				for(x=x3/4;x<=x4/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X",
+						cga_ram[addr]);
+					if ((y==y4-1)&&(x==x4/4)) {
+					}
+					else {
+						printf(",");
+					}
+				}
+				printf("\n");
+			}
+
+		}
+		else {
+			/* print even first, then odd */
+
+			/* print even sprite */
+			for(y=y1;y<y2;y+=2) {
+				printf("\t");
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X,",
+						cga_ram[addr]);
+				}
+				printf("\n");
+			}
+
+			/* print odd sprite */
+			for(y=y1+1;y<y2;y+=2) {
+				printf("\t");
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X,",
+						cga_ram[addr]);
+				}
+				printf("\n");
+			}
+
+			/* print even mask */
+			for(y=y3;y<y4;y+=2) {
+				printf("\t");
+				for(x=x3/4;x<=x4/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X,",
+						cga_ram[addr]);
+				}
+				printf("\n");
+			}
+
+			/* print odd mask */
+			for(y=y3+1;y<y4;y+=2) {
+				printf("\t");
+				for(x=x3/4;x<=x4/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X",
+						cga_ram[addr]);
+					if ((y==y4-1)&&(x==x4/4)) {
+					}
+					else {
+						printf(",");
+					}
+				}
+				printf("\n");
+			}
 		}
 		printf(");\n");
 

@@ -25,6 +25,7 @@ Procedure SetCGAMode(Mode: byte);
 Procedure SetPalette(which: byte);
 Procedure PutPixelXY(x,y: word);
 Procedure RestoreBG(x,y,xsize,ysize: word; bg, fb: screen_ptr);
+Procedure RestoreBG4(x,y,ysize: word; bg, fb: screen_ptr);
 Procedure Rectangle(x1,y1,x2,y2: word; color: byte; fb: screen_ptr);
 Procedure Hline(x1,x2,y: word; color: byte; fb: screen_ptr);
 Procedure Vline(y1,y2,x: word; color: byte; fb: screen_ptr);
@@ -156,7 +157,7 @@ end;
 {***********************************************}
 { Really only used for Rather Dashing }
 { Assumptions: }
-{   Sprites always 4 bytes wide? }
+{   Sprites always 4 bytes wide }
 {   x from 0..319 but only draw on byte (4-pixel) boundaries }
 
 
@@ -187,8 +188,9 @@ begin
 	s_off:=ofs(sprite^)+2;			{ skip xsize/ysize }
 
 	even_offset:=((y div 2)*80)+(x div 4);	{ actual offset where to draw }
-						{ note only draw at 4-pixel }
-						{ boundary }
+						{ note only draw at }
+						{ x: multiple of 4-pixel }
+						{ y: multiple of 2-pixel }
 
 	even_offset:=even_offset+f_off;		{ CGA even and odd lines }
 	odd_offset:=even_offset+$2000;		{ 8k apart in memory }
@@ -201,7 +203,7 @@ begin
 					{ follows sprite }
 
 
-	xsize:=xsize div 2;			{ do 16-bit math? }
+	{ xsize:=xsize div 2; }			{ do 16-bit math? }
 
 	asm
 
@@ -220,13 +222,16 @@ begin
 		mov	ds,ax
 		mov	si,[s_off]		{ ds:si = source sprite}
 
-		mov	bx,[mask_offset]	{ ds:bx = mask }
+		mov	bx,[mask_offset]	{ ds:si+bx = mask }
 
 		mov	dx,[ysize]		{ dx = y iterator }
 
 even_loopy:
-		mov	cx,[xsize]		{ cx = x iterator }
-even_loopx:
+
+		{ unroll: assume always 4-bytes wide }
+
+		{ xoffset=0 }
+
 		mov	ax,es:[di]		{ load bg from fb }
 		and	ax,ds:[si][bx] 		{ mask with mask }
 		or	ax,ds:[si]		{ or in sprite }
@@ -234,12 +239,19 @@ even_loopx:
 		inc	si			{ increment sprite ptr }
 		stosw			 	{ store out to fb + inc }
 
-		loop	even_loopx		{ repeat for all X values }
+		{ xoffset=2 }
 
-		add	di,(80-4)		{ point fb to next row }
+		mov	ax,es:[di]		{ load bg from fb }
+		and	ax,ds:[si][bx] 		{ mask with mask }
+		or	ax,ds:[si]		{ or in sprite }
+		inc	si			{ increment sprite ptr }
+		inc	si			{ increment sprite ptr }
+		stosw			 	{ store out to fb + inc }
 
-		dec	dx			{ decrement Y counter }
-		jne	even_loopy
+		sub	di,4			{ point fb to next row }
+
+		{dec	dx}			{ decrement Y counter }
+		{jne	even_loopy}
 
 
 		{=======================}
@@ -249,27 +261,40 @@ even_loopx:
 						{ si should already }
 						{ point to right place }
 
-		mov	di,[odd_offset]		{ es:di = destination}
+		{mov	di,[even_offset]}	{ es:di = destination}
 
-		mov	dx,[ysize]
+		{mov	dx,[ysize]}
 
-odd_loopy:
-		mov	cx,[xsize]
-odd_loopx:
+{odd_loopy:}
 
-		mov	ax,es:[di]
+		{ unroll, xoffset=0 }
+
+		mov	ax,es:[di][8192]
 		and	ax,ds:[si][bx]
 		or	ax,ds:[si]
 		inc	si
 		inc	si
-		stosw
+		{ stosw }
+		mov	es:[di][8192],ax
+		inc	di
+		inc	di
 
-		loop	odd_loopx
+		{ unroll, xoffset=0 }
 
-		add	di,(80-4)
+		mov	ax,es:[di][8192]
+		and	ax,ds:[si][bx]
+		or	ax,ds:[si]
+		inc	si
+		inc	si
+		{ stosw }
+		mov	es:[di][8192],ax
+		inc	di
+		inc	di
+
+		add	di,(80-4)		{ point fb to next line }
 
 		dec	dx
-		jne	odd_loopy
+		jne	even_loopy
 
 		{=========}
 
@@ -280,6 +305,90 @@ odd_loopx:
 
 end;
 
+
+
+{==================================}
+{ RestoreBG4                       }
+{==================================}
+{ used to restore BG around Rather Dashing }
+{ assumes 4-byte wide }
+
+Procedure RestoreBG4(x,y,ysize: word; bg, fb: screen_ptr);
+
+var
+	b_seg,b_off,f_seg,f_off,src_off,dest_off,dest_odd_off,src_odd_off:word;
+
+label loopy;
+
+begin
+	f_seg:=seg(fb^);			{ point to framebuffer}
+	f_off:=ofs(fb^);
+
+	b_seg:=seg(bg^);			{ point to background }
+	b_off:=ofs(bg^);
+
+	src_off:=((y div 2)*80)+(x div 4);	{ get offset in both }
+	dest_off:=src_off;
+
+	src_off:=src_off+b_off;			{ adjust offsets }
+	dest_off:=dest_off+f_off;
+
+
+	asm
+
+		push	ds
+		push	es
+
+		{=======================}
+		{ setup pointers }
+		{=======================}
+
+		mov	ax,[f_seg]	{ destination is framebuffer }
+		mov	es,ax
+		mov	di,[dest_off]	{ es:di = destination}
+
+		mov	ax,[b_seg]	{ source is background}
+		mov	ds,ax
+		mov	si,[src_off]	{ ds:si = source}
+
+		mov	cx,[ysize]	{ cx = y iterator }
+
+loopy:
+		{=======================}
+		{ draw odd lines first  }
+		{=======================}
+
+		{ unroll, xoffset=0 }
+
+		mov	ax,ds:[si][8192]	{ ds:si is src }
+		mov	es:[di][8192],ax	{ es:di is dest }
+
+		{ unroll, xoffset=0 }
+
+		mov	ax,ds:[si][8193]
+		mov	es:[di][8193],ax
+
+
+		{ now even lines }
+
+		{ xoffset=0 }
+
+		movsw				{ move from src to dest }
+		movsw			 	{ store out to fb + inc }
+
+		add	di,(80-4)		{ point dest to next line }
+		add	si,(80-4)		{ point src to next line }
+
+		loop	even_loopy
+
+		{=========}
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
 
 
 {***********************************************}

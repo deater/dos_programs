@@ -225,11 +225,12 @@ static void print_help(char *name,int version) {
 
 	if (version) exit(1);
 
-	printf("\nUsage: %s [-h] [-v] [-d] [-s] [-l label] PNGFILE x1 y1 x2 y2\n\n",name);
+	printf("\nUsage: %s [-h] [-v] [-d] [-s] [i] [-l label] PNGFILE x1 y1 x2 y2\n\n",name);
 	printf("\t[-d] debug\n");
 	printf("\t[-h] help\n");
 	printf("\t[-b] version\n");
 	printf("\t[-s] emit size of sprite before the data\n");
+	printf("\t[-i] interleave even/odd lines together\n");
 	printf("\t[-l label] for the sprite\n");
 	printf("\n");
 
@@ -240,6 +241,7 @@ int main(int argc, char **argv) {
 
 	int xsize=0,ysize=0;
 	int printsize=0,mask_offset=0,total_bytes=0;
+	int interleave=0;
 	int c,x,y;
 	unsigned char *image;
 	char label_string[BUFSIZ];
@@ -254,7 +256,7 @@ int main(int argc, char **argv) {
 
 	/* Parse command line arguments */
 
-	while ( (c=getopt(argc, argv, "hvdmsl:") ) != -1) {
+	while ( (c=getopt(argc, argv, "hvdmsil:") ) != -1) {
 
 		switch(c) {
 
@@ -272,6 +274,9 @@ int main(int argc, char **argv) {
 				break;
 			case 'm':
 				mask_offset=1;
+				break;
+			case 'i':
+				interleave=1;
 				break;
 			case 'l':
 				strncpy(label_string,optarg,BUFSIZ-1);
@@ -340,7 +345,7 @@ int main(int argc, char **argv) {
 
 
 
-	int addr,total_size;
+	int addr;
 
 	if (output_type==OUTPUT_ASM) {
 		printf("; %d %d %d %d\n",x1,y1,x2,y2);
@@ -394,37 +399,62 @@ int main(int argc, char **argv) {
 				total_bytes>>8);
 		}
 
-		/* print even */
-		for(y=y1;y<y2;y+=2) {
-			printf("\t");
-			for(x=x1/4;x<=x2/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X",
-					cga_ram[addr]);
-//				if ((y==y2-1)&&(x==x2/4)) {
-//				}
-//				else {
-					printf(",");
-//				}
-			}
-			printf("\n");
-		}
-//		printf(");\n");
 
-		/* print odd */
-		for(y=y1+1;y<y2;y+=2) {
-			printf("\t");
-			for(x=x1/4;x<=x2/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("#$%02X",
-					cga_ram[addr]);
-				if ((y==y2-1)&&(x==x2/4)) {
+		if (interleave) {
+			/* mix even/odd lines inline */
+
+			/* print even */
+			for(y=y1;y<y2;y++) {
+				printf("\t");
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X",
+						cga_ram[addr]);
+//					if ((y==y2-1)&&(x==x2/4)) {
+//					}
+//					else {
+						printf(",");
+//					}
 				}
-				else {
-					printf(",");
-				}
+				printf("\n");
 			}
-			printf("\n");
+
+		}
+		else {
+			/* have even lines first, then odd lines */
+
+			/* print even */
+			for(y=y1;y<y2;y+=2) {
+				printf("\t");
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X",
+						cga_ram[addr]);
+//					if ((y==y2-1)&&(x==x2/4)) {
+//					}
+//					else {
+						printf(",");
+//					}
+				}
+				printf("\n");
+			}
+//			printf(");\n");
+
+			/* print odd */
+			for(y=y1+1;y<y2;y+=2) {
+				printf("\t");
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("#$%02X",
+						cga_ram[addr]);
+					if ((y==y2-1)&&(x==x2/4)) {
+					}
+					else {
+						printf(",");
+					}
+				}
+				printf("\n");
+			}
 		}
 		printf(");\n");
 
