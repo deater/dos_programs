@@ -169,8 +169,7 @@ var	even_offset,odd_offset,mask_offset,width,height:word;
 	peasant_priority,tempy,col_offset:word;
 
 
-label even_loopy,even_loopx;
-label odd_loopy,odd_loopx;
+label loopy;
 
 begin
 	{ calculate depth of top of sprite (head) }
@@ -203,12 +202,24 @@ begin
 					{ follows sprite }
 
 
-	{ xsize:=xsize div 2; }			{ do 16-bit math? }
-
 	asm
 
 		push	ds
 		push	es
+
+{ 8088 timing notes }
+{  inc 16-bit reg:	2 cycles }
+{  add/sub: reg+imm	4 cycles }
+{ effective addr calc:	}
+{	base = 5 }
+{	indexed = 5 }
+{	displace = 6 }
+{	BX+SI = 7 }
+{	BX+DI = 8 }
+{	BX+SI+IMM = 11 }
+{	BX+DI+IMM = 12 }
+{ movsw = 26 cycles 1 word, faster if rep }
+{ stosw = 15 cycles 1 word, faster if rep }
 
 		{=======================}
 		{ draw even lines first }
@@ -224,77 +235,49 @@ begin
 
 		mov	bx,[mask_offset]	{ ds:si+bx = mask }
 
-		mov	dx,[ysize]		{ dx = y iterator }
+		mov	cx,[ysize]		{ cx = y iterator }
 
-even_loopy:
+loopy:
 
 		{ unroll: assume always 4-bytes wide }
 
-		{ xoffset=0 }
+		{ even lines first }
 
+						{ xoffset=0 }
 		mov	ax,es:[di]		{ load bg from fb }
 		and	ax,ds:[si][bx] 		{ mask with mask }
 		or	ax,ds:[si]		{ or in sprite }
 		inc	si			{ increment sprite ptr }
 		inc	si			{ increment sprite ptr }
-		stosw			 	{ store out to fb + inc }
+		stosw			 	{ store out to fb, di+=2}
 
-		{ xoffset=2 }
-
+						{ xoffset=2 }
 		mov	ax,es:[di]		{ load bg from fb }
 		and	ax,ds:[si][bx] 		{ mask with mask }
 		or	ax,ds:[si]		{ or in sprite }
 		inc	si			{ increment sprite ptr }
 		inc	si			{ increment sprite ptr }
-		stosw			 	{ store out to fb + inc }
+		stosw			 	{ store out to fb, di+=2}
 
-		sub	di,4			{ point fb to next row }
+		{ draw odd lines next }
+		{ di is 4 bytes past where we want }
 
-		{dec	dx}			{ decrement Y counter }
-		{jne	even_loopy}
-
-
-		{=======================}
-		{ draw odd lines next   }
-		{=======================}
-
-						{ si should already }
-						{ point to right place }
-
-		{mov	di,[even_offset]}	{ es:di = destination}
-
-		{mov	dx,[ysize]}
-
-{odd_loopy:}
-
-		{ unroll, xoffset=0 }
-
-		mov	ax,es:[di][8192]
+		mov	ax,es:[di][8192-4]	{ unroll, xoffset=0 }
 		and	ax,ds:[si][bx]
 		or	ax,ds:[si]
-		inc	si
-		inc	si
-		{ stosw }
-		mov	es:[di][8192],ax
-		inc	di
-		inc	di
+		mov	es:[di][8192-4],ax
 
-		{ unroll, xoffset=0 }
+		mov	ax,es:[di][8194-4]	{ unroll, xoffset=0 }
+		and	ax,ds:[si][bx][2]
+		or	ax,ds:[si][2]
+		mov	es:[di][8194-4],ax
 
-		mov	ax,es:[di][8192]
-		and	ax,ds:[si][bx]
-		or	ax,ds:[si]
-		inc	si
-		inc	si
-		{ stosw }
-		mov	es:[di][8192],ax
-		inc	di
-		inc	di
+		add	si,4			{ adjust sprite pointer }
+						{ di is unchanged }
 
 		add	di,(80-4)		{ point fb to next line }
 
-		dec	dx
-		jne	even_loopy
+		loop	loopy
 
 		{=========}
 
@@ -363,15 +346,11 @@ loopy:
 		mov	ax,ds:[si][8192]	{ ds:si is src }
 		mov	es:[di][8192],ax	{ es:di is dest }
 
-		{ unroll, xoffset=0 }
-
-		mov	ax,ds:[si][8193]
-		mov	es:[di][8193],ax
+		mov	ax,ds:[si][8194]	{ unroll xoffset=1 }
+		mov	es:[di][8194],ax
 
 
 		{ now even lines }
-
-		{ xoffset=0 }
 
 		movsw				{ move from src to dest }
 		movsw			 	{ store out to fb + inc }
@@ -379,7 +358,7 @@ loopy:
 		add	di,(80-4)		{ point dest to next line }
 		add	si,(80-4)		{ point src to next line }
 
-		loop	even_loopy
+		loop	loopy
 
 		{=========}
 
