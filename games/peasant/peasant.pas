@@ -10,6 +10,7 @@ uses crt,zx02_asm,cga;
 
 Procedure yellow_tree_actions; forward;
 Procedure waterfall_actions; forward;
+Procedure west_lake_actions; forward;
 Procedure east_lake_actions; forward;
 Procedure river_actions; forward;
 Procedure knight_actions; forward;
@@ -25,6 +26,7 @@ Procedure unknown_actions; forward;
 {$I o_wfall.pas}
 {$I o_rock.pas}
 {$I o_knight.pas}
+{$I o_wlake.pas}
 {$I o_elake.pas}
 {$I o_inn.pas}
 {$I o_olady.pas}
@@ -722,7 +724,7 @@ begin
 		LOCATION_MOUNTAIN_PASS:		knight_actions;
 		LOCATION_JHONKA_CAVE:		knight_actions;
 		LOCATION_YOUR_COTTAGE:		knight_actions;
-		LOCATION_LAKE_WEST:		knight_actions;
+		LOCATION_LAKE_WEST:		west_lake_actions;
 		LOCATION_LAKE_EAST:		east_lake_actions;
 		LOCATION_OUTSIDE_INN:		outside_inn_actions;
 		LOCATION_OUTSIDE_NN:		knight_actions;
@@ -1552,6 +1554,7 @@ end;
 {$I lwfall.pas}
 {$I lriver.pas}
 {$I lknight.pas}
+{$I lwlake.pas}
 {$I lelake.pas}
 {$I linn.pas}
 {$I lolady.pas}
@@ -1752,7 +1755,7 @@ begin
 		LOCATION_MOUNTAIN_PASS:		do_knight;
 		LOCATION_JHONKA_CAVE:		do_unknown;
 		LOCATION_YOUR_COTTAGE:		do_unknown;
-		LOCATION_LAKE_WEST:		do_unknown;
+		LOCATION_LAKE_WEST:		do_west_lake;
 		LOCATION_LAKE_EAST:		do_east_lake;
 		LOCATION_OUTSIDE_INN:		do_outside_inn;
 		LOCATION_OUTSIDE_NN:		do_unknown;

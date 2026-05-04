@@ -10,6 +10,7 @@ all:	shrink_text \
 	D_WFALL.PAS  O_WFALL.PAS \
 	D_ROCK.PAS   O_ROCK.PAS \
 	D_KNIGHT.PAS O_KNIGHT.PAS \
+	D_WLAKE.PAS  O_WLAKE.PAS \
 	D_ELAKE.PAS  O_ELAKE.PAS \
 	D_INN.PAS    O_INN.PAS \
 	D_OLADY.PAS  O_OLADY.PAS \
@@ -75,6 +76,19 @@ dialog_knight.raw:	knight.inc
 
 ############################################
 ############################################
+
+O_WLAKE.PAS:	dialog_lake_west.raw
+
+D_WLAKE.PAS:	D_WLAKE.ZX2
+	$(BIN2PAS) -l D_WLAKE D_WLAKE.ZX2 > D_WLAKE.PAS
+
+D_WLAKE.ZX2:	dialog_lake_west.raw
+	$(ZX02) -f  dialog_lake_west.raw D_WLAKE.ZX2
+
+dialog_lake_west.raw:	lake_west.inc
+	./shrink_text dialog_lake_west.raw O_WLAKE.PAS lake_west < lake_west.inc
+
+#####
 
 O_ELAKE.PAS:	dialog_lake_east.raw
 

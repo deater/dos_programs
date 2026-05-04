@@ -14,6 +14,7 @@ PEASANT.WAD:	\
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_priority.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_priority.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_priority.zx02 \
+	pq_w_lake.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_priority.zx02 \
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_priority.zx02 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_priority.zx02 \
@@ -30,6 +31,7 @@ PEASANT.WAD:	\
 		river_priority.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		knight_priority.zx02,PKNIGHT \
+		pq_w_lake.zx02,GWLAKE \
 		pq_e_lake.zx02,GELAKE ../text/D_ELAKE.ZX2,DELAKE \
 		lake_e_priority.zx02,PELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
@@ -153,6 +155,23 @@ knight_priority.combined:	knight_priority.png knight_collision.png
 
 #################################################
 #################################################
+
+PQ_WLAKE.PAS:	pq_w_lake.zx02
+	$(BIN2PAS) -l PQ_WLAKE pq_w_lake.zx02 > PQ_WLAKE.PAS
+
+pq_w_lake.zx02:	pq_w_lake.cga
+	$(ZX02) -f pq_w_lake.cga pq_w_lake.zx02
+
+pq_w_lake.cga:	pq_w_lake.png
+	$(PNG2CGA) -r ./pq_w_lake.png > pq_w_lake.cga
+
+lake_w_priority.zx02:	lake_w_priority.combined
+	$(ZX02) -f lake_w_priority.combined lake_w_priority.zx02
+
+lake_w_priority.combined:	lake_w_priority.png lake_w_collision.png
+	$(PNG2COLLISION) lake_w_collision.png lake_w_priority.png lake_w_priority.combined
+
+###
 
 PQ_ELAKE.PAS:	pq_e_lake.zx02
 	$(BIN2PAS) -l PQ_ELAKE pq_e_lake.zx02 > PQ_ELAKE.PAS
