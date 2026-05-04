@@ -331,7 +331,7 @@ const WalkingSprites : array[0..23] of SpritePtr =
 var
 	visited_locations : array [0..34] of boolean;
 
-	collision,file_buffer,dialog,background,framebuffer:buffer_ptr;
+	collision,file_buffer,dialog,background:buffer_ptr;
 
 	score: word;
 	screen:screentype absolute $B800:0000;
@@ -647,7 +647,7 @@ begin
 
 	{ refresh background }
 
-	screen_update(@screen,screen_ptr(framebuffer));
+	screen_update(@screen,screen_ptr(background));
 
 end;
 

@@ -52,9 +52,11 @@ begin
 	wad_load(file_buffer,'GYTREE');
 	decompress(background,file_buffer);
 
-	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
+{	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
 
-	screen_copy(@screen,screen_ptr(framebuffer));
+	screen_copy(@screen,screen_ptr(framebuffer)); }
+
+	screen_copy(@screen,screen_ptr(background));
 
 	update_score;
 
