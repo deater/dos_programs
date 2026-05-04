@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -O2 -Wall -g
 
-all:	png2cga cga2png cga_make_sprite cga_make_sprite_mask png2collision
+all:	png2cga cga2png cga_make_sprite cga_make_sprite_mask \
+	png2collision png2priority
 
 ###
 
@@ -44,6 +45,15 @@ png2collision:		png2collision.o
 
 png2collision.o:		png2collision.c
 			$(CC) $(CFLAGS) -c png2collision.c
+
+###
+
+png2priority:		png2priority.o
+			$(CC) -o png2priority png2priority.o $(LFLAGS) -lpng
+
+png2priority.o:		png2priority.c
+			$(CC) $(CFLAGS) -c png2priority.c
+
 
 
 ###

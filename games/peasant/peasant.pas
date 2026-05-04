@@ -1443,7 +1443,7 @@ begin
 
 	temp3:=collision_offset[(y shr 5)]+x;
 
-	temp4:=collision^[960+temp3]; { get 8 bits of collision info }
+	temp4:=collision^[temp3]; { get 8 bits of collision info }
 
 	temp5:=temp4 and collision_masks[temp2];
 
@@ -1551,7 +1551,7 @@ begin
 }
 
 	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
-		@screen,screen_ptr(collision));
+		@screen);
 
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],screen_ptr(framebuffer));}
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],@screen);}
@@ -1715,11 +1715,11 @@ begin
 	{ allocate memory }
 	{*****************}
 
-	GetMem(background,16384);
-	GetMem(framebuffer,16384);
+	GetMem(background,16384*2);
+	{GetMem(framebuffer,16384);}
 	GetMem(dialog,8192);		{ probably could be smaller }
 	GetMem(file_buffer,5*1024);	{ 4k is slightly to small }
-	GetMem(collision,1024+256);
+	GetMem(collision,256);
 
 	decompress(dialog,@D_COMMON);
 

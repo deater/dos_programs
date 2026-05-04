@@ -15,7 +15,7 @@ type
 Procedure PrintChar(which: char);
 Procedure PrintCharXor(which: char;x,y:word);
 Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
-		framebuffer,priority: screen_ptr);
+		framebuffer: screen_ptr);
 Procedure SpriteXY(x,y: word; sprite: SpritePtr; framebuffer: screen_ptr);
 Procedure PrintStringXor(st:string;x,y:word);
 Procedure screen_copy(dest,src:screen_ptr);
@@ -166,6 +166,209 @@ end;
 
 
 Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
+			framebuffer: screen_ptr);
+
+var	even_offset,odd_offset,mask_offset,width,height:word;
+	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
+	tempy,col_offset:word;
+	peasant_priority:byte;
+
+label loopy,skip0,skip1,skip2,skip3,skip4,skip5,skip6,skip7;
+
+
+{ get mask }
+{ (y/8) gets you 24 rows }
+{ (y/8)+(x/8) gets you starting }
+{ top/bottom you can get from ((y/4)&1) }
+
+
+begin
+	f_seg:=seg(framebuffer^);		{ pointer to framebuffer }
+	f_off:=ofs(framebuffer^);
+
+	s_seg:=seg(sprite^);			{ pointer to sprite }
+	s_off:=ofs(sprite^)+2;			{ skip xsize/ysize }
+
+	even_offset:=((y div 2)*80)+(x div 4);	{ actual offset where to draw }
+						{ note only draw at }
+						{ x: multiple of 4-pixel }
+						{ y: multiple of 2-pixel }
+
+	even_offset:=even_offset+f_off;		{ CGA even and odd lines }
+	odd_offset:=even_offset+$2000;		{ 8k apart in memory }
+
+	xsize:=Word(sprite^[0]);		{ get xsize, extend to 16-bits }
+	ysize:=Word(sprite^[1]);		{ get ysize, extend to 16-bits }
+					{ note: ysize is 1/2 sprite size }
+
+	mask_offset:=xsize*ysize*2;	{ point to mask which immediately }
+					{ follows sprite }
+
+
+	{ calculate depth of top of sprite (head) }
+	tempy:=y;
+	{ make sure at least 48 }
+	if (tempy<48) then tempy:=48;
+	{ ((y-48)/8)+2; }
+	{ +2 skips colors 0,1.  0 used to be collision, 1 is always-visible }
+	peasant_priority:=((tempy-48) shr 3)+2;
+
+	asm
+
+		push	ds
+		push	es
+
+{ 8088 timing notes }
+{  inc 16-bit reg:	2 cycles }
+{  add/sub: reg+imm	4 cycles }
+{ effective addr calc:	}
+{	base = 5 }
+{	indexed = 5 }
+{	displace = 6 }
+{	BX+SI = 7 }
+{	BX+DI = 8 }
+{	BX+SI+IMM = 11 }
+{	BX+DI+IMM = 12 }
+{ movsw = 26 cycles 1 word, faster if rep }
+{ stosw = 15 cycles 1 word, faster if rep }
+{ Note: write to CGA memory can take up to 25 cycles / word }
+
+		{=======================}
+		{ initialize            }
+		{=======================}
+
+		mov	dh,[peasant_priority]
+
+		mov	ax,[f_seg]
+		mov	es,ax
+		mov	di,[even_offset]	{ es:di = fb destination}
+
+		mov	ax,[s_seg]
+		mov	ds,ax
+		mov	si,[s_off]		{ ds:si = source sprite}
+
+		mov	bx,[mask_offset]	{ ds:si+bx = mask }
+
+		mov	cx,[ysize]		{ cx = y iterator }
+
+loopy:
+
+		{ unroll: assume always 4-bytes wide }
+
+		{ even lines first }
+
+						{ xoffset=0 }
+		mov	al,es:[di]		{ load bg from fb }
+		mov	dl,es:[di][16384]
+		cmp	dl,dh
+		jge	skip0
+		and	al,ds:[si][bx] 		{ mask with mask }
+		or	al,ds:[si]		{ or in sprite }
+skip0:
+		inc	si			{ increment sprite ptr }
+		stosb			 	{ store out to fb, di+=2}
+
+						{ xoffset=2 }
+		mov	al,es:[di]		{ load bg from fb }
+		mov	dl,es:[di][16384]
+		cmp	dl,dh
+		jge	skip1
+		and	al,ds:[si][bx] 		{ mask with mask }
+		or	al,ds:[si]		{ or in sprite }
+skip1:
+		inc	si			{ increment sprite ptr }
+		stosb			 	{ store out to fb, di+=2}
+
+						{ xoffset=0 }
+		mov	al,es:[di]		{ load bg from fb }
+		mov	dl,es:[di][16384]
+		cmp	dl,dh
+		jge	skip2
+		and	al,ds:[si][bx] 		{ mask with mask }
+		or	al,ds:[si]		{ or in sprite }
+skip2:		inc	si			{ increment sprite ptr }
+		stosb			 	{ store out to fb, di+=2}
+
+						{ xoffset=2 }
+		mov	al,es:[di]		{ load bg from fb }
+		mov	dl,es:[di][16384]
+		cmp	dl,dh
+		jge	skip3
+		and	al,ds:[si][bx] 		{ mask with mask }
+		or	al,ds:[si]		{ or in sprite }
+skip3:
+		inc	si			{ increment sprite ptr }
+		stosb			 	{ store out to fb, di+=2}
+
+
+
+
+		{ draw odd lines next }
+		{ di is 4 bytes past where we want }
+
+		mov	al,es:[di][8192-4]	{ unroll, xoffset=0 }
+		mov	dl,es:[di][16384+8192-4]
+		cmp	dl,dh
+		jge	skip4
+		and	al,ds:[si][bx]
+		or	al,ds:[si]
+skip4:
+		mov	es:[di][8192-4],al
+
+
+		mov	al,es:[di][8193-4]	{ unroll, xoffset=0 }
+		mov	dl,es:[di][16384+8193-4]
+		cmp	dl,dh
+		jge	skip5
+		and	al,ds:[si][bx][1]
+		or	al,ds:[si][1]
+skip5:
+		mov	es:[di][8193-4],al
+
+
+		mov	al,es:[di][8194-4]	{ unroll, xoffset=0 }
+		mov	dl,es:[di][16384+8194-4]
+		cmp	dl,dh
+		jge	skip6
+		and	al,ds:[si][bx][2]
+		or	al,ds:[si][2]
+skip6:
+		mov	es:[di][8194-4],al
+
+
+
+		mov	al,es:[di][8195-4]	{ unroll, xoffset=0 }
+		mov	dl,es:[di][16384+8195-4]
+		cmp	dl,dh
+		jge	skip7
+		and	al,ds:[si][bx][3]
+		or	al,ds:[si][3]
+skip7:
+		mov	es:[di][8195-4],al
+
+
+		add	si,4			{ adjust sprite pointer }
+						{ di is unchanged }
+
+		add	di,(80-4)		{ point fb to next line }
+
+		 {loop	loopy too far :( }
+
+		dec	cx
+		jne	loopy
+
+		{=========}
+
+		pop	es
+		pop	ds
+
+	end;
+
+end;
+
+(*
+
+Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
 			framebuffer,priority: screen_ptr);
 
 var	even_offset,odd_offset,mask_offset,width,height:word;
@@ -174,6 +377,13 @@ var	even_offset,odd_offset,mask_offset,width,height:word;
 
 
 label loopy;
+
+
+{ get mask }
+{ (y/8) gets you 24 rows }
+{ (y/8)+(x/8) gets you starting }
+{ top/bottom you can get from ((y/4)&1) }
+
 
 begin
 	{ calculate depth of top of sprite (head) }
@@ -293,6 +503,7 @@ loopy:
 	end;
 
 end;
+*)
 
 
 

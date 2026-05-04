@@ -418,18 +418,17 @@ int main(int argc, char **argv) {
 	int xsize,ysize;
 	FILE *outfile;
 
-	if (argc<3) {
-		fprintf(stderr,"Usage:\t%s COLLISION OUTFILE\n\n",argv[0]);
+	if (argc<4) {
+		fprintf(stderr,"Usage:\t%s COLLISION PRIORITY OUTFILE\n\n",argv[0]);
 		exit(-1);
 	}
 
-	outfile=fopen(argv[2],"w");
+	outfile=fopen(argv[3],"w");
 	if (outfile==NULL) {
 		fprintf(stderr,"Error!  Could not open %s\n",argv[2]);
 		exit(-1);
 	}
 
-#if 0
 	/*****************/
 	/* load priority */
 	if (loadpng(argv[2],&image,&xsize,&ysize,PNG_WHOLETHING)<0) {
@@ -448,7 +447,6 @@ int main(int argc, char **argv) {
 			fputc( temp,outfile);
 		}
 	}
-#endif
 
 	/******************/
 	/* load collision */

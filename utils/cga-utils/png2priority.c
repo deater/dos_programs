@@ -1,10 +1,8 @@
-/* png2collision */
+/* png2priority */
 
-/* takes png file and generates the 240 byte table lookup info */
-/* for collision of sprites in the Peasant's Quest game */
-/* a color of 0 indicates there should be a collision */
+/* takes png file and generates the 80x200 priority file */
+/* for use in the Peasant's Quest game */
 
-/* data organized in 6 rows of 40 bytes */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,12 +138,7 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 	height = png_get_image_height(png_ptr, info_ptr);
 
 	/* get the xadd */
-	if (width==40) {
-		*xsize=40;
-		xadd=1;
-		yadd=1;
-	}
-	else if (width==80) {
+	if (width==80) {
 		if (png_type==PNG_NO_ADJUST) {
 			*xsize=80;
 			xadd=1;
@@ -157,13 +150,8 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 		yadd=1;
 	}
 	else if (width==320) {
-		*xsize=40;
-		xadd=8;
-		yadd=4; /* FIXME: check we are 192 in ysize */
-	}
-	else if (width==16) {
-		*xsize=16;
-		xadd=1;
+		*xsize=80;
+		xadd=4;
 		yadd=1;
 	}
 	else {
@@ -174,23 +162,7 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 	if ((png_type==PNG_WHOLETHING) || (png_type==PNG_NO_ADJUST)) {
 		*ysize=height;
 		ystart=0;
-		yadd*=2;
-	}
-	else if (png_type==PNG_ODDLINES) {
-		*ysize=height/2;
-		ystart=1;
-		yadd*=4;
-	}
-	else if (png_type==PNG_EVENLINES) {
-		*ysize=height/2;
-		ystart=0;
-		yadd*=4;
-	}
-	else if (png_type==PNG_RAW) {
-		/* FIXME, not working */
-		*ysize=height;
-		ystart=0;
-		yadd=1;
+		yadd*=1;
 	}
 	else {
 		fprintf(stderr,"Unknown PNG type\n");
@@ -256,17 +228,6 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 						x,y);
 				}
 
-
-				/* bottom color */
-				color=	(row_pointers[y+1][x*4]<<16)+
-					(row_pointers[y+1][x*4+1]<<8)+
-					(row_pointers[y+1][x*4+2]);
-				if (debug) {
-					fprintf(stderr,"%x ",color);
-				}
-
-				a2_color|=(convert_color(color,filename)<<4);
-
 				*out_ptr=a2_color;
 				out_ptr++;
 			}
@@ -276,7 +237,11 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 
 	}
 	else if (color_type==PNG_COLOR_TYPE_PALETTE) {
-		if (debug) fprintf(stderr,"PNG_COLOR_TYPE_PALETTE\n");
+		if (debug) {
+			fprintf(stderr,"PNG_COLOR_TYPE_PALETTE\n");
+			fprintf(stderr,"y: %d to %d step %d\n",ystart,height,yadd);
+			fprintf(stderr,"x: %d to %d step %d\n",0,width,xadd);
+		}
 		for(y=ystart;y<height;y+=yadd) {
 			for(x=0;x<width;x+=xadd) {
 
@@ -290,19 +255,8 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 						fprintf(stderr,"Error color %d\n",a2_color);
 					}
 
-					/* bottom color */
-					color=row_pointers[y+(yadd/2)][x];
-					if (color==16) {
-						color=10;
-					}
-					if (color>16) {
-						fprintf(stderr,"Error color %d\n",color);
-					}
-
-					a2_color|=(color<<4);
-
 					if (debug) {
-						printf("%x ",a2_color);
+						printf("%x",a2_color);
 					}
 
 					*out_ptr=a2_color;
@@ -315,19 +269,6 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 						a2_color=(a2_color>>4);
 					}
 					a2_color&=0xf;
-
-					/* bottom color */
-					color=row_pointers[y+(yadd/2)][x/2];
-					if (x%2==0) {
-						color=(color>>4);
-					}
-					color&=0xf;
-
-					a2_color|=(color<<4);
-
-					if (debug) {
-						printf("%x ",a2_color);
-					}
 
 					*out_ptr=a2_color;
 					out_ptr++;
@@ -382,21 +323,6 @@ int loadpng(char *filename, unsigned char **image_ptr, int *xsize, int *ysize,
 		exit(-1);
 	}
 
-	/* Stripe test image */
-//	for(x=0;x<40;x++) for(y=0;y<40;y++) image[(y*width)+x]=y%16;
-
-/*
-	Addr		Row	/80	%40
-	$400	0	0	0	0
-	$428	28	16	0
-	$450	50	32	0
-	$480	80	2	1
-	$4A8	a8	18	1
-	$4D0	d0	34	1
-	$500	100	3	2
-	0,0 0,1 0,2....0,39 16,0 16,1 ....16,39 32,0..32,39, X X X X X X X X
-*/
-
 	*image_ptr=image;
 
 	return 0;
@@ -419,7 +345,7 @@ int main(int argc, char **argv) {
 	FILE *outfile;
 
 	if (argc<3) {
-		fprintf(stderr,"Usage:\t%s COLLISION OUTFILE\n\n",argv[0]);
+		fprintf(stderr,"Usage:\t%s PRIORITY OUTFILE\n\n",argv[0]);
 		exit(-1);
 	}
 
@@ -429,10 +355,9 @@ int main(int argc, char **argv) {
 		exit(-1);
 	}
 
-#if 0
 	/*****************/
 	/* load priority */
-	if (loadpng(argv[2],&image,&xsize,&ysize,PNG_WHOLETHING)<0) {
+	if (loadpng(argv[1],&image,&xsize,&ysize,PNG_WHOLETHING)<0) {
 		fprintf(stderr,"Error loading png!\n");
 		exit(-1);
 	}
@@ -441,48 +366,10 @@ int main(int argc, char **argv) {
 		argv[2],xsize,ysize);
 
 	int temp;
-	for(row=0;row<24;row++) {
-		for(col=0;col<40;col++) {
-			temp=((image[((row*4)+0)*xsize+col])&0xf)<<4;
-			temp|=image[((row*4)+1)*xsize+col]&0xf;
+	for(row=0;row<200;row++) {
+		for(col=0;col<80;col++) {
+			temp=((image[(row*xsize)+col])&0xff);
 			fputc( temp,outfile);
-		}
-	}
-#endif
-
-	/******************/
-	/* load collision */
-	if (loadpng(argv[1],&image,&xsize,&ysize,PNG_WHOLETHING)<0) {
-		fprintf(stderr,"Error loading png!\n");
-		exit(-1);
-	}
-
-	fprintf(stderr,"Loaded collision image %s %d by %d\n",
-			argv[1],xsize,ysize);
-	/* output the distance table, 40x24 = 960 bytes */
-	/* high/low nibble, opposite of Apple II */
-
-
-	/* output the collision table (240 bytes) */
-
-	int temp_byte;
-
-	for(row=0;row<6;row++) {
-		for(col=0;col<40;col++) {
-			temp_byte=0;
-			if ((image[((row*4)+0)*xsize+col]&0xf)==0) temp_byte|=0x80;
-			if (((image[((row*4)+0)*xsize+col]>>4)&0xf)==0) temp_byte|=0x40;
-
-			if ((image[((row*4)+1)*xsize+col]&0xf)==0) temp_byte|=0x20;
-			if (((image[((row*4)+1)*xsize+col]>>4)&0xf)==0) temp_byte|=0x10;
-
-			if ((image[((row*4)+2)*xsize+col]&0xf)==0) temp_byte|=0x08;
-			if (((image[((row*4)+2)*xsize+col]>>4)&0xf)==0) temp_byte|=0x04;
-
-			if ((image[((row*4)+3)*xsize+col]&0xf)==0) temp_byte|=0x02;
-			if (((image[((row*4)+3)*xsize+col]>>4)&0xf)==0) temp_byte|=0x01;
-
-			fputc( temp_byte,outfile);
 		}
 	}
 
