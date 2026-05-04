@@ -154,6 +154,11 @@ end;
 {***********************************************}
 { CGA_draw_sprite_bg_mask                       }
 {***********************************************}
+{ Really only used for Rather Dashing }
+{ Assumptions: }
+{   Sprites always 4 bytes wide? }
+{   x from 0..319 but only draw on byte (4-pixel) boundaries }
+
 
 Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
 			framebuffer,priority: screen_ptr);
@@ -167,66 +172,84 @@ label even_loopy,even_loopx;
 label odd_loopy,odd_loopx;
 
 begin
+	{ calculate depth of top of sprite (head) }
 	tempy:=y;
+	{ make sure at least 48 }
 	if (tempy<48) then tempy:=48;
+	{ ((y-48)/8)+2; }
+	{ +2 skips colors 0,1.  0 used to be collision, 1 is always-visible }
 	peasant_priority:=((tempy-48) shr 3)+2;
 
-	f_seg:=seg(framebuffer^);
+	f_seg:=seg(framebuffer^);		{ pointer to framebuffer }
 	f_off:=ofs(framebuffer^);
 
-	s_seg:=seg(sprite^);
-	s_off:=ofs(sprite^)+2;
+	s_seg:=seg(sprite^);			{ pointer to sprite }
+	s_off:=ofs(sprite^)+2;			{ skip xsize/ysize }
 
-	even_offset:=((y div 2)*80)+(x div 4);
-	even_offset:=even_offset+f_off;
-	odd_offset:=even_offset+$2000;
+	even_offset:=((y div 2)*80)+(x div 4);	{ actual offset where to draw }
+						{ note only draw at 4-pixel }
+						{ boundary }
 
-	xsize:=Word(sprite^[0]);
-	ysize:=Word(sprite^[1]);
+	even_offset:=even_offset+f_off;		{ CGA even and odd lines }
+	odd_offset:=even_offset+$2000;		{ 8k apart in memory }
 
-	mask_offset:=xsize*ysize*2;
+	xsize:=Word(sprite^[0]);		{ get xsize, extend to 16-bits }
+	ysize:=Word(sprite^[1]);		{ get ysize, extend to 16-bits }
+					{ note: ysize is 1/2 sprite size }
+
+	mask_offset:=xsize*ysize*2;	{ point to mask which immediately }
+					{ follows sprite }
+
+
+	xsize:=xsize div 2;			{ do 16-bit math? }
 
 	asm
-
-		{; even first }
 
 		push	ds
 		push	es
 
+		{=======================}
+		{ draw even lines first }
+		{=======================}
+
 		mov	ax,[f_seg]
 		mov	es,ax
-		mov	di,[even_offset]	{; es:di = destination}
+		mov	di,[even_offset]	{ es:di = fb destination}
 
 		mov	ax,[s_seg]
 		mov	ds,ax
-		mov	si,[s_off]	{; ds:si = source}
+		mov	si,[s_off]		{ ds:si = source sprite}
 
-		mov	bx,[mask_offset]
+		mov	bx,[mask_offset]	{ ds:bx = mask }
 
-		mov	dx,[ysize]
+		mov	dx,[ysize]		{ dx = y iterator }
 
 even_loopy:
-		mov	cx,[xsize]
+		mov	cx,[xsize]		{ cx = x iterator }
 even_loopx:
+		mov	ax,es:[di]		{ load bg from fb }
+		and	ax,ds:[si][bx] 		{ mask with mask }
+		or	ax,ds:[si]		{ or in sprite }
+		inc	si			{ increment sprite ptr }
+		inc	si			{ increment sprite ptr }
+		stosw			 	{ store out to fb + inc }
 
-		mov	al,es:[di]
-		and	al,ds:[si][bx]
-		or	al,ds:[si]
-		inc	si
-		stosb
+		loop	even_loopx		{ repeat for all X values }
 
-		loop	even_loopx
+		add	di,(80-4)		{ point fb to next row }
 
-		add	di,(80-4)
-
-		dec	dx
+		dec	dx			{ decrement Y counter }
 		jne	even_loopy
 
 
-		{; odd next }
-		{; at this point }
+		{=======================}
+		{ draw odd lines next   }
+		{=======================}
 
-		mov	di,[odd_offset]	{; es:di = destination}
+						{ si should already }
+						{ point to right place }
+
+		mov	di,[odd_offset]		{ es:di = destination}
 
 		mov	dx,[ysize]
 
@@ -234,11 +257,12 @@ odd_loopy:
 		mov	cx,[xsize]
 odd_loopx:
 
-		mov	al,es:[di]
-		and	al,ds:[si][bx]
-		or	al,ds:[si]
+		mov	ax,es:[di]
+		and	ax,ds:[si][bx]
+		or	ax,ds:[si]
 		inc	si
-		stosb
+		inc	si
+		stosw
 
 		loop	odd_loopx
 
@@ -246,6 +270,8 @@ odd_loopx:
 
 		dec	dx
 		jne	odd_loopy
+
+		{=========}
 
 		pop	es
 		pop	ds
