@@ -200,7 +200,7 @@ begin
 	{ decompress priority }
 
 	wad_load(file_buffer,'PIINN');
-	decompress(buffer_ptr(collision),file_buffer);
+	decompress(buffer_ptr(@collision^[8192]),file_buffer);
 
 	{ load bg }
 

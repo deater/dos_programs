@@ -15,7 +15,7 @@ PEASANT.WAD:	\
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_collision.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_collision.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_collision.zx02 \
-	pq_w_lake.zx02 \
+	pq_w_lake.zx02    ../text/D_WLAKE.ZX2  lake_w_collision.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_collision.zx02 \
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_collision.zx02 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_collision.zx02 \
@@ -33,7 +33,8 @@ PEASANT.WAD:	\
 		river_collision.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		knight_collision.zx02,PKNIGHT \
-		pq_w_lake.zx02,GWLAKE \
+		pq_w_lake.zx02,GWLAKE ../text/D_WLAKE.ZX2,DWLAKE \
+		lake_w_collision.zx02,PWLAKE \
 		pq_e_lake.zx02,GELAKE ../text/D_ELAKE.ZX2,DELAKE \
 		lake_e_collision.zx02,PELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
@@ -86,25 +87,26 @@ pq_tips.cga:	pq_tips.png
 #################################################
 #################################################
 
-PQ_YTREE.PAS:	pq_ytree.zx02
-	$(BIN2PAS) -l PQ_YTREE pq_ytree.zx02 > PQ_YTREE.PAS
-
 pq_ytree.zx02:	pq_ytree.cga
 	$(ZX02) -f pq_ytree.cga pq_ytree.zx02
 
 pq_ytree.cga:	pq_ytree.png
 	$(PNG2CGA) -r ./pq_ytree.png > pq_ytree.cga
 
-yellow_tree_collision.zx02:	yellow_tree_collision.collision
-	$(ZX02) -f yellow_tree_collision.collision yellow_tree_collision.zx02
+yellow_tree_collision.zx02:	yellow_tree_collision.combined
+	$(ZX02) -f yellow_tree_collision.combined yellow_tree_collision.zx02
 
-yellow_tree_collision.collision:	yellow_tree_collision.png yellow_tree_collision.png
+yellow_tree_collision.combined:	yellow_tree_collision.collision yellow_tree_priority.priority
+	cat yellow_tree_priority.priority > yellow_tree_collision.combined
+	cat yellow_tree_collision.collision >> yellow_tree_collision.combined
+
+yellow_tree_priority.priority:	yellow_tree_priority.png
+	$(PNG2PRIORITY) yellow_tree_priority.png yellow_tree_priority.priority
+
+yellow_tree_collision.collision:	yellow_tree_collision.png
 	$(PNG2COLLISION) yellow_tree_collision.png yellow_tree_collision.collision
 
 ####
-
-PQ_WFALL.PAS:	pq_waterfall.zx02
-	$(BIN2PAS) -l PQ_WFALL pq_waterfall.zx02 > PQ_WFALL.PAS
 
 pq_waterfall.zx02:	pq_waterfall.cga
 	$(ZX02) -f pq_waterfall.cga pq_waterfall.zx02
@@ -112,17 +114,23 @@ pq_waterfall.zx02:	pq_waterfall.cga
 pq_waterfall.cga:	pq_waterfall.png
 	$(PNG2CGA) -r ./pq_waterfall.png > pq_waterfall.cga
 
-waterfall_collision.zx02:	waterfall_collision.collision
-	$(ZX02) -f waterfall_collision.collision waterfall_collision.zx02
+waterfall_collision.zx02:	waterfall_collision.combined
+	$(ZX02) -f waterfall_collision.combined waterfall_collision.zx02
 
-waterfall_collision.collision:	waterfall_collision.png waterfall_collision.png
+waterfall_collision.combined:	waterfall_collision.collision waterfall_priority.priority
+	cat waterfall_priority.priority > waterfall_collision.combined
+	cat waterfall_collision.collision >> waterfall_collision.combined
+
+waterfall_priority.priority:	waterfall_priority.png
+	$(PNG2PRIORITY) waterfall_priority.png waterfall_priority.priority
+
+waterfall_collision.collision:	waterfall_collision.png
 	$(PNG2COLLISION) waterfall_collision.png waterfall_collision.collision
 
+
 #################################################
 #################################################
 
-PQ_ROCK.PAS:	pq_rock.zx02
-	$(BIN2PAS) -l PQ_ROCK pq_rock.zx02 > PQ_ROCK.PAS
 
 pq_rock.zx02:	pq_rock.cga
 	$(ZX02) -f pq_rock.cga pq_rock.zx02
@@ -130,22 +138,20 @@ pq_rock.zx02:	pq_rock.cga
 pq_rock.cga:	pq_rock.png
 	$(PNG2CGA) -r ./pq_rock.png > pq_rock.cga
 
-river_collision.zx02:	river_collision.collision
-	$(ZX02) -f river_collision.collision river_collision.zx02
+river_collision.zx02:	river_collision.combined
+	$(ZX02) -f river_collision.combined river_collision.zx02
 
-river_collision.collision:	river_collision.png river_collision.png
+river_collision.combined:	river_collision.collision river_priority.priority
+	cat river_priority.priority > river_collision.combined
+	cat river_collision.collision >> river_collision.combined
+
+river_priority.priority:	river_priority.png
+	$(PNG2PRIORITY) river_priority.png river_priority.priority
+
+river_collision.collision:	river_collision.png
 	$(PNG2COLLISION) river_collision.png river_collision.collision
 
 ###
-
-PQ_KNGHT.PAS:	pq_knight.zx02
-	$(BIN2PAS) -l PQ_KNIGHT pq_knight.zx02 > PQ_KNGHT.PAS
-
-#pq_knight.zx02:	pq_knight.combined
-#	$(ZX02) -f pq_knight.combined pq_knight.zx02
-
-#pq_knight.combined: pq_knight.cga knight_priority.priority
-#	cat pq_knight.cga knight_priority.priority > pq_knight.combined
 
 pq_knight.zx02:	pq_knight.cga
 	$(ZX02) -f pq_knight.cga pq_knight.zx02
@@ -170,25 +176,26 @@ knight_collision.collision:	knight_collision.png
 #################################################
 #################################################
 
-PQ_WLAKE.PAS:	pq_w_lake.zx02
-	$(BIN2PAS) -l PQ_WLAKE pq_w_lake.zx02 > PQ_WLAKE.PAS
-
 pq_w_lake.zx02:	pq_w_lake.cga
 	$(ZX02) -f pq_w_lake.cga pq_w_lake.zx02
 
 pq_w_lake.cga:	pq_w_lake.png
 	$(PNG2CGA) -r ./pq_w_lake.png > pq_w_lake.cga
 
-lake_w_collision.zx02:	lake_w_collision.collision
-	$(ZX02) -f lake_w_collision.collision lake_w_collision.zx02
+lake_w_collision.zx02:	lake_w_collision.combined
+	$(ZX02) -f lake_w_collision.combined lake_w_collision.zx02
 
-lake_w_collision.collision:	lake_w_collision.png lake_w_collision.png
+lake_w_collision.combined:	lake_w_collision.collision lake_w_priority.priority
+	cat lake_w_priority.priority > lake_w_collision.combined
+	cat lake_w_collision.collision >> lake_w_collision.combined
+
+lake_w_priority.priority:	lake_w_priority.png
+	$(PNG2PRIORITY) lake_w_priority.png lake_w_priority.priority
+
+lake_w_collision.collision:	lake_w_collision.png
 	$(PNG2COLLISION) lake_w_collision.png lake_w_collision.collision
 
 ###
-
-PQ_ELAKE.PAS:	pq_e_lake.zx02
-	$(BIN2PAS) -l PQ_ELAKE pq_e_lake.zx02 > PQ_ELAKE.PAS
 
 pq_e_lake.zx02:	pq_e_lake.cga
 	$(ZX02) -f pq_e_lake.cga pq_e_lake.zx02
@@ -196,16 +203,20 @@ pq_e_lake.zx02:	pq_e_lake.cga
 pq_e_lake.cga:	pq_e_lake.png
 	$(PNG2CGA) -r ./pq_e_lake.png > pq_e_lake.cga
 
-lake_e_collision.zx02:	lake_e_collision.collision
-	$(ZX02) -f lake_e_collision.collision lake_e_collision.zx02
+lake_e_collision.zx02:	lake_e_collision.combined
+	$(ZX02) -f lake_e_collision.combined lake_e_collision.zx02
 
-lake_e_collision.collision:	lake_e_collision.png lake_e_collision.png
+lake_e_collision.combined:	lake_e_collision.collision lake_e_priority.priority
+	cat lake_e_priority.priority > lake_e_collision.combined
+	cat lake_e_collision.collision >> lake_e_collision.combined
+
+lake_e_priority.priority:	lake_e_priority.png
+	$(PNG2PRIORITY) lake_e_priority.png lake_e_priority.priority
+
+lake_e_collision.collision:	lake_e_collision.png
 	$(PNG2COLLISION) lake_e_collision.png lake_e_collision.collision
 
 ###
-
-PQ_INN.PAS:	pq_inn.zx02
-	$(BIN2PAS) -l PQ_INN pq_inn.zx02 > PQ_INN.PAS
 
 pq_inn.zx02:	pq_inn.cga
 	$(ZX02) -f pq_inn.cga pq_inn.zx02
@@ -213,17 +224,21 @@ pq_inn.zx02:	pq_inn.cga
 pq_inn.cga:	pq_inn.png
 	$(PNG2CGA) -r ./pq_inn.png > pq_inn.cga
 
-outside_inn_collision.zx02:	outside_inn_collision.collision
-	$(ZX02) -f outside_inn_collision.collision outside_inn_collision.zx02
+outside_inn_collision.zx02:	outside_inn_collision.combined
+	$(ZX02) -f outside_inn_collision.combined outside_inn_collision.zx02
 
-outside_inn_collision.collision:	outside_inn_collision.png outside_inn_collision.png
+outside_inn_collision.combined:	outside_inn_collision.collision outside_inn_priority.priority
+	cat outside_inn_priority.priority > outside_inn_collision.combined
+	cat outside_inn_collision.collision >> outside_inn_collision.combined
+
+outside_inn_priority.priority:	outside_inn_priority.png
+	$(PNG2PRIORITY) outside_inn_priority.png outside_inn_priority.priority
+
+outside_inn_collision.collision:	outside_inn_collision.png
 	$(PNG2COLLISION) outside_inn_collision.png outside_inn_collision.collision
 
 #################################################
 #################################################
-
-PQ_OLADY.PAS:	pq_olady.zx02
-	$(BIN2PAS) -l PQ_OLADY pq_hut.zx02 > PQ_OLADY.PAS
 
 pq_hut.zx02:	pq_hut.cga
 	$(ZX02) -f pq_hut.cga pq_hut.zx02
@@ -231,34 +246,44 @@ pq_hut.zx02:	pq_hut.cga
 pq_hut.cga:	pq_hut.png
 	$(PNG2CGA) -r ./pq_hut.png > pq_hut.cga
 
-lady_cottage_collision.zx02:	lady_cottage_collision.collision
-	$(ZX02) -f lady_cottage_collision.collision lady_cottage_collision.zx02
+lady_cottage_collision.zx02:	lady_cottage_collision.combined
+	$(ZX02) -f lady_cottage_collision.combined lady_cottage_collision.zx02
 
-lady_cottage_collision.collision:	lady_cottage_collision.png lady_cottage_collision.png
+lady_cottage_collision.combined:	lady_cottage_collision.collision lady_cottage_priority.priority
+	cat lady_cottage_priority.priority > lady_cottage_collision.combined
+	cat lady_cottage_collision.collision >> lady_cottage_collision.combined
+
+lady_cottage_priority.priority:	lady_cottage_priority.png
+	$(PNG2PRIORITY) lady_cottage_priority.png lady_cottage_priority.priority
+
+lady_cottage_collision.collision:	lady_cottage_collision.png
 	$(PNG2COLLISION) lady_cottage_collision.png lady_cottage_collision.collision
 
 ####
 
-PQ_BTREE.PAS:	pq_btree.zx02
-	$(BIN2PAS) -l PQ_BTREE pq_btree.zx02 > PQ_BTREE.PAS
+pq_btree.zx02:	pq_burntree.cga
+	$(ZX02) -f pq_burntree.cga pq_btree.zx02
 
-pq_btree.zx02:	pq_btree.cga
-	$(ZX02) -f pq_btree.cga pq_btree.zx02
+pq_burntree.cga:	pq_burntree.png
+	$(PNG2CGA) -r ./pq_burntree.png > pq_burntree.cga
 
-pq_btree.cga:	pq_burntree.png
-	$(PNG2CGA) -r ./pq_burntree.png > pq_btree.cga
+crooked_tree_collision.zx02:	crooked_tree_collision.combined
+	$(ZX02) -f crooked_tree_collision.combined crooked_tree_collision.zx02
 
-crooked_tree_collision.zx02:	crooked_tree_collision.collision
-	$(ZX02) -f crooked_tree_collision.collision crooked_tree_collision.zx02
+crooked_tree_collision.combined:	crooked_tree_collision.collision crooked_tree_priority.priority
+	cat crooked_tree_priority.priority > crooked_tree_collision.combined
+	cat crooked_tree_collision.collision >> crooked_tree_collision.combined
 
-crooked_tree_collision.collision:	crooked_tree_collision.png crooked_tree_collision.png
+crooked_tree_priority.priority:	crooked_tree_priority.png
+	$(PNG2PRIORITY) crooked_tree_priority.png crooked_tree_priority.priority
+
+crooked_tree_collision.collision:	crooked_tree_collision.png
 	$(PNG2COLLISION) crooked_tree_collision.png crooked_tree_collision.collision
 
 #################################################
 #################################################
 
-PQ_IINN.PAS:	pq_iinn.zx02
-	$(BIN2PAS) -l PQ_IINN pq_iinn.zx02 > PQ_IINN.PAS
+###
 
 pq_iinn.zx02:	pq_iinn.cga
 	$(ZX02) -f pq_iinn.cga pq_iinn.zx02
@@ -266,17 +291,20 @@ pq_iinn.zx02:	pq_iinn.cga
 pq_iinn.cga:	pq_iinn.png
 	$(PNG2CGA) -r ./pq_iinn.png > pq_iinn.cga
 
-inside_inn_collision.zx02:	inside_inn_collision.collision
-	$(ZX02) -f inside_inn_collision.collision inside_inn_collision.zx02
+inside_inn_collision.zx02:	inside_inn_collision.combined
+	$(ZX02) -f inside_inn_collision.combined inside_inn_collision.zx02
 
-inside_inn_collision.collision:	inside_inn_collision.png inside_inn_collision.png
+inside_inn_collision.combined:	inside_inn_collision.collision inside_inn_priority.priority
+	cat inside_inn_priority.priority > inside_inn_collision.combined
+	cat inside_inn_collision.collision >> inside_inn_collision.combined
+
+inside_inn_priority.priority:	inside_inn_priority.png
+	$(PNG2PRIORITY) inside_inn_priority.png inside_inn_priority.priority
+
+inside_inn_collision.collision:	inside_inn_collision.png
 	$(PNG2COLLISION) inside_inn_collision.png inside_inn_collision.collision
 
-
 ####
-
-PQ_ILADY.PAS:	pq_ilady.zx02
-	$(BIN2PAS) -l PQ_ILADY pq_ilady.zx02 > PQ_ILADY.PAS
 
 pq_ilady.zx02:	pq_ilady.cga
 	$(ZX02) -f pq_ilady.cga pq_ilady.zx02
@@ -284,17 +312,23 @@ pq_ilady.zx02:	pq_ilady.cga
 pq_ilady.cga:	pq_ilady.png
 	$(PNG2CGA) -r ./pq_ilady.png > pq_ilady.cga
 
-inside_cottage_collision.zx02:	inside_cottage_collision.collision
-	$(ZX02) -f inside_cottage_collision.collision inside_cottage_collision.zx02
+inside_cottage_collision.zx02:	inside_cottage_collision.combined
+	$(ZX02) -f inside_cottage_collision.combined inside_cottage_collision.zx02
 
-inside_cottage_collision.collision:	inside_cottage_collision.png inside_cottage_collision.png
+inside_cottage_collision.combined:	inside_cottage_collision.collision inside_cottage_priority.priority
+	cat inside_cottage_priority.priority > inside_cottage_collision.combined
+	cat inside_cottage_collision.collision >> inside_cottage_collision.combined
+
+inside_cottage_priority.priority:	inside_cottage_priority.png
+	$(PNG2PRIORITY) inside_cottage_priority.png inside_cottage_priority.priority
+
+inside_cottage_collision.collision:	inside_cottage_collision.png
 	$(PNG2COLLISION) inside_cottage_collision.png inside_cottage_collision.collision
 
 #################################################
 #################################################
 
-PQ_UNKNOWN.PAS:	pq_unknown.zx02
-	$(BIN2PAS) -l PQ_UNKNOWN pq_unknown.zx02 > PQ_UNKNOWN.PAS
+###
 
 pq_unknown.zx02:	pq_unknown.cga
 	$(ZX02) -f pq_unknown.cga pq_unknown.zx02
@@ -302,10 +336,17 @@ pq_unknown.zx02:	pq_unknown.cga
 pq_unknown.cga:	pq_unknown.png
 	$(PNG2CGA) -r ./pq_unknown.png > pq_unknown.cga
 
-unknown_collision.zx02:	unknown_collision.collision
-	$(ZX02) -f unknown_collision.collision unknown_collision.zx02
+unknown_collision.zx02:	unknown_collision.combined
+	$(ZX02) -f unknown_collision.combined unknown_collision.zx02
 
-unknown_collision.collision:	unknown_collision.png unknown_collision.png
+unknown_collision.combined:	unknown_collision.collision unknown_priority.priority
+	cat unknown_priority.priority > unknown_collision.combined
+	cat unknown_collision.collision >> unknown_collision.combined
+
+unknown_priority.priority:	unknown_priority.png
+	$(PNG2PRIORITY) unknown_priority.png unknown_priority.priority
+
+unknown_collision.collision:	unknown_collision.png
 	$(PNG2COLLISION) unknown_collision.png unknown_collision.collision
 
 ####
