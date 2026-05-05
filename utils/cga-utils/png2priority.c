@@ -365,13 +365,32 @@ int main(int argc, char **argv) {
 	fprintf(stderr,"Loaded priority image %s, %d by %d\n",
 		argv[2],xsize,ysize);
 
+	/* interleave it */
+
 	int temp;
-	for(row=0;row<200;row++) {
+
+	/* even lines */
+	for(row=0;row<200;row+=2) {
 		for(col=0;col<80;col++) {
 			temp=((image[(row*xsize)+col])&0xff);
 			fputc( temp,outfile);
 		}
 	}
+	/* pad to 8k (8192-100*80 = 192) */
+	for(row=0;row<192;row++) fputc(0,outfile);
+
+	/* odd lines */
+	for(row=1;row<201;row+=2) {
+		for(col=0;col<80;col++) {
+			temp=((image[(row*xsize)+col])&0xff);
+			fputc( temp,outfile);
+		}
+	}
+
+	/* pad to 8k (8192-100*80 = 192) */
+	for(row=0;row<192;row++) fputc(0,outfile);
+
+
 
 	fclose(outfile);
 

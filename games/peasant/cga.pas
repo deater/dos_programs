@@ -155,6 +155,50 @@ begin
 
 end;
 
+Procedure debug_byte(byte1, byte2 : byte);
+
+var debug_string : string[30];
+	ones,tens : Integer;
+	ch : char;
+	result : byte;
+
+begin
+        { erase old score }
+        Rectangle(0,0,319,10,$ff,@screen);
+
+	ones:=byte1 mod 16;		{ 2 }
+	result:=byte1 div 16;
+	tens:=result mod 16;		{ 1 }
+
+	debug_string:='XX XX';
+
+	if (ones<10) then ch:=chr(ones+48)
+	else ch:=chr(ones+(65-10));
+	debug_string[2]:=ch;
+
+	if (tens<10) then ch:=chr(tens+48)
+	else ch:=chr(tens+(65-10));
+	debug_string[1]:=ch;
+
+	ones:=byte2 mod 16;		{ 2 }
+	result:=byte2 div 16;
+	tens:=result mod 16;		{ 1 }
+
+
+	if (ones<10) then ch:=chr(ones+48)
+	else ch:=chr(ones+(65-10));
+	debug_string[5]:=ch;
+
+	if (tens<10) then ch:=chr(tens+48)
+	else ch:=chr(tens+(65-10));
+	debug_string[4]:=ch;
+
+
+	PrintStringXor(debug_string,0,0);
+
+
+end;
+
 
 {***********************************************}
 { CGA_draw_sprite_bg_mask                       }
@@ -168,9 +212,9 @@ end;
 Procedure CGA_draw_sprite_bg_mask(x,y,sprite_offset: word;
 			sprite_data,framebuffer: screen_ptr);
 
-var	even_offset,odd_offset,mask_offset,width,height:word;
+var	even_offset,mask_offset,priority_offset:word;
 	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
-	tempy,col_offset:word;
+	tempy:word;
 	peasant_priority:byte;
 
 label loopy,skip0,skip1,skip2,skip3,skip4,skip5,skip6,skip7;
@@ -191,13 +235,12 @@ begin
 
 	s_off:=s_off+sprite_offset;
 
+	priority_offset:=8192;			{ after the sprite data }
+
 	even_offset:=((y div 2)*80)+(x div 4);	{ actual offset where to draw }
 						{ note only draw at }
 						{ x: multiple of 4-pixel }
 						{ y: multiple of 2-pixel }
-
-	{ even_offset:=even_offset+f_off;}		{ CGA even and odd lines }
-	{ odd_offset:=even_offset+$2000;}		{ 8k apart in memory }
 
 	xsize:=4;   {Word(sprite^[0]);		{ get xsize, extend to 16-bits }
 	ysize:=15;  {Word(sprite^[1]);		{ get ysize, extend to 16-bits }
@@ -214,6 +257,8 @@ begin
 	{ ((y-48)/8)+2; }
 	{ +2 skips colors 0,1.  0 used to be collision, 1 is always-visible }
 	peasant_priority:=((tempy-48) shr 3)+2;
+
+	(* debug_byte(peasant_priority,sprite_data^[8192+even_offset]); *)
 
 	asm
 
@@ -261,7 +306,7 @@ loopy:
 
 						{ xoffset=0 }
 		mov	al,es:[di]		{ load bg from fb }
-		mov	dl,es:[di][16384]
+		mov	dl,ds:[di][8192]	{ point to priority }
 		cmp	dl,dh
 		jge	skip0
 		and	al,ds:[si][bx] 		{ mask with mask }
@@ -272,7 +317,7 @@ skip0:
 
 						{ xoffset=2 }
 		mov	al,es:[di]		{ load bg from fb }
-		mov	dl,es:[di][16384]
+		mov	dl,ds:[di][8192]
 		cmp	dl,dh
 		jge	skip1
 		and	al,ds:[si][bx] 		{ mask with mask }
@@ -283,7 +328,7 @@ skip1:
 
 						{ xoffset=0 }
 		mov	al,es:[di]		{ load bg from fb }
-		mov	dl,es:[di][16384]
+		mov	dl,ds:[di][8192]
 		cmp	dl,dh
 		jge	skip2
 		and	al,ds:[si][bx] 		{ mask with mask }
@@ -293,7 +338,7 @@ skip2:		inc	si			{ increment sprite ptr }
 
 						{ xoffset=2 }
 		mov	al,es:[di]		{ load bg from fb }
-		mov	dl,es:[di][16384]
+		mov	dl,ds:[di][8192]
 		cmp	dl,dh
 		jge	skip3
 		and	al,ds:[si][bx] 		{ mask with mask }
@@ -309,7 +354,7 @@ skip3:
 		{ di is 4 bytes past where we want }
 
 		mov	al,es:[di][8192-4]	{ unroll, xoffset=0 }
-		mov	dl,es:[di][16384+8192-4]
+		mov	dl,ds:[di][8192+8192-4]
 		cmp	dl,dh
 		jge	skip4
 		and	al,ds:[si][bx]
@@ -319,7 +364,7 @@ skip4:
 
 
 		mov	al,es:[di][8193-4]	{ unroll, xoffset=0 }
-		mov	dl,es:[di][16384+8193-4]
+		mov	dl,ds:[di][8192+8193-4]
 		cmp	dl,dh
 		jge	skip5
 		and	al,ds:[si][bx][1]
@@ -329,7 +374,7 @@ skip5:
 
 
 		mov	al,es:[di][8194-4]	{ unroll, xoffset=0 }
-		mov	dl,es:[di][16384+8194-4]
+		mov	dl,ds:[di][8192+8194-4]
 		cmp	dl,dh
 		jge	skip6
 		and	al,ds:[si][bx][2]
@@ -340,7 +385,7 @@ skip6:
 
 
 		mov	al,es:[di][8195-4]	{ unroll, xoffset=0 }
-		mov	dl,es:[di][16384+8195-4]
+		mov	dl,ds:[di][8192+8195-4]
 		cmp	dl,dh
 		jge	skip7
 		and	al,ds:[si][bx][3]

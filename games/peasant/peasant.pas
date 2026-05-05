@@ -1442,7 +1442,7 @@ begin
 
 	temp3:=collision_offset[(y shr 5)]+x;
 
-	temp4:=collision^[16000+8192+temp3]; { get 8 bits of collision info }
+	temp4:=collision^[16384+8192+temp3]; { get 8 bits of collision info }
 
 	temp5:=temp4 and collision_masks[temp2];
 
