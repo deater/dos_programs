@@ -56,4 +56,8 @@ begin
 	repeat until keypressed;
 	ch:=readkey;
 
+	{ refresh background }
+
+        screen_update(@screen,screen_ptr(background));
+
 end;
