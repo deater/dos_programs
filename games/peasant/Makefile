@@ -26,9 +26,9 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	inv.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
 	lwell.pas lytree.pas lwfall.pas \
-	lriver.pas lknight.pas \
+	larch.pas lriver.pas lknight.pas \
 	lwlake.pas lelake.pas linn.pas \
-	lolady.pas lbtree.pas \
+	lkerrek2.pas lolady.pas lbtree.pas \
 	liinn.pas lilady.pas
 	cp peasant.pas zx02_asm.pas cga.pas inv.pas $(TPDIR)
 	cp wad_load.pas $(TPDIR)

@@ -28,13 +28,13 @@ PEASANT.WAD:	\
 	pq_unknown.zx02	unknown_collision.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		../sprites/s_walk.zx02,SWALK \
-		pq_well.zx02,GWELL ../text/D_YTREE.ZX2,DWELL \
+		pq_well.zx02,GWELL ../text/D_WELL.ZX2,DWELL \
 		well_collision.zx02,PWELL \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		yellow_tree_collision.zx02,PYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		waterfall_collision.zx02,PWFALL \
-		pq_archery.zx02,GARCH ../text/D_YTREE.ZX2,DARCH \
+		pq_archery.zx02,GARCH ../text/D_ARCH.ZX2,DARCH \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
 		river_collision.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
@@ -304,8 +304,8 @@ kerrek2_collision.combined:	kerrek2_collision.collision kerrek2_priority.priorit
 kerrek2_priority.priority:	kerrek2_priority.png
 	$(PNG2PRIORITY) kerrek2_priority.png kerrek2_priority.priority
 
-yellow_tree_collision.collision:	yellow_tree_collision.png
-	$(PNG2COLLISION) yellow_tree_collision.png yellow_tree_collision.collision
+kerrek2_collision.collision:	kerrek2_collision.png
+	$(PNG2COLLISION) kerrek2_collision.png kerrek2_collision.collision
 
 ####
 
