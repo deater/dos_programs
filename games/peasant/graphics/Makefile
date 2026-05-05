@@ -24,6 +24,7 @@ PEASANT.WAD:	\
 	pq_ilady.zx02     ../text/D_ILADY.ZX2  inside_cottage_collision.zx02 \
 	pq_unknown.zx02	unknown_collision.zx02
 	$(MKWAD) -o PEASANT.WAD \
+		../sprites/s_walk.zx02,SWALK \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		yellow_tree_collision.zx02,PYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
@@ -140,24 +141,30 @@ river_collision.collision:	river_collision.png river_collision.png
 PQ_KNGHT.PAS:	pq_knight.zx02
 	$(BIN2PAS) -l PQ_KNIGHT pq_knight.zx02 > PQ_KNGHT.PAS
 
-pq_knight.zx02:	pq_knight.combined
-	$(ZX02) -f pq_knight.combined pq_knight.zx02
+#pq_knight.zx02:	pq_knight.combined
+#	$(ZX02) -f pq_knight.combined pq_knight.zx02
 
-pq_knight.combined: pq_knight.cga knight_priority.priority
-	cat pq_knight.cga knight_priority.priority > pq_knight.combined
+#pq_knight.combined: pq_knight.cga knight_priority.priority
+#	cat pq_knight.cga knight_priority.priority > pq_knight.combined
+
+pq_knight.zx02:	pq_knight.cga
+	$(ZX02) -f pq_knight.cga pq_knight.zx02
 
 pq_knight.cga:	pq_knight.png
 	$(PNG2CGA) -r ./pq_knight.png > pq_knight.cga
 
+knight_collision.zx02:	knight_collision.combined
+	$(ZX02) -f knight_collision.combined knight_collision.zx02
+
+knight_collision.combined:	knight_collision.collision knight_priority.priority
+	cat knight_priority.priority > knight_collision.combined
+	cat knight_collision.collision >> knight_collision.combined
+
 knight_priority.priority:	knight_priority.png
 	$(PNG2PRIORITY) knight_priority.png knight_priority.priority
 
-knight_collision.zx02:	knight_collision.collision
-	$(ZX02) -f knight_collision.collision knight_collision.zx02
-
-knight_collision.collision:	knight_collision.png knight_collision.png
+knight_collision.collision:	knight_collision.png
 	$(PNG2COLLISION) knight_collision.png knight_collision.collision
-
 
 
 #################################################
@@ -304,4 +311,4 @@ unknown_collision.collision:	unknown_collision.png unknown_collision.png
 ####
 
 clean:	
-	rm -f *.PAS *.WAD *.combined *.collision
+	rm -f *.PAS *.WAD *.combined *.collision *.priority

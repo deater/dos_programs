@@ -14,8 +14,8 @@ type
 
 Procedure PrintChar(which: char);
 Procedure PrintCharXor(which: char;x,y:word);
-Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
-		framebuffer: screen_ptr);
+Procedure CGA_draw_sprite_bg_mask(x,y,sprite_offset:word;
+		sprite_data,framebuffer: screen_ptr);
 Procedure SpriteXY(x,y: word; sprite: SpritePtr; framebuffer: screen_ptr);
 Procedure PrintStringXor(st:string;x,y:word);
 Procedure screen_copy(dest,src:screen_ptr);
@@ -161,12 +161,12 @@ end;
 {***********************************************}
 { Really only used for Rather Dashing }
 { Assumptions: }
-{   Sprites always 4 bytes wide }
+{   Sprites always 4 bytes wide by 30 tall }
 {   x from 0..319 but only draw on byte (4-pixel) boundaries }
 
 
-Procedure CGA_draw_sprite_bg_mask(x,y: word; sprite: SpritePtr;
-			framebuffer: screen_ptr);
+Procedure CGA_draw_sprite_bg_mask(x,y,sprite_offset: word;
+			sprite_data,framebuffer: screen_ptr);
 
 var	even_offset,odd_offset,mask_offset,width,height:word;
 	xsize,ysize,s_seg,s_off,f_seg,f_off:word;
@@ -186,19 +186,21 @@ begin
 	f_seg:=seg(framebuffer^);		{ pointer to framebuffer }
 	f_off:=ofs(framebuffer^);
 
-	s_seg:=seg(sprite^);			{ pointer to sprite }
-	s_off:=ofs(sprite^)+2;			{ skip xsize/ysize }
+	s_seg:=seg(sprite_data^);		{ pointer to sprite }
+	s_off:=ofs(sprite_data^);
+
+	s_off:=s_off+sprite_offset;
 
 	even_offset:=((y div 2)*80)+(x div 4);	{ actual offset where to draw }
 						{ note only draw at }
 						{ x: multiple of 4-pixel }
 						{ y: multiple of 2-pixel }
 
-	even_offset:=even_offset+f_off;		{ CGA even and odd lines }
-	odd_offset:=even_offset+$2000;		{ 8k apart in memory }
+	{ even_offset:=even_offset+f_off;}		{ CGA even and odd lines }
+	{ odd_offset:=even_offset+$2000;}		{ 8k apart in memory }
 
-	xsize:=Word(sprite^[0]);		{ get xsize, extend to 16-bits }
-	ysize:=Word(sprite^[1]);		{ get ysize, extend to 16-bits }
+	xsize:=4;   {Word(sprite^[0]);		{ get xsize, extend to 16-bits }
+	ysize:=15;  {Word(sprite^[1]);		{ get ysize, extend to 16-bits }
 					{ note: ysize is 1/2 sprite size }
 
 	mask_offset:=xsize*ysize*2;	{ point to mask which immediately }

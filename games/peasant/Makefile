@@ -29,8 +29,7 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	lriver.pas lknight.pas \
 	lwlake.pas lelake.pas linn.pas \
 	lolady.pas lbtree.pas \
-	liinn.pas lilady.pas\
-	sprites/s_walk.pas
+	liinn.pas lilady.pas
 	cp peasant.pas zx02_asm.pas cga.pas inv.pas $(TPDIR)
 	cp wad_load.pas $(TPDIR)
 	cp lytree.pas lwfall.pas $(TPDIR)
@@ -44,7 +43,6 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	cp graphics/PQ_TITLE.PAS $(TPDIR)
 	cp graphics/PQ_TIPS.PAS $(TPDIR)
 	cp graphics/PEASANT.WAD $(TPDIR)
-	cp sprites/s_walk.pas $(TPDIR)
 	cp text/dialog_t.pas $(TPDIR)
 	cp text/O_YTREE.PAS $(TPDIR)
 	cp text/O_WFALL.PAS $(TPDIR)

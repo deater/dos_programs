@@ -137,12 +137,14 @@ begin
 	{ decompress priority }
 
 	wad_load(file_buffer,'PKNIGHT');
-	decompress(buffer_ptr(collision),file_buffer);
+	decompress(buffer_ptr(@collision^[8192]),file_buffer);
 
 	{ load bg }
 
 	wad_load(file_buffer,'GKNIGHT');
 	decompress(background,file_buffer);
+
+
 
 {	screen_copy(screen_ptr(framebuffer),screen_ptr(background));
 

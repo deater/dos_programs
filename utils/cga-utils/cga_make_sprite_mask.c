@@ -256,9 +256,13 @@ int main(int argc, char **argv) {
 
 	/* Parse command line arguments */
 
-	while ( (c=getopt(argc, argv, "hvdmsil:") ) != -1) {
+	while ( (c=getopt(argc, argv, "hvdbmsil:") ) != -1) {
 
 		switch(c) {
+
+			case 'b':
+				output_type=OUTPUT_RAW;
+				break;
 
                         case 'h':
                                 print_help(argv[0],0);
@@ -353,34 +357,80 @@ int main(int argc, char **argv) {
 
 	int addr,output_size;
 
-	if (output_type==OUTPUT_ASM) {
-		printf("; %d %d %d %d\n",x1,y1,x2,y2);
-		printf("; total bytes: %d\n",total_bytes);
-		printf("%s:\n",label_string);
-
+	if (output_type==OUTPUT_RAW) {
 
 		if (printsize) {
-
-			printf("\t.byte $%02X,$%02X\n",
-					xs,y2-y1);
+			printf("%c%c",xs,y2-y1);
 		}
 
 		if (mask_offset) {
-			printf("\t.byte $%02X,$%02X\n",
-					total_bytes&0xff,
+			printf("%c%c", total_bytes&0xff,
 					total_bytes>>8);
 		}
 
-		for(y=y1;y<y2;y++) {
-			printf("\t.byte ");
-			for(x=x1/4;x<=x2/4;x++) {
-				addr=(0x2000*(y&1))+((y/2)*80)+x;
-				printf("$%02X",
-					cga_ram[addr]);
-				if (x!=x2/4) printf(",");
+		if (interleave) {
+			/* interleave even/odd */
+
+			/* print sprite */
+			for(y=y1;y<y2;y++) {
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("%c",
+						cga_ram[addr]);
+				}
 			}
-			printf("\n");
+
+			/* print mask */
+			for(y=y3;y<y4;y++) {
+				for(x=x3/4;x<=x4/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("%c",
+						cga_ram[addr]);
+				}
+			}
+
 		}
+		else {
+			/* print even first, then odd */
+
+			/* print even sprite */
+			for(y=y1;y<y2;y+=2) {
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("%c",
+						cga_ram[addr]);
+				}
+			}
+
+			/* print odd sprite */
+			for(y=y1+1;y<y2;y+=2) {
+				for(x=x1/4;x<=x2/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("%c",
+						cga_ram[addr]);
+				}
+			}
+
+			/* print even mask */
+			for(y=y3;y<y4;y+=2) {
+				for(x=x3/4;x<=x4/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("%c",
+						cga_ram[addr]);
+				}
+			}
+
+			/* print odd mask */
+			for(y=y3+1;y<y4;y+=2) {
+				for(x=x3/4;x<=x4/4;x++) {
+					addr=(0x2000*(y&1))+((y/2)*80)+x;
+					printf("%c",
+						cga_ram[addr]);
+				}
+			}
+		}
+
+
 	}
 	else if (output_type==OUTPUT_PASCAL) {
 

@@ -34,34 +34,33 @@ Procedure unknown_actions; forward;
 {$I o_iinn.pas}
 {$I o_ilady.pas}
 
-{$I s_walk.pas}
+(* {$I s_walk.pas} *)
 
 {$I dialog_t.pas}
 {$I o_common.pas}
 {$I d_common.pas}
 
-const WalkingSprites : array[0..23] of SpritePtr =
+const WalkingSprites : array[0..23] of word =
 (
 	{0 = up}
 
-	@walk_u0_sprite,@walk_u1_sprite,@walk_u2_sprite,
-	@walk_u3_sprite,@walk_u4_sprite,@walk_u5_sprite,
+	240*12,240*13,240*14,	{ up }
+	240*15,240*16,240*17,
 
 	{1 = right}
 
-	@walk_r0_sprite,@walk_r1_sprite,@walk_r2_sprite,
-	@walk_r3_sprite,@walk_r4_sprite,@walk_r5_sprite,
+	240*0,240*1,240*2,	{ right }
+	240*3,240*4,240*5,
 
 	{2 = left}
 
-	@walk_l0_sprite,@walk_l1_sprite,@walk_l2_sprite,
-	@walk_l3_sprite,@walk_l4_sprite,@walk_l5_sprite,
+	240*6,240*7,240*8,	{ left }
+	240*9,240*10,240*11,
 
 	{3 = down}
 
-	@walk_d0_sprite,@walk_d1_sprite,@walk_d2_sprite,
-	@walk_d3_sprite,@walk_d4_sprite,@walk_d5_sprite
-
+	240*18,240*19,240*20,	{ down }
+	240*21,240*22,240*23
 );
 
 	type level_over_type = (
@@ -1443,7 +1442,7 @@ begin
 
 	temp3:=collision_offset[(y shr 5)]+x;
 
-	temp4:=collision^[temp3]; { get 8 bits of collision info }
+	temp4:=collision^[16000+8192+temp3]; { get 8 bits of collision info }
 
 	temp5:=temp4 and collision_masks[temp2];
 
@@ -1551,7 +1550,7 @@ begin
 }
 
 	CGA_draw_sprite_bg_mask(peasant_x,peasant_y,WalkingSprites[which],
-		@screen);
+		screen_ptr(collision),@screen);
 
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],screen_ptr(framebuffer));}
 {	SpriteXY(peasant_x,peasant_y,WalkingSprites[which],@screen);}
@@ -1715,11 +1714,11 @@ begin
 	{ allocate memory }
 	{*****************}
 
-	GetMem(background,16384*2);
+	GetMem(background,16384);
 	{GetMem(framebuffer,16384);}
 	GetMem(dialog,8192);		{ probably could be smaller }
 	GetMem(file_buffer,5*1024);	{ 4k is slightly to small }
-	GetMem(collision,256);
+	GetMem(collision,8192+16384+256);	{ also sprite data }
 
 	decompress(dialog,@D_COMMON);
 
@@ -1743,6 +1742,10 @@ begin
 	bush_status:=0;
 
 	init_inventory;
+
+	{ load initial walking sprites }
+	wad_load(file_buffer,'SWALK');
+	decompress(buffer_ptr(collision),file_buffer);
 
 	map_location:=LOCATION_MOUNTAIN_PASS;
 
