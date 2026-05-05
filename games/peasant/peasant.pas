@@ -13,9 +13,11 @@ Procedure yellow_tree_actions; forward;
 Procedure waterfall_actions; forward;
 Procedure west_lake_actions; forward;
 Procedure east_lake_actions; forward;
+Procedure archery_actions; forward;
 Procedure river_actions; forward;
 Procedure knight_actions; forward;
 Procedure outside_inn_actions; forward;
+Procedure kerrek2_actions; forward;
 Procedure outside_lady_actions; forward;
 Procedure burn_tree_actions; forward;
 Procedure inside_inn_actions; forward;
@@ -26,11 +28,13 @@ Procedure unknown_actions; forward;
 {$I o_well.pas}
 {$I o_ytree.pas}
 {$I o_wfall.pas}
+{$I o_arch.pas}
 {$I o_rock.pas}
 {$I o_knight.pas}
 {$I o_wlake.pas}
 {$I o_elake.pas}
 {$I o_inn.pas}
+{$i o_kerrek.pas}
 {$I o_olady.pas}
 {$I o_btree.pas}
 {$I o_iinn.pas}
@@ -724,7 +728,7 @@ begin
 		LOCATION_WATERFALL:		waterfall_actions;
 		LOCATION_HAY_BALE:		knight_actions;
 		LOCATION_MUD_PUDDLE:		knight_actions;
-		LOCATION_ARCHERY:		knight_actions;
+		LOCATION_ARCHERY:		archery_actions;
 		LOCATION_RIVER_STONE:		river_actions;
 		LOCATION_MOUNTAIN_PASS:		knight_actions;
 		LOCATION_JHONKA_CAVE:		knight_actions;
@@ -734,7 +738,7 @@ begin
 		LOCATION_OUTSIDE_INN:		outside_inn_actions;
 		LOCATION_OUTSIDE_NN:		knight_actions;
 		LOCATION_WAVY_TREE:		knight_actions;
-		LOCATION_KERREK_2:		knight_actions;
+		LOCATION_KERREK_2:		kerrek2_actions;
 		LOCATION_OUTSIDE_LADY:		outside_lady_actions;
 		LOCATION_BURN_TREES:		burn_tree_actions;
 		LOCATION_CLIFF_BASE:		knight_actions;
@@ -1563,11 +1567,13 @@ end;
 {$I lwell.pas}
 {$I lytree.pas}
 {$I lwfall.pas}
+{$I larch.pas}
 {$I lriver.pas}
 {$I lknight.pas}
 {$I lwlake.pas}
 {$I lelake.pas}
 {$I linn.pas}
+{$I lkerrek2.pas}
 {$I lolady.pas}
 {$I lbtree.pas}
 {$I liinn.pas }
@@ -1765,7 +1771,7 @@ begin
 		LOCATION_WATERFALL:		do_waterfall;
 		LOCATION_HAY_BALE:		do_unknown;
 		LOCATION_MUD_PUDDLE:		do_unknown;
-		LOCATION_ARCHERY:		do_unknown;
+		LOCATION_ARCHERY:		do_archery;
 		LOCATION_RIVER_STONE:		do_river;
 		LOCATION_MOUNTAIN_PASS:		do_knight;
 		LOCATION_JHONKA_CAVE:		do_unknown;
@@ -1775,7 +1781,7 @@ begin
 		LOCATION_OUTSIDE_INN:		do_outside_inn;
 		LOCATION_OUTSIDE_NN:		do_unknown;
 		LOCATION_WAVY_TREE:		do_unknown;
-		LOCATION_KERREK_2:		do_unknown;
+		LOCATION_KERREK_2:		do_kerrek2;
 		LOCATION_OUTSIDE_LADY:		do_outside_lady;
 		LOCATION_BURN_TREES:		do_burn_tree;
 		LOCATION_CLIFF_BASE:		do_unknown;

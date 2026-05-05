@@ -14,11 +14,13 @@ PEASANT.WAD:	\
 	pq_well.zx02      ../text/D_WELL.ZX2   well_collision.zx02 \
 	pq_ytree.zx02     ../text/D_YTREE.ZX2  yellow_tree_collision.zx02 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_collision.zx02 \
+	pq_archery.zx02   ../text/D_ARCH.ZX2   \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_collision.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_collision.zx02 \
 	pq_w_lake.zx02    ../text/D_WLAKE.ZX2  lake_w_collision.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_collision.zx02 \
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_collision.zx02 \
+	pq_kerrek2.zx02   ../text/D_KERREK.ZX2 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_collision.zx02 \
 	pq_btree.zx02     ../text/D_BTREE.ZX2  crooked_tree_collision.zx02 \
 	pq_iinn.zx02      ../text/D_IINN.ZX2   inside_inn_collision.zx02 \
@@ -32,6 +34,7 @@ PEASANT.WAD:	\
 		yellow_tree_collision.zx02,PYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		waterfall_collision.zx02,PWFALL \
+		pq_archery.zx02,GARCH ../text/D_YTREE.ZX2,DARCH \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
 		river_collision.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
@@ -42,6 +45,7 @@ PEASANT.WAD:	\
 		lake_e_collision.zx02,PELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
 		outside_inn_collision.zx02,PINN \
+		pq_kerrek2.zx02,GKERREK2 ../text/D_KERREK.ZX2,DKERREK \
 		pq_hut.zx02,GOLADY ../text/D_OLADY.ZX2,DOLADY \
 		lady_cottage_collision.zx02,POLADY \
 		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE \
@@ -155,6 +159,26 @@ waterfall_collision.collision:	waterfall_collision.png
 #################################################
 #################################################
 
+pq_archery.zx02:	pq_archery.cga
+	$(ZX02) -f pq_archery.cga pq_archery.zx02
+
+pq_archery.cga:	pq_archery.png
+	$(PNG2CGA) -r ./pq_archery.png > pq_archery.cga
+
+archery_collision.zx02:	archery_collision.combined
+	$(ZX02) -f archery_collision.combined archery_collision.zx02
+
+archery_collision.combined:	archery_collision.collision archery_priority.priority
+	cat archery_priority.priority > archery_collision.combined
+	cat archery_collision.collision >> archery_collision.combined
+
+archery_priority.priority:	archery_priority.png
+	$(PNG2PRIORITY) archery_priority.png archery_priority.priority
+
+archery_collision.collision:	archery_collision.png
+	$(PNG2COLLISION) archery_collision.png archery_collision.collision
+
+###
 
 pq_rock.zx02:	pq_rock.cga
 	$(ZX02) -f pq_rock.cga pq_rock.zx02
@@ -263,6 +287,27 @@ outside_inn_collision.collision:	outside_inn_collision.png
 
 #################################################
 #################################################
+
+pq_kerrek2.zx02:	pq_kerrek2.cga
+	$(ZX02) -f pq_kerrek2.cga pq_kerrek2.zx02
+
+pq_kerrek2.cga:	pq_kerrek2.png
+	$(PNG2CGA) -r ./pq_kerrek2.png > pq_kerrek2.cga
+
+kerrek2_collision.zx02:	kerrek2_collision.combined
+	$(ZX02) -f kerrek2_collision.combined kerrek2_collision.zx02
+
+kerrek2_collision.combined:	kerrek2_collision.collision kerrek2_priority.priority
+	cat kerrek2_priority.priority > kerrek2_collision.combined
+	cat kerrek2_collision.collision >> kerrek2_collision.combined
+
+kerrek2_priority.priority:	kerrek2_priority.png
+	$(PNG2PRIORITY) kerrek2_priority.png kerrek2_priority.priority
+
+yellow_tree_collision.collision:	yellow_tree_collision.png
+	$(PNG2COLLISION) yellow_tree_collision.png yellow_tree_collision.collision
+
+####
 
 pq_hut.zx02:	pq_hut.cga
 	$(ZX02) -f pq_hut.cga pq_hut.zx02
@@ -376,4 +421,4 @@ unknown_collision.collision:	unknown_collision.png
 ####
 
 clean:	
-	rm -f *.PAS *.WAD *.combined *.collision *.priority
+	rm -f *.PAS *.WAD *.combined *.collision *.priority *.cga *.zx02

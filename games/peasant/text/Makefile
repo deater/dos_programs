@@ -9,21 +9,23 @@ all:	shrink_text \
 	D_WELL.PAS   O_WELL.PAS \
 	D_YTREE.PAS  O_YTREE.PAS \
 	D_WFALL.PAS  O_WFALL.PAS \
+	D_ARCH.PAS   O_ARCH.PAS \
 	D_ROCK.PAS   O_ROCK.PAS \
 	D_KNIGHT.PAS O_KNIGHT.PAS \
 	D_WLAKE.PAS  O_WLAKE.PAS \
 	D_ELAKE.PAS  O_ELAKE.PAS \
 	D_INN.PAS    O_INN.PAS \
+	D_KERREK.PAS O_KERREK.PAS \
 	D_OLADY.PAS  O_OLADY.PAS \
 	D_BTREE.PAS  O_BTREE.PAS \
 	D_IINN.PAS   O_IINN.PAS \
-	D_ILADY.PAS   O_ILADY.PAS \
+	D_ILADY.PAS  O_ILADY.PAS \
 	D_COMMON.PAS O_COMMON.PAS
 
 ############################################
 ############################################
 
-O_WELL.PAS:	dialog_waterfall.raw
+O_WELL.PAS:	dialog_well.raw
 
 D_WELL.PAS:	D_WELL.ZX2
 	$(BIN2PAS) -l D_WELL D_WELL.ZX2 > D_WELL.PAS
@@ -63,6 +65,19 @@ dialog_waterfall.raw:	falls.inc
 
 ############################################
 ############################################
+
+O_ARCH.PAS:	dialog_archery.raw
+
+D_ARCH.PAS:	D_ARCH.ZX2
+	$(BIN2PAS) -l D_ARCH D_ARCH.ZX2 > D_ARCH.PAS
+
+D_ARCH.ZX2:	dialog_archery.raw
+	$(ZX02) -f  dialog_archery.raw D_ARCH.ZX2
+
+dialog_archery.raw:	archery.inc
+	./shrink_text dialog_archery.raw O_ARCH.PAS archery < archery.inc
+
+###
 
 O_ROCK.PAS:	dialog_rock.raw
 
@@ -130,6 +145,19 @@ dialog_inn.raw:	outside_inn.inc
 
 ############################################
 ############################################
+
+O_KERREK.PAS:	dialog_kerrek.raw
+
+D_KERREK.PAS:	D_KERREK.ZX2
+	$(BIN2PAS) -l D_KERREK D_KERREK.ZX2 > D_KERREK.PAS
+
+D_KERREK.ZX2:	dialog_kerrek.raw
+	$(ZX02) -f  dialog_kerrek.raw D_KERREK.ZX2
+
+dialog_kerrek.raw:	kerrek.inc
+	./shrink_text dialog_kerrek.raw O_KERREK.PAS kerrek < kerrek.inc
+
+####
 
 O_OLADY.PAS:	dialog_lady_cottage.raw
 
