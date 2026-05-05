@@ -8,6 +8,7 @@ uses crt,zx02_asm,cga;
 {$I pq_tips.pas}
 
 
+Procedure well_actions; forward;
 Procedure yellow_tree_actions; forward;
 Procedure waterfall_actions; forward;
 Procedure west_lake_actions; forward;
@@ -22,6 +23,7 @@ Procedure inside_lady_actions; forward;
 Procedure unknown_actions; forward;
 
 
+{$I o_well.pas}
 {$I o_ytree.pas}
 {$I o_wfall.pas}
 {$I o_rock.pas}
@@ -717,7 +719,7 @@ begin
 
 		LOCATION_POOR_GARY:		knight_actions;
 		LOCATION_KERREK_1:		knight_actions;
-		LOCATION_OLD_WELL:		knight_actions;
+		LOCATION_OLD_WELL:		well_actions;
 		LOCATION_YELLOW_TREE:		yellow_tree_actions;
 		LOCATION_WATERFALL:		waterfall_actions;
 		LOCATION_HAY_BALE:		knight_actions;
@@ -1558,6 +1560,7 @@ end;
 
 {$I wad_load.pas}
 
+{$I lwell.pas}
 {$I lytree.pas}
 {$I lwfall.pas}
 {$I lriver.pas}
@@ -1757,7 +1760,7 @@ begin
 
 		LOCATION_POOR_GARY:		do_unknown;
 		LOCATION_KERREK_1:		do_unknown;
-		LOCATION_OLD_WELL:		do_unknown;
+		LOCATION_OLD_WELL:		do_well;
 		LOCATION_YELLOW_TREE:		do_yellow_tree;
 		LOCATION_WATERFALL:		do_waterfall;
 		LOCATION_HAY_BALE:		do_unknown;

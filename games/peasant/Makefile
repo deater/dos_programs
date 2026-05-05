@@ -25,14 +25,14 @@ TEST.EXE:	test.pas
 PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	inv.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
-	lytree.pas lwfall.pas \
+	lwell.pas lytree.pas lwfall.pas \
 	lriver.pas lknight.pas \
 	lwlake.pas lelake.pas linn.pas \
 	lolady.pas lbtree.pas \
 	liinn.pas lilady.pas
 	cp peasant.pas zx02_asm.pas cga.pas inv.pas $(TPDIR)
 	cp wad_load.pas $(TPDIR)
-	cp lytree.pas lwfall.pas $(TPDIR)
+	cp lwell.pas lytree.pas lwfall.pas $(TPDIR)
 	cp lriver.pas lknight.pas $(TPDIR)
 	cp lwlake.pas lelake.pas linn.pas $(TPDIR)
 	cp lolady.pas lbtree.pas $(TPDIR)
@@ -44,6 +44,7 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	cp graphics/PQ_TIPS.PAS $(TPDIR)
 	cp graphics/PEASANT.WAD $(TPDIR)
 	cp text/dialog_t.pas $(TPDIR)
+	cp text/O_WELL.PAS $(TPDIR)
 	cp text/O_YTREE.PAS $(TPDIR)
 	cp text/O_WFALL.PAS $(TPDIR)
 	cp text/O_ROCK.PAS $(TPDIR)

@@ -11,6 +11,7 @@ all:	PEASANT.WAD \
 ####
 
 PEASANT.WAD:	\
+	pq_well.zx02      ../text/D_WELL.ZX2   well_collision.zx02 \
 	pq_ytree.zx02     ../text/D_YTREE.ZX2  yellow_tree_collision.zx02 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_collision.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_collision.zx02 \
@@ -25,6 +26,8 @@ PEASANT.WAD:	\
 	pq_unknown.zx02	unknown_collision.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		../sprites/s_walk.zx02,SWALK \
+		pq_well.zx02,GWELL ../text/D_YTREE.ZX2,DWELL \
+		well_collision.zx02,PWELL \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
 		yellow_tree_collision.zx02,PYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
@@ -86,6 +89,27 @@ pq_tips.cga:	pq_tips.png
 
 #################################################
 #################################################
+
+pq_well.zx02:	pq_well.cga
+	$(ZX02) -f pq_well.cga pq_well.zx02
+
+pq_well.cga:	pq_well.png
+	$(PNG2CGA) -r ./pq_well.png > pq_well.cga
+
+well_collision.zx02:	well_collision.combined
+	$(ZX02) -f well_collision.combined well_collision.zx02
+
+well_collision.combined:	well_collision.collision well_priority.priority
+	cat well_priority.priority > well_collision.combined
+	cat well_collision.collision >> well_collision.combined
+
+well_priority.priority:	well_priority.png
+	$(PNG2PRIORITY) well_priority.png well_priority.priority
+
+well_collision.collision:	well_collision.png
+	$(PNG2COLLISION) well_collision.png well_collision.collision
+
+####
 
 pq_ytree.zx02:	pq_ytree.cga
 	$(ZX02) -f pq_ytree.cga pq_ytree.zx02

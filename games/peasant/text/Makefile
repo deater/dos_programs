@@ -6,6 +6,7 @@ CC = gcc
 CFLAGS = -O2 -Wall -g
 
 all:	shrink_text \
+	D_WELL.PAS   O_WELL.PAS \
 	D_YTREE.PAS  O_YTREE.PAS \
 	D_WFALL.PAS  O_WFALL.PAS \
 	D_ROCK.PAS   O_ROCK.PAS \
@@ -22,6 +23,19 @@ all:	shrink_text \
 ############################################
 ############################################
 
+O_WELL.PAS:	dialog_waterfall.raw
+
+D_WELL.PAS:	D_WELL.ZX2
+	$(BIN2PAS) -l D_WELL D_WELL.ZX2 > D_WELL.PAS
+
+D_WELL.ZX2:	dialog_well.raw
+	$(ZX02) -f  dialog_well.raw D_WELL.ZX2
+
+dialog_well.raw:	well.inc
+	./shrink_text dialog_well.raw O_WELL.PAS well < well.inc
+
+####
+
 O_YTREE.PAS:	dialog_waterfall.raw
 
 D_YTREE.PAS:	D_YTREE.ZX2
@@ -30,7 +44,7 @@ D_YTREE.PAS:	D_YTREE.ZX2
 D_YTREE.ZX2:	dialog_yellow_tree.raw
 	$(ZX02) -f  dialog_yellow_tree.raw D_YTREE.ZX2
 
-dialog_yellow_tree.raw:	falls.inc
+dialog_yellow_tree.raw:	yellow_tree.inc
 	./shrink_text dialog_yellow_tree.raw O_YTREE.PAS yellow_tree < yellow_tree.inc
 
 ####
