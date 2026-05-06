@@ -240,9 +240,14 @@ begin
 
 	screen_copy(@screen,screen_ptr(background));
 
+	{ set palette }
+
+	SetPalette(0); { yellow }
+
 	update_score;
 
 	reset_prompt;
+
 
 
 	{ mark visited }

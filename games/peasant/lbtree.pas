@@ -134,6 +134,8 @@ begin
 
 	screen_copy(@screen,screen_ptr(framebuffer)); }
 
+	SetPalette(1); { cyan }
+
 	screen_copy(@screen,screen_ptr(background));
 
 	update_score;

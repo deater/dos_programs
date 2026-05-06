@@ -58,6 +58,8 @@ begin
 
 	screen_copy(@screen,screen_ptr(background));
 
+	SetPalette(0); { yellow }
+
 	update_score;
 
 	reset_prompt;

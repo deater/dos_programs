@@ -20,7 +20,7 @@ PEASANT.WAD:	\
 	pq_w_lake.zx02    ../text/D_WLAKE.ZX2  lake_w_collision.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_collision.zx02 \
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_collision.zx02 \
-	pq_kerrek2.zx02   ../text/D_KERREK.ZX2 \
+	pq_kerrek2.zx02   ../text/D_KERREK.ZX2 bottom_prints_collision.zx02 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_collision.zx02 \
 	pq_btree.zx02     ../text/D_BTREE.ZX2  crooked_tree_collision.zx02 \
 	pq_iinn.zx02      ../text/D_IINN.ZX2   inside_inn_collision.zx02 \
@@ -47,6 +47,7 @@ PEASANT.WAD:	\
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
 		outside_inn_collision.zx02,PINN \
 		pq_kerrek2.zx02,GKERREK2 ../text/D_KERREK.ZX2,DKERREK \
+		bottom_prints_collision.zx02,PKERREK2 \
 		pq_hut.zx02,GOLADY ../text/D_OLADY.ZX2,DOLADY \
 		lady_cottage_collision.zx02,POLADY \
 		pq_btree.zx02,GBTREE ../text/D_BTREE.ZX2,DBTREE \
@@ -295,18 +296,18 @@ pq_kerrek2.zx02:	pq_kerrek2.cga
 pq_kerrek2.cga:	pq_kerrek2.png
 	$(PNG2CGA) -r ./pq_kerrek2.png > pq_kerrek2.cga
 
-kerrek2_collision.zx02:	kerrek2_collision.combined
-	$(ZX02) -f kerrek2_collision.combined kerrek2_collision.zx02
+bottom_prints_collision.zx02:	bottom_prints_collision.combined
+	$(ZX02) -f bottom_prints_collision.combined bottom_prints_collision.zx02
 
-kerrek2_collision.combined:	kerrek2_collision.collision kerrek2_priority.priority
-	cat kerrek2_priority.priority > kerrek2_collision.combined
-	cat kerrek2_collision.collision >> kerrek2_collision.combined
+bottom_prints_collision.combined:	bottom_prints_collision.collision bottom_prints_priority.priority
+	cat bottom_prints_priority.priority > bottom_prints_collision.combined
+	cat bottom_prints_collision.collision >> bottom_prints_collision.combined
 
-kerrek2_priority.priority:	kerrek2_priority.png
-	$(PNG2PRIORITY) kerrek2_priority.png kerrek2_priority.priority
+bottom_prints_priority.priority:	bottom_prints_priority.png
+	$(PNG2PRIORITY) bottom_prints_priority.png bottom_prints_priority.priority
 
-kerrek2_collision.collision:	kerrek2_collision.png
-	$(PNG2COLLISION) kerrek2_collision.png kerrek2_collision.collision
+bottom_prints_collision.collision:	bottom_prints_collision.png
+	$(PNG2COLLISION) bottom_prints_collision.png bottom_prints_collision.collision
 
 ####
 

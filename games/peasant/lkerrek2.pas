@@ -45,7 +45,7 @@ begin
 
 	{ decompress priority }
 
-	wad_load(file_buffer,'PYTREE');
+	wad_load(file_buffer,'PKERREK2');
 	decompress(buffer_ptr(@collision^[8192]),file_buffer);
 
 	{ load bg }
@@ -58,6 +58,8 @@ begin
 	screen_copy(@screen,screen_ptr(framebuffer)); }
 
 	screen_copy(@screen,screen_ptr(background));
+
+	SetPalette(1); { cyan }
 
 	update_score;
 

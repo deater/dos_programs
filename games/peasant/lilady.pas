@@ -299,6 +299,8 @@ begin
 
 	screen_copy(@screen,screen_ptr(background));
 
+	SetPalette(1); { cyan }
+
 	update_score;
 
 	reset_prompt;
