@@ -178,9 +178,9 @@ begin
 		{ only talk if close }
 
 		{ TODO: check y too? }
-		if (peasant_x<23) then begin
-			print_offset:=archery_dialog(archery_talk_too_far);
-		end;
+		if (peasant_x<(23*8)) then begin
+			print_offset:=archery_dialog(archery_talk_far_message);
+		end
 		else begin {close enough}
 			if (current_noun=NOUN_MAN) or
 				(current_noun=NOUN_GUY) or
@@ -226,7 +226,7 @@ begin
 
 	{ decompress priority }
 
-	wad_load(file_buffer,'PYTREE');
+	wad_load(file_buffer,'PARCH');
 	decompress(buffer_ptr(@collision^[8192]),file_buffer);
 
 	{ load bg }

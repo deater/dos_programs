@@ -14,7 +14,7 @@ PEASANT.WAD:	\
 	pq_well.zx02      ../text/D_WELL.ZX2   well_collision.zx02 \
 	pq_ytree.zx02     ../text/D_YTREE.ZX2  yellow_tree_collision.zx02 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_collision.zx02 \
-	pq_archery.zx02   ../text/D_ARCH.ZX2   \
+	pq_archery.zx02   ../text/D_ARCH.ZX2   archery_collision.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_collision.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_collision.zx02 \
 	pq_w_lake.zx02    ../text/D_WLAKE.ZX2  lake_w_collision.zx02 \
@@ -35,6 +35,7 @@ PEASANT.WAD:	\
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		waterfall_collision.zx02,PWFALL \
 		pq_archery.zx02,GARCH ../text/D_ARCH.ZX2,DARCH \
+		archery_collision.zx02,PARCH \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
 		river_collision.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \

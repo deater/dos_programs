@@ -256,7 +256,10 @@ begin
 	if (tempy<48) then tempy:=48;
 	{ ((y-48)/8)+2; }
 	{ +2 skips colors 0,1.  0 used to be collision, 1 is always-visible }
-	peasant_priority:=((tempy-48) shr 3)+2;
+
+	{ adjust as we seem to walk through things we shouldn't? }
+
+	peasant_priority:=((tempy-40) shr 3)+2;
 
 	(* debug_byte(peasant_priority,sprite_data^[8192+even_offset]); *)
 

@@ -1436,7 +1436,9 @@ begin
 
 	x:=(x shr 3)+1;	{ each block 8 pixels wide, point to middle }
 
-	y:=y+30;	{ point to feet }
+	y:=y+28;	{ point to feet }
+
+			{ adjusted? 30 wasn't good? }
 
 	{ temp:=y shr 2;}	{ offset lookup? }
 

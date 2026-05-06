@@ -104,6 +104,27 @@ begin
 	end;
 
 done_well:
+	{ check border }
 
+	{ in actual game, walking down center pops you out gap in trees }
+        { at archery }
+        { walking to the left side of screen pops you out the trees on left }
+        { but you can't go back that way }
 
+	if (map_location=LOCATION_ARCHERY) then begin
+
+		if (peasant_x>=(6*8)) then begin
+	{ ======================= }
+	{ if 8..25 exit at 25 }
+	{ if 30-40 exit at 29 }
+	{ else exit as-is }
+			if (peasant_x<(25*8)) then peasant_x:=(25*8)
+			else if (peasant_x<(29*8)) then peasant_x:=(29*8);
+		end
+		else begin
+			{ exit_through_trees }
+			peasant_newy:=50;
+			peasant_x:=(8*8);
+		end;
+	end;
 end;
