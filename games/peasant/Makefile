@@ -12,6 +12,9 @@ peasant.img:	PEASANT.EXE
 	mcopy -i peasant.img PEASANT.EXE ::PEASANT.EXE
 	mcopy -i peasant.img graphics/PEASANT.WAD ::PEASANT.WAD
 
+pq_disk.zip:	peasant.img
+	zip -r pq_disk.zip peasant.img
+
 
 ###
 

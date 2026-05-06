@@ -209,4 +209,7 @@ done_outside_inn:
 		if (peasant_x >= 33*8) then
 			peasant_x:=(32*8);
 
+	if (map_location=LOCATION_INSIDE_INN) then
+		peasant_newy:=120;
+
 end;
