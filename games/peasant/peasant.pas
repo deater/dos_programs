@@ -1154,6 +1154,9 @@ begin
 	else begin
 		{ all other keys }
 
+		if (ch=chr(2)) then SetPalette(1); { cyan } {ctrl-B}
+		if (ch=chr(25)) then SetPalette(0); { yellow } {ctrl-Y}
+
 		{  Note, it handles enter }
 
 		graphics_input(ch);

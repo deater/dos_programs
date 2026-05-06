@@ -125,4 +125,8 @@ done_river:
 		if (peasant_x<16*8) then peasant_x:=16*8;
 	end;
 
+	if (map_location=LOCATION_YELLOW_TREE) then begin
+		if (peasant_x>(3*8)) then peasant_x:=3*8;
+	end;
+
 end;
