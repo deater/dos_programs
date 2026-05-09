@@ -12,6 +12,7 @@ all:	PEASANT.WAD \
 
 PEASANT.WAD:	\
 	pq_well.zx02      ../text/D_WELL.ZX2   well_collision.zx02 \
+	pq_kerrek1.zx02   kerrek1_collision.zx02 \
 	pq_ytree.zx02     ../text/D_YTREE.ZX2  yellow_tree_collision.zx02 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_collision.zx02 \
 	pq_archery.zx02   ../text/D_ARCH.ZX2   archery_collision.zx02 \
@@ -28,6 +29,8 @@ PEASANT.WAD:	\
 	pq_unknown.zx02	unknown_collision.zx02
 	$(MKWAD) -o PEASANT.WAD \
 		../sprites/s_walk.zx02,SWALK \
+		pq_kerrek1.zx02,GKERREK1 \
+		kerrek1_collision.zx02,PKERREK1 \
 		pq_well.zx02,GWELL ../text/D_WELL.ZX2,DWELL \
 		well_collision.zx02,PWELL \
 		pq_ytree.zx02,GYTREE ../text/D_YTREE.ZX2,DYTREE \
@@ -95,6 +98,27 @@ pq_tips.cga:	pq_tips.png
 
 #################################################
 #################################################
+
+pq_kerrek1.zx02:	pq_kerrek1.cga
+	$(ZX02) -f pq_kerrek1.cga pq_kerrek1.zx02
+
+pq_kerrek1.cga:	pq_kerrek1.png
+	$(PNG2CGA) -r ./pq_kerrek1.png > pq_kerrek1.cga
+
+kerrek1_collision.zx02:	kerrek1_collision.combined
+	$(ZX02) -f kerrek1_collision.combined kerrek1_collision.zx02
+
+kerrek1_collision.combined:	kerrek1_collision.collision kerrek1_priority.priority
+	cat kerrek1_priority.priority > kerrek1_collision.combined
+	cat kerrek1_collision.collision >> kerrek1_collision.combined
+
+kerrek1_priority.priority:	kerrek1_priority.png
+	$(PNG2PRIORITY) kerrek1_priority.png kerrek1_priority.priority
+
+kerrek1_collision.collision:	kerrek1_collision.png
+	$(PNG2COLLISION) kerrek1_collision.png kerrek1_collision.collision
+
+####
 
 pq_well.zx02:	pq_well.cga
 	$(ZX02) -f pq_well.cga pq_well.zx02
