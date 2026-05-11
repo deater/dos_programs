@@ -9,6 +9,7 @@ all:	shrink_text \
 	D_WELL.PAS   O_WELL.PAS \
 	D_YTREE.PAS  O_YTREE.PAS \
 	D_WFALL.PAS  O_WFALL.PAS \
+	D_MUD.PAS    O_MUD.PAS \
 	D_ARCH.PAS   O_ARCH.PAS \
 	D_ROCK.PAS   O_ROCK.PAS \
 	D_KNIGHT.PAS O_KNIGHT.PAS \
@@ -66,6 +67,18 @@ dialog_waterfall.raw:	falls.inc
 ############################################
 ############################################
 
+O_MUD.PAS:	dialog_mud.raw
+
+D_MUD.PAS:	D_MUD.ZX2
+	$(BIN2PAS) -l D_MUD D_MUD.ZX2 > D_MUD.PAS
+
+D_MUD.ZX2:	dialog_mud.raw
+	$(ZX02) -f  dialog_mud.raw D_MUD.ZX2
+
+dialog_mud.raw:	mud.inc
+	./shrink_text dialog_mud.raw O_MUD.PAS mud < mud.inc
+
+###
 O_ARCH.PAS:	dialog_archery.raw
 
 D_ARCH.PAS:	D_ARCH.ZX2

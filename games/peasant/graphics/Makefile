@@ -15,6 +15,7 @@ PEASANT.WAD:	\
 	pq_kerrek1.zx02   kerrek1_collision.zx02 \
 	pq_ytree.zx02     ../text/D_YTREE.ZX2  yellow_tree_collision.zx02 \
 	pq_waterfall.zx02 ../text/D_WFALL.ZX2  waterfall_collision.zx02 \
+	pq_puddle.zx02    ../text/D_MUD.ZX2    puddle_collision.zx02 \
 	pq_archery.zx02   ../text/D_ARCH.ZX2   archery_collision.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_collision.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_collision.zx02 \
@@ -37,6 +38,8 @@ PEASANT.WAD:	\
 		yellow_tree_collision.zx02,PYTREE \
 		pq_waterfall.zx02,GWFALL ../text/D_WFALL.ZX2,DWFALL \
 		waterfall_collision.zx02,PWFALL \
+		pq_puddle.zx02,GMUD ../text/D_MUD.ZX2,DMUD \
+		puddle_collision.zx02,PMUD \
 		pq_archery.zx02,GARCH ../text/D_ARCH.ZX2,DARCH \
 		archery_collision.zx02,PARCH \
 		pq_rock.zx02,GROCK ../text/D_ROCK.ZX2,DROCK \
@@ -184,6 +187,27 @@ waterfall_collision.collision:	waterfall_collision.png
 
 #################################################
 #################################################
+
+pq_puddle.zx02:	pq_puddle.cga
+	$(ZX02) -f pq_puddle.cga pq_puddle.zx02
+
+pq_puddle.cga:	pq_puddle.png
+	$(PNG2CGA) -r ./pq_puddle.png > pq_puddle.cga
+
+puddle_collision.zx02:	puddle_collision.combined
+	$(ZX02) -f puddle_collision.combined puddle_collision.zx02
+
+puddle_collision.combined:	puddle_collision.collision puddle_priority.priority
+	cat puddle_priority.priority > puddle_collision.combined
+	cat puddle_collision.collision >> puddle_collision.combined
+
+puddle_priority.priority:	puddle_priority.png
+	$(PNG2PRIORITY) puddle_priority.png puddle_priority.priority
+
+puddle_collision.collision:	puddle_collision.png
+	$(PNG2COLLISION) puddle_collision.png puddle_collision.collision
+
+####
 
 pq_archery.zx02:	pq_archery.cga
 	$(ZX02) -f pq_archery.cga pq_archery.zx02
