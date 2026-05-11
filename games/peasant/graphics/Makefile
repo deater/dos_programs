@@ -19,9 +19,11 @@ PEASANT.WAD:	\
 	pq_archery.zx02   ../text/D_ARCH.ZX2   archery_collision.zx02 \
 	pq_rock.zx02      ../text/D_ROCK.ZX2   river_collision.zx02 \
 	pq_knight.zx02    ../text/D_KNIGHT.ZX2 knight_collision.zx02 \
+	pq_cottage.zx02   ../text/D_COT.ZX2    cottage_collision.zx02 \
 	pq_w_lake.zx02    ../text/D_WLAKE.ZX2  lake_w_collision.zx02 \
 	pq_e_lake.zx02    ../text/D_ELAKE.ZX2  lake_e_collision.zx02 \
 	pq_inn.zx02       ../text/D_INN.ZX2    outside_inn_collision.zx02 \
+	pq_ned_tree.zx02  ../text/D_WAVY.ZX2   ned_collision.zx02 \
 	pq_kerrek2.zx02   ../text/D_KERREK.ZX2 bottom_prints_collision.zx02 \
 	pq_hut.zx02       ../text/D_OLADY.ZX2  lady_cottage_collision.zx02 \
 	pq_btree.zx02     ../text/D_BTREE.ZX2  crooked_tree_collision.zx02 \
@@ -46,12 +48,16 @@ PEASANT.WAD:	\
 		river_collision.zx02,PROCK \
 		pq_knight.zx02,GKNIGHT ../text/D_KNIGHT.ZX2,DKNIGHT \
 		knight_collision.zx02,PKNIGHT \
+		pq_cottage.zx02,GCOT ../text/D_COT.ZX2,DCOT \
+		cottage_collision.zx02,PCOT \
 		pq_w_lake.zx02,GWLAKE ../text/D_WLAKE.ZX2,DWLAKE \
 		lake_w_collision.zx02,PWLAKE \
 		pq_e_lake.zx02,GELAKE ../text/D_ELAKE.ZX2,DELAKE \
 		lake_e_collision.zx02,PELAKE \
 		pq_inn.zx02,GINN ../text/D_INN.ZX2,DINN \
 		outside_inn_collision.zx02,PINN \
+		pq_ned_tree.zx02,GWAVY ../text/D_WAVY.ZX2,DWAVY \
+		ned_collision.zx02,PWAVY \
 		pq_kerrek2.zx02,GKERREK2 ../text/D_KERREK.ZX2,DKERREK \
 		bottom_prints_collision.zx02,PKERREK2 \
 		pq_hut.zx02,GOLADY ../text/D_OLADY.ZX2,DOLADY \
@@ -274,6 +280,26 @@ knight_collision.collision:	knight_collision.png
 #################################################
 #################################################
 
+pq_cottage.zx02:	pq_cottage.cga
+	$(ZX02) -f pq_cottage.cga pq_cottage.zx02
+
+pq_cottage.cga:	pq_cottage.png
+	$(PNG2CGA) -r ./pq_cottage.png > pq_cottage.cga
+
+cottage_collision.zx02:	cottage_collision.combined
+	$(ZX02) -f cottage_collision.combined cottage_collision.zx02
+
+cottage_collision.combined:	cottage_collision.collision cottage_priority.priority
+	cat cottage_priority.priority > cottage_collision.combined
+	cat cottage_collision.collision >> cottage_collision.combined
+
+cottage_priority.priority:	cottage_priority.png
+	$(PNG2PRIORITY) cottage_priority.png cottage_priority.priority
+
+cottage_collision.collision:	cottage_collision.png
+	$(PNG2COLLISION) cottage_collision.png cottage_collision.collision
+
+###
 pq_w_lake.zx02:	pq_w_lake.cga
 	$(ZX02) -f pq_w_lake.cga pq_w_lake.zx02
 
@@ -337,6 +363,27 @@ outside_inn_collision.collision:	outside_inn_collision.png
 
 #################################################
 #################################################
+
+pq_ned_tree.zx02:	pq_ned_tree.cga
+	$(ZX02) -f pq_ned_tree.cga pq_ned_tree.zx02
+
+pq_ned_tree.cga:	pq_ned_tree.png
+	$(PNG2CGA) -r ./pq_ned_tree.png > pq_ned_tree.cga
+
+ned_collision.zx02:	ned_collision.combined
+	$(ZX02) -f ned_collision.combined ned_collision.zx02
+
+ned_collision.combined:	ned_collision.collision ned_priority.priority
+	cat ned_priority.priority > ned_collision.combined
+	cat ned_collision.collision >> ned_collision.combined
+
+ned_priority.priority:	ned_priority.png
+	$(PNG2PRIORITY) ned_priority.png ned_priority.priority
+
+ned_collision.collision:	ned_collision.png
+	$(PNG2COLLISION) ned_collision.png ned_collision.collision
+
+####
 
 pq_kerrek2.zx02:	pq_kerrek2.cga
 	$(ZX02) -f pq_kerrek2.cga pq_kerrek2.zx02

@@ -13,9 +13,11 @@ all:	shrink_text \
 	D_ARCH.PAS   O_ARCH.PAS \
 	D_ROCK.PAS   O_ROCK.PAS \
 	D_KNIGHT.PAS O_KNIGHT.PAS \
+	D_COT.PAS   O_COT.PAS \
 	D_WLAKE.PAS  O_WLAKE.PAS \
 	D_ELAKE.PAS  O_ELAKE.PAS \
 	D_INN.PAS    O_INN.PAS \
+	D_WAVY.PAS   O_WAVY.PAS \
 	D_KERREK.PAS O_KERREK.PAS \
 	D_OLADY.PAS  O_OLADY.PAS \
 	D_BTREE.PAS  O_BTREE.PAS \
@@ -119,6 +121,19 @@ dialog_knight.raw:	knight.inc
 ############################################
 ############################################
 
+O_COT.PAS:	dialog_cottage.raw
+
+D_COT.PAS:	D_COT.ZX2
+	$(BIN2PAS) -l D_COT D_COT.ZX2 > D_COT.PAS
+
+D_COT.ZX2:	dialog_cottage.raw
+	$(ZX02) -f  dialog_cottage.raw D_COT.ZX2
+
+dialog_cottage.raw:	cottage.inc
+	./shrink_text dialog_cottage.raw O_COT.PAS cottage < cottage.inc
+
+###
+
 O_WLAKE.PAS:	dialog_lake_west.raw
 
 D_WLAKE.PAS:	D_WLAKE.ZX2
@@ -159,6 +174,19 @@ dialog_inn.raw:	outside_inn.inc
 ############################################
 ############################################
 
+O_WAVY.PAS:	dialog_wavy_tree.raw
+
+D_WAVY.PAS:	D_WAVY.ZX2
+	$(BIN2PAS) -l D_WAVY D_WAVY.ZX2 > D_WAVY.PAS
+
+D_WAVY.ZX2:	dialog_wavy_tree.raw
+	$(ZX02) -f  dialog_wavy_tree.raw D_WAVY.ZX2
+
+dialog_wavy_tree.raw:	wavy_tree.inc
+	./shrink_text dialog_wavy_tree.raw O_WAVY.PAS wavy_tree < wavy_tree.inc
+
+
+####
 O_KERREK.PAS:	dialog_kerrek.raw
 
 D_KERREK.PAS:	D_KERREK.ZX2
