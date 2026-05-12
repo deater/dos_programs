@@ -28,17 +28,17 @@ TEST.EXE:	test.pas
 PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	inv.pas \
 	graphics/PQ_VID.PAS graphics/PQ_TITLE.PAS \
-	lwell.pas lytree.pas lwfall.pas \
-	larch.pas lriver.pas lknight.pas \
-	lwlake.pas lelake.pas linn.pas \
-	lkerrek2.pas lolady.pas lbtree.pas \
+	lkerrek1.pas lwell.pas  lytree.pas lwfall.pas \
+	lpuddle.pas  larch.pas  lriver.pas lknight.pas \
+	lcottage.pas lwlake.pas lelake.pas linn.pas \
+	lwavy.pas lkerrek2.pas lolady.pas lbtree.pas \
 	liinn.pas lilady.pas
 	cp peasant.pas zx02_asm.pas cga.pas inv.pas $(TPDIR)
 	cp wad_load.pas $(TPDIR)
-	cp lwell.pas lytree.pas lwfall.pas $(TPDIR)
-	cp larch.pas lriver.pas lknight.pas $(TPDIR)
-	cp lwlake.pas lelake.pas linn.pas $(TPDIR)
-	cp lkerrek2.pas lolady.pas lbtree.pas $(TPDIR)
+	cp lkerrek1.pas lwell.pas  lytree.pas lwfall.pas $(TPDIR)
+	cp lpuddle.pas  larch.pas  lriver.pas lknight.pas $(TPDIR)
+	cp lcottage.pas lwlake.pas lelake.pas linn.pas $(TPDIR)
+	cp lwavy.pas lkerrek2.pas lolady.pas lbtree.pas $(TPDIR)
 	cp liinn.pas lilady.pas $(TPDIR)
 	cp lunknown.pas $(TPDIR)
 	cp test2.pas $(TPDIR)
@@ -50,12 +50,15 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	cp text/O_WELL.PAS $(TPDIR)
 	cp text/O_YTREE.PAS $(TPDIR)
 	cp text/O_WFALL.PAS $(TPDIR)
+	cp text/O_MUD.PAS $(TPDIR)
 	cp text/O_ARCH.PAS $(TPDIR)
 	cp text/O_ROCK.PAS $(TPDIR)
 	cp text/O_KNIGHT.PAS $(TPDIR)
+	cp text/O_COT.PAS $(TPDIR)
 	cp text/O_WLAKE.PAS $(TPDIR)
 	cp text/O_ELAKE.PAS $(TPDIR)
 	cp text/O_INN.PAS $(TPDIR)
+	cp text/O_WAVY.PAS $(TPDIR)
 	cp text/O_KERREK.PAS $(TPDIR)
 	cp text/O_OLADY.PAS $(TPDIR)
 	cp text/O_BTREE.PAS $(TPDIR)
@@ -65,11 +68,6 @@ PEASANT.EXE:	peasant.pas zx02_asm.pas cga.pas \
 	cp text/O_COMMON.PAS $(TPDIR)
 	dosbox -conf build.conf
 	cp $(TPDIR)/PEASANT.EXE .
-
-#	cp graphics/PQ_INN.PAS $(TPDIR)
-#	cp graphics/PQ_KER1.PAS $(TPDIR)
-#	cp graphics/PQ_YTREE.PAS $(TPDIR)
-
 
 ###
 
